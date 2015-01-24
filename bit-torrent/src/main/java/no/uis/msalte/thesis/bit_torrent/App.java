@@ -15,14 +15,20 @@ public class App {
 	public static void main(String[] args) {
 		startTracker();
 
-		BitTorrentClient sourceClient = new BitTorrentClient(TORRENT_PATH,
-				SOURCE_DIR);
-		BitTorrentClient recipientClient = new BitTorrentClient(TORRENT_PATH,
-				RECIPIENT_DIR);
+		share(TORRENT_PATH, SOURCE_DIR);
+		download(TORRENT_PATH, RECIPIENT_DIR);
+	}
 
-		sourceClient.getClient().share();
+	private static void share(String torrent, String dir) {
+		startClient(torrent, dir).getClient().share();
+	}
 
-		recipientClient.getClient().download();
+	private static void download(String torrent, String dir) {
+		startClient(torrent, dir).getClient().download();
+	}
+
+	private static BitTorrentClient startClient(String torrent, String dir) {
+		return new BitTorrentClient(torrent, dir);
 	}
 
 	private static void startTracker() {
