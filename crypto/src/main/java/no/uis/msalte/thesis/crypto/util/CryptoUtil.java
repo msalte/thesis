@@ -1,7 +1,6 @@
 package no.uis.msalte.thesis.crypto.util;
 
 import java.math.BigInteger;
-import java.util.Calendar;
 import java.util.Random;
 
 public class CryptoUtil {
@@ -37,15 +36,5 @@ public class CryptoUtil {
 
 	private static boolean isCoPrime(BigInteger a, BigInteger b) {
 		return a.gcd(b).equals(BigInteger.ONE);
-	}
-
-	private static BigInteger generateSeed() {
-		int millis = 0;
-
-		while (millis == 0) {
-			millis = Calendar.getInstance().get(Calendar.MILLISECOND);
-		}
-
-		return new BigInteger(String.format("%d", millis));
 	}
 }

@@ -7,31 +7,46 @@ import no.uis.msalte.thesis.crypto.util.CryptoUtil;
 
 public class ElGamalEncryption {
 
-	private BigInteger q, alpha;
+	private ElGamalParams params;
 
-	public ElGamalEncryption(BigInteger q, BigInteger alpha) {
-		this.q = q;
-		this.alpha = alpha;
+	public ElGamalEncryption(ElGamalParams params) {
+		this.params = params;
 	}
 
-	public CipherText encrypt(BigInteger plaintext, BigInteger publicKey) {
+	public CipherText encrypt(byte[] plaintext, BigInteger publicKey) {
+		return encrypt(new BigInteger(plaintext), publicKey);
+	}
+
+	public byte[] decrypt(CipherText ciphertext, BigInteger secretKey) {
+		return decrypt(ciphertext.getC1(), ciphertext.getC2(), secretKey)
+				.toByteArray();
+	}
+
+	private CipherText encrypt(BigInteger plaintext, BigInteger publicKey) {
+		if (plaintext.compareTo(params.q) > 0) {
+			try {
+				throw new Exception("Message is too large for q parameter");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		CipherText cipher = new CipherText();
 
-		BigInteger k = CryptoUtil.rand(BigInteger.ONE, q);
-		BigInteger bigK = publicKey.modPow(k, q);
+		BigInteger k = CryptoUtil.rand(BigInteger.ONE, params.q);
+		BigInteger bigK = publicKey.modPow(k, params.q);
 
-		cipher.setC1(alpha.modPow(k, q));
-		cipher.setC2(bigK.multiply(plaintext).mod(q));
+		cipher.setC1(params.a.modPow(k, params.q));
+		cipher.setC2(bigK.multiply(plaintext).mod(params.q));
 
 		return cipher;
 	}
 
-	public BigInteger decrypt(CipherText ciphertext, BigInteger secretKey) {
-		BigInteger bigK = ciphertext.getC1().modPow(secretKey, q);
-		BigInteger bigKInverse = bigK.modInverse(q);
+	private BigInteger decrypt(BigInteger c1, BigInteger c2,
+			BigInteger secretKey) {
+		BigInteger bigK = c1.modPow(secretKey, params.q);
+		BigInteger bigKInverse = bigK.modInverse(params.q);
 
-		BigInteger plainText = ciphertext.getC2().multiply(bigKInverse).mod(q);
-
-		return plainText;
+		return c2.multiply(bigKInverse).mod(params.q);
 	}
 }
