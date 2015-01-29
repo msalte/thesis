@@ -12,7 +12,7 @@ public class BitTorrentTracker {
 	private Tracker tracker;
 	private FilenameFilter filter;
 
-	private static final String TORRENT_SUFFIX = ".torrent";
+	public static final String TORRENT_SUFFIX = ".torrent";
 
 	public BitTorrentTracker(int port) {
 		init(port);
