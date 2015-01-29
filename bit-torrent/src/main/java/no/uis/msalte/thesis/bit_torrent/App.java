@@ -14,7 +14,7 @@ public class App {
 	private static final String RECIPIENT_DIR = "C:\\Users\\Morten\\Desktop\\ttorrent\\recipient_dir";
 	private static final String TORRENTS_DIR = "C:\\Users\\Morten\\Desktop\\ttorrent\\torrents";
 
-	private static final String OWNER_FILE = "meg.jpg";
+	private static final String OWNER_FILE = "document.pdf";
 	private static final String TORRENT_FILE = String.format("%s%s",
 			OWNER_FILE, BitTorrentTracker.TORRENT_SUFFIX);
 
@@ -34,7 +34,7 @@ public class App {
 		File input = new File(String.format("%s\\%s", sourceDir, sourceFile));
 		File output = new File(String.format("%s\\%s", torrentDir, torrentFile));
 
-		URI announce = URI.create("http://10.0.5.84:6969/announce");
+		URI announce = URI.create("http://localhost:6969/announce");
 
 		List<List<URI>> announceTiers = new ArrayList<List<URI>>();
 		List<URI> announceTier1 = new ArrayList<URI>();

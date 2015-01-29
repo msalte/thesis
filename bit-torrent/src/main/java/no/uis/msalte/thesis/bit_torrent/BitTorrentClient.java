@@ -12,8 +12,8 @@ public class BitTorrentClient {
 
 	private Client client;
 
-	public static final double MAX_DOWNLOAD_RATE = 50.0;
-	public static final double MAX_UPLOAD_RATE = 50.0;
+	public static final double MAX_DOWNLOAD_RATE = 50.0 * 1000;
+	public static final double MAX_UPLOAD_RATE = 50.0 * 1000;
 
 	public BitTorrentClient(String torrentPath, String outputDir) {
 		init(torrentPath, outputDir);
