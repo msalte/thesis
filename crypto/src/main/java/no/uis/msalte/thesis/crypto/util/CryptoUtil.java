@@ -4,6 +4,9 @@ import java.math.BigInteger;
 import java.util.Random;
 
 public class CryptoUtil {
+	private static final int LESS_THAN = -1;
+	private static final int GREATER_THAN = 1;
+
 	public static BigInteger getPrime(int bitLength) {
 		return BigInteger.probablePrime(bitLength, new Random());
 	}
@@ -12,7 +15,16 @@ public class CryptoUtil {
 		BigInteger candidate = BigInteger.ZERO;
 
 		while (!isCoPrime(prime, candidate)) {
-			candidate = getPrime(randInt(2, prime.bitLength()) - 1);
+			int min = 2;
+			int max = prime.bitLength()-1;
+			
+			if(min > max) {
+				max = min;
+			}
+			
+			int rnd = randInt(min, max);
+
+			candidate = getPrime(rnd);
 		}
 
 		return candidate;
@@ -23,7 +35,8 @@ public class CryptoUtil {
 
 		BigInteger result = BigInteger.ZERO;
 
-		while (result.compareTo(min) == -1 || result.compareTo(max) == 1) {
+		while (result.compareTo(min) == LESS_THAN
+				|| result.compareTo(max) == GREATER_THAN) {
 			result = new BigInteger(max.bitLength(), rnd);
 		}
 

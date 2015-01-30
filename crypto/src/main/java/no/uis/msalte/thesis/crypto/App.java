@@ -1,32 +1,41 @@
 package no.uis.msalte.thesis.crypto;
 
-import java.math.BigInteger;
+import java.io.IOException;
 
-import no.uis.msalte.thesis.crypto.el_gamal.ElGamalEncryption;
-import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
-import no.uis.msalte.thesis.crypto.model.CipherText;
+import no.uis.msalte.thesis.crypto.model.CyclicGroup;
 
 public class App {
-	public static void main(String[] args) {
-		ElGamalParams params = new ElGamalParams(1024);
-		ElGamalEncryption scheme = new ElGamalEncryption(params);
+	public static void main(String[] args) throws IOException {
 
-		// Alice generates a secret and a public key
-		BigInteger secretKey = params.newSecretKey();
-		BigInteger publicKey = params.newPublicKey(secretKey);
+		CyclicGroup cg = new CyclicGroup(16);
+		
+		System.out.println("Modulus (p): " + cg.getModulus());
+		System.out.println("Generator (g): " + cg.getGenerator());
+//		System.out.println(cg.getElements());
+		System.out.println("Random element in group: " + cg.getRandomElement());
 
-		// Bob writes a message
-		String message = "secret message";
-
-		System.out.println(String.format("Plaintext: %s", message));
-
-		// Bob encrypts the message using the global parameters and Alice's
-		// public key
-		CipherText ciphertext = scheme.encrypt(message.getBytes(), publicKey);
-
-		// Alice decrypts the message using her secret key
-		String decrypted = new String(scheme.decrypt(ciphertext, secretKey));
-
-		System.out.println(String.format("Decrypted: %s", decrypted));
+	
+		
+//		ElGamalParams params = new ElGamalParams(1024);
+//		ElGamalEncryption scheme = new ElGamalEncryption(params);
+//
+//		// Alice generates a secret and a public key
+//		BigInteger secretKey = params.newSecretKey();
+//		BigInteger publicKey = params.newPublicKey(secretKey);
+//
+//		Path inputPath = Paths.get("C:\\Users\\Morten\\Desktop\\test.txt");
+//		Path outputPath = Paths
+//				.get("C:\\Users\\Morten\\Desktop\\decrypted.txt");
+//
+//		byte[] plaintext = Files.readAllBytes(inputPath);
+//
+//		CipherText ciphertext = scheme.encrypt(plaintext, publicKey);
+//
+//		// Alice decrypts the message using her secret key
+//		byte[] decrypted = scheme.decrypt(ciphertext, secretKey);
+//
+//		Files.write(outputPath, decrypted, StandardOpenOption.CREATE);
+//
+//		System.out.println("Success: " + Arrays.equals(plaintext, decrypted));
 	}
 }
