@@ -1,6 +1,15 @@
 package no.uis.msalte.thesis.secure_cloud.model;
 
-public interface ISecureCloudShare {
+public interface SecureCloudShare {
+	/**
+	 * Generates a new torrent for the given file
+	 * 
+	 * @param file
+	 *            The file for which to generate torrent file
+	 * @return The new torrent file, represented by bytes
+	 */
+	public byte[] newTorrent(byte[] file);
+
 	/**
 	 * Generates a new secret key
 	 * 
@@ -11,25 +20,25 @@ public interface ISecureCloudShare {
 	/**
 	 * Generates a new public key
 	 * 
-	 * @param sk
+	 * @param secretKey
 	 *            The respective secret key
 	 * @return The new public key, represented by bytes
 	 */
-	public byte[] newPublicKey(byte[] sk);
+	public byte[] newPublicKey(byte[] secretKey);
 
 	/**
 	 * Generates a new re-encryption key
 	 * 
-	 * @param sk
+	 * @param secretKey
 	 *            The respective secret key
-	 * @param pk
+	 * @param publicKey
 	 *            The respective public key
 	 * @return The new re-encryption key, represented by bytes
 	 */
-	public byte[] newReEncryptionKey(byte[] sk, byte[] pk);
+	public byte[] newReEncryptionKey(byte[] secretKey, byte[] publicKey);
 
 	/**
-	 * Upload a file to the system's torrent directory
+	 * Upload a torrent to the system's torrent directory
 	 * 
 	 * @param torrent
 	 *            The torrent, represented by bytes
@@ -42,22 +51,22 @@ public interface ISecureCloudShare {
 	 * 
 	 * @param id
 	 *            The id of the torrent to be shared
-	 * @param rek
+	 * @param preKey
 	 *            The respective re-encryption key
-	 * @param pk
+	 * @param publicKey
 	 *            The recipient's public key
 	 */
-	public void share(int id, byte[] rek, byte[] pk);
+	public void share(int id, byte[] preKey, byte[] publicKey);
 
 	/**
 	 * Download a file from the torrent directory
 	 * 
 	 * @param id
 	 *            The id of the torrent to download
-	 * @param pk
+	 * @param publicKey
 	 *            The caller's public key. This must reflect an entry in the
 	 *            system's share dictionary
 	 * @return The torrent, represented by bytes
 	 */
-	public byte[] download(int id, byte[] pk);
+	public byte[] download(int id, byte[] publicKey);
 }
