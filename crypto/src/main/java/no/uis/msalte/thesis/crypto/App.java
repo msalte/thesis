@@ -2,40 +2,53 @@ package no.uis.msalte.thesis.crypto;
 
 import java.io.IOException;
 
-import no.uis.msalte.thesis.crypto.model.CyclicGroup;
+import no.uis.msalte.thesis.crypto.pre.ProxyReEncryption;
+import no.uis.msalte.thesis.crypto.pre.ProxyReEncryptionParams;
 
 public class App {
 	public static void main(String[] args) throws IOException {
 
-		CyclicGroup cg = new CyclicGroup(16);
+		ProxyReEncryptionParams params = new ProxyReEncryptionParams();
 		
-		System.out.println("Modulus (p): " + cg.getModulus());
-		System.out.println("Generator (g): " + cg.getGenerator());
-//		System.out.println(cg.getElements());
-		System.out.println("Random element in group: " + cg.getRandomElement());
+		params.initialize();
 
-	
+		ProxyReEncryption scheme = new ProxyReEncryption(params);
 		
-//		ElGamalParams params = new ElGamalParams(1024);
-//		ElGamalEncryption scheme = new ElGamalEncryption(params);
+		scheme.test();
+		
+//		Element secretKey = scheme.newSecretKey();
+//		Element publicKey = scheme.newPublicKey(secretKey);
+//		
 //
-//		// Alice generates a secret and a public key
-//		BigInteger secretKey = params.newSecretKey();
-//		BigInteger publicKey = params.newPublicKey(secretKey);
+//		Element message = scheme.stringToElement("a");
+//		
+//		Tuple ciphertext = scheme.encryptFirstLevel(message, secretKey);
 //
-//		Path inputPath = Paths.get("C:\\Users\\Morten\\Desktop\\test.txt");
-//		Path outputPath = Paths
-//				.get("C:\\Users\\Morten\\Desktop\\decrypted.txt");
-//
-//		byte[] plaintext = Files.readAllBytes(inputPath);
-//
-//		CipherText ciphertext = scheme.encrypt(plaintext, publicKey);
-//
-//		// Alice decrypts the message using her secret key
-//		byte[] decrypted = scheme.decrypt(ciphertext, secretKey);
-//
-//		Files.write(outputPath, decrypted, StandardOpenOption.CREATE);
-//
-//		System.out.println("Success: " + Arrays.equals(plaintext, decrypted));
+//		Element recovered = scheme.decryptFirstLevel(ciphertext, secretKey);
+//		
+//		System.out.println(recovered);
+		
+		// ElGamalParams params = new ElGamalParams(1024);
+		// ElGamalEncryption scheme = new ElGamalEncryption(params);
+		//
+		// // Alice generates a secret and a public key
+		// BigInteger secretKey = params.newSecretKey();
+		// BigInteger publicKey = params.newPublicKey(secretKey);
+		//
+		// Path inputPath = Paths.get("C:\\Users\\Morten\\Desktop\\test.txt");
+		// Path outputPath = Paths
+		// .get("C:\\Users\\Morten\\Desktop\\decrypted.txt");
+		//
+		// byte[] plaintext = Files.readAllBytes(inputPath);
+		//
+		// CipherText ciphertext = scheme.encrypt(plaintext, publicKey);
+		//
+		// // Alice decrypts the message using her secret key
+		// byte[] decrypted = scheme.decrypt(ciphertext, secretKey);
+		//
+		// Files.write(outputPath, decrypted, StandardOpenOption.CREATE);
+		//
+		// System.out.println("Success: " + Arrays.equals(plaintext,
+		// decrypted));
 	}
 }

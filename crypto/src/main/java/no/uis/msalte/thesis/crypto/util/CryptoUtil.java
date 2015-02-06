@@ -34,10 +34,11 @@ public class CryptoUtil {
 		Random rnd = new Random();
 
 		BigInteger result = BigInteger.ZERO;
-
+		int bitLength = randInt(min.bitLength(), max.bitLength());
+		
 		while (result.compareTo(min) == LESS_THAN
 				|| result.compareTo(max) == GREATER_THAN) {
-			result = new BigInteger(max.bitLength(), rnd);
+			result = new BigInteger(bitLength, rnd);
 		}
 
 		return result;
