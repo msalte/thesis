@@ -2,8 +2,8 @@ package no.uis.msalte.thesis.web_service.server;
 
 import java.net.HttpURLConnection;
 
+import no.uis.msalte.thesis.web_service.model.TestObject;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
-import no.uis.thesis.web_service.model.TestObject;
 import spark.Spark;
 
 public class Server {

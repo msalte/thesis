@@ -1,4 +1,4 @@
-package no.uis.thesis.web_service.model;
+package no.uis.msalte.thesis.web_service.model;
 
 public class TestObject {
 	private String title;
