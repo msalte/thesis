@@ -7,10 +7,9 @@ public class App {
 
 	public static void main(String[] args) {
 		Server.start();
-
-		String result = Client.call(Server.Methods.TEST);
-
-		System.out.println(result);
+		
+		String torrent = Client.call(Server.Methods.NEW_TORRENT, "bytes".getBytes().toString());
+		
+		System.out.println(torrent);
 	}
-
 }

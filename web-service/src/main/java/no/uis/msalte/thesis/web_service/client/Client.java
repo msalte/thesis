@@ -11,9 +11,14 @@ import java.net.URL;
 public class Client {
 	private static final String URL_TEMPLATE = "http://localhost:4567/%s";
 
-	private static HttpURLConnection conn;
+	public static String call(String method, String param) {
+		HttpURLConnection conn = null;
 
-	public static String call(String method) {
+		if (param != null) {
+			// convert /method/:parameter to /method/argument
+			method = method.substring(0, method.indexOf(":")).concat(param);
+		}
+
 		try {
 			conn = (HttpURLConnection) new URL(String.format(URL_TEMPLATE,
 					method)).openConnection();
