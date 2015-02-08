@@ -11,11 +11,15 @@ import spark.Route;
 import spark.Spark;
 
 public class Server {
+	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonRenderer JSON_RENDERER = new JsonRenderer();
-	private static final SecureCloudShareImpl scs = new SecureCloudShareImpl();
+
+	public static final int HTTP_PORT = 9090;
 
 	public static void start() {
+		Spark.port(HTTP_PORT);
+
 		Spark.get(Methods.NEW_SECRET_KEY, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
@@ -23,7 +27,8 @@ public class Server {
 
 				response.status(HttpURLConnection.HTTP_OK);
 
-				BigInteger secretKey = new BigInteger(scs.newSecretKey());
+				BigInteger secretKey = new BigInteger(SECURE_CLOUD_SHARE
+						.newSecretKey());
 
 				return secretKey;
 			}
@@ -36,11 +41,11 @@ public class Server {
 			public Object handle(Request request, Response response)
 					throws Exception {
 				response.status(HttpURLConnection.HTTP_OK);
-				
+
 				BigInteger secretKey = new BigInteger(request
 						.params(":secretKey"));
 
-				BigInteger publicKey = new BigInteger(scs
+				BigInteger publicKey = new BigInteger(SECURE_CLOUD_SHARE
 						.newPublicKey(secretKey.toByteArray()));
 
 				return publicKey;

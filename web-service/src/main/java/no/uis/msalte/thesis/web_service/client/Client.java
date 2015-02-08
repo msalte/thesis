@@ -8,8 +8,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import no.uis.msalte.thesis.web_service.server.Server;
+
 public class Client {
-	private static final String URL_TEMPLATE = "http://localhost:4567/%s";
+
+	private static final String URL_TEMPLATE = "http://localhost:%d/%s";
 
 	public static String call(String method, String param) {
 		HttpURLConnection conn = null;
@@ -21,7 +24,7 @@ public class Client {
 
 		try {
 			conn = (HttpURLConnection) new URL(String.format(URL_TEMPLATE,
-					method)).openConnection();
+					Server.HTTP_PORT, method)).openConnection();
 
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				return parseResponse(conn.getInputStream());
