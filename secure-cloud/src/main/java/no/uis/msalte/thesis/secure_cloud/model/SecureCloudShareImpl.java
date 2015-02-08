@@ -1,15 +1,19 @@
 package no.uis.msalte.thesis.secure_cloud.model;
 
+import java.math.BigInteger;
+
+import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
+
 public class SecureCloudShareImpl implements SecureCloudShare {
+	
+	private ElGamalParams params = new ElGamalParams(512);
 
 	public byte[] newSecretKey() {
-		// TODO Auto-generated method stub
-		return null;
+		return params.newSecretKey().toByteArray();
 	}
 
 	public byte[] newPublicKey(byte[] secretKey) {
-		// TODO Auto-generated method stub
-		return null;
+		return params.newPublicKey(new BigInteger(secretKey)).toByteArray();
 	}
 
 	public byte[] newReEncryptionKey(byte[] secretKey, byte[] publicKey) {
