@@ -6,8 +6,8 @@ import spark.Response;
 
 public class CallResponse {
 	private int status;
-	private Object content;
 	private String message;
+	private Object content;
 
 	public CallResponse(Response response, Object content, String message) {
 		this.content = content;
