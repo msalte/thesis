@@ -3,9 +3,13 @@ package no.uis.msalte.thesis.secure_cloud.model;
 import java.math.BigInteger;
 
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
+import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
+import no.uis.msalte.thesis.secure_cloud.storage.TorrentDirectory;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
-	
+
+	private TorrentDirectory torrentDirectory = new TorrentDirectory();
+	private AccessControl accessControl = new AccessControl();
 	private ElGamalParams params = new ElGamalParams(512);
 
 	public byte[] newSecretKey() {
@@ -22,17 +26,25 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public int upload(byte[] torrent) {
-		// TODO Auto-generated method stub
-		return 0;
+		return torrentDirectory.store(torrent.toString());
 	}
 
-	public void share(int id, byte[] preKey, byte[] publicKey) {
-		// TODO Auto-generated method stub
+	public boolean share(int id, byte[] publicKey, byte[] reEncryptionKey) {
+		if (torrentDirectory.get(id) != null) {
 
+			accessControl.grant(id, publicKey, reEncryptionKey);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public byte[] download(int id, byte[] publicKey) {
-		// TODO Auto-generated method stub
+		if (accessControl.hasAccess(id, publicKey)) {
+			return torrentDirectory.get(id).getBytes();
+		}
+
 		return null;
 	}
 

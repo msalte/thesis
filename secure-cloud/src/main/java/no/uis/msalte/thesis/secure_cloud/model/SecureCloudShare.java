@@ -51,12 +51,13 @@ public interface SecureCloudShare {
 	 * 
 	 * @param id
 	 *            The id of the torrent to be shared
-	 * @param preKey
-	 *            The respective re-encryption key
 	 * @param publicKey
 	 *            The recipient's public key
+	 * @param reEncryptionKey
+	 *            The respective re-encryption key
+	 * @return true if success, false otherwise
 	 */
-	public void share(int id, byte[] preKey, byte[] publicKey);
+	public boolean share(int id, byte[] publicKey, byte[] reEncryptionKey);
 
 	/**
 	 * Download a file from the torrent directory
