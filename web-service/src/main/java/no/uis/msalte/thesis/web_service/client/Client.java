@@ -18,6 +18,8 @@ public class Client {
 		HttpURLConnection conn = null;
 
 		if (param != null) {
+			// TODO support multiple parameters
+			
 			// convert /method/:parameter to /method/argument
 			method = method.substring(0, method.indexOf(":")).concat(param);
 		}
