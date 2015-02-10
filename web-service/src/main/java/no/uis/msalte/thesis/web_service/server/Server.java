@@ -2,26 +2,43 @@ package no.uis.msalte.thesis.web_service.server;
 
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import no.uis.msalte.thesis.secure_cloud.model.SecureCloudShareImpl;
 import no.uis.msalte.thesis.web_service.model.CallResponse;
+import no.uis.msalte.thesis.web_service.model.InterfaceEntry;
+import no.uis.msalte.thesis.web_service.model.MethodCalls;
+import no.uis.msalte.thesis.web_service.model.MethodParams;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.Spark;
 
-public class Server {
+public class Server implements MethodCalls {
+
 	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonRenderer JSON_RENDERER = new JsonRenderer();
 
 	public static final int HTTP_PORT = 9090;
 
-	public static void start() {
+	public void start() {
 		Spark.port(HTTP_PORT);
 
-		Spark.get(Methods.NEW_SECRET_KEY, ACCEPT_TYPE, new Route() {
+		Spark.get(UI, ACCEPT_TYPE, new Route() {
+			@Override
+			public Object handle(Request request, Response response)
+					throws Exception {
+				return new CallResponse(response, ui(),
+						"This is the user interface");
+			}
+		}, JSON_RENDERER);
+
+		addRedirect(UI);
+
+		Spark.get(NEW_SECRET_KEY, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
@@ -33,13 +50,13 @@ public class Server {
 			}
 		}, JSON_RENDERER);
 
-		addRedirect(Methods.NEW_SECRET_KEY);
+		addRedirect(NEW_SECRET_KEY);
 
-		Spark.get(Methods.NEW_PUBLIC_KEY, ACCEPT_TYPE, new Route() {
+		Spark.get(NEW_PUBLIC_KEY, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
-				final String sk = request.params(":sk");
+				final String sk = request.params(MethodParams.SECRET_KEY);
 
 				if (sk != null) {
 					BigInteger secretKey = new BigInteger(sk);
@@ -51,15 +68,15 @@ public class Server {
 							publicKey), "New public key generated");
 				}
 
-				return httpNotFound(response);
+				return httpBadRequest(response);
 			}
 		}, JSON_RENDERER);
 
-		Spark.get(Methods.NEW_TORRENT, ACCEPT_TYPE, new Route() {
+		Spark.get(NEW_TORRENT, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
-				final String bytes = request.params(":bytes");
+				final String bytes = request.params(MethodParams.BYTES);
 
 				if (bytes != null) {
 					return new CallResponse(response, String
@@ -67,15 +84,15 @@ public class Server {
 							"Added torrent");
 				}
 
-				return httpNotFound(response);
+				return httpBadRequest(response);
 			}
 		}, JSON_RENDERER);
 
-		Spark.get(Methods.UPLOAD, ACCEPT_TYPE, new Route() {
+		Spark.get(UPLOAD, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
-				final String bytes = request.params(":bytes");
+				final String bytes = request.params(MethodParams.BYTES);
 
 				if (bytes != null) {
 					int result = SECURE_CLOUD_SHARE.upload(bytes.getBytes());
@@ -84,18 +101,19 @@ public class Server {
 							"Upload stored");
 				}
 
-				return httpNotFound(response);
+				return httpBadRequest(response);
 			}
 		}, JSON_RENDERER);
 
-		Spark.get(Methods.SHARE, ACCEPT_TYPE, new Route() {
+		Spark.get(SHARE, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
 
-				final String id = request.params(":id");
-				final String pk = request.params(":pk");
-				final String rek = request.params(":rek");
+				final String id = request.params(MethodParams.ID);
+				final String pk = request.params(MethodParams.PUBLIC_KEY);
+				final String rek = request
+						.params(MethodParams.RE_ENCRYPTION_KEY);
 
 				boolean shared = SECURE_CLOUD_SHARE.share(Integer.parseInt(id),
 						pk.getBytes(), rek.getBytes());
@@ -103,24 +121,25 @@ public class Server {
 				if (shared) {
 					return new CallResponse(
 							response,
-							null,
+							shared,
 							String.format(
 									"Shared torrent: [%s] with public key holder: [%s] (re-encrypted by: [%s])",
 									id, pk, rek));
 				}
 
-				return httpNotFound(response);
+				return httpBadRequest(response);
 
 			}
 		}, JSON_RENDERER);
 
-		Spark.get(Methods.DOWNLOAD, ACCEPT_TYPE, new Route() {
+		Spark.get(DOWNLOAD, ACCEPT_TYPE, new Route() {
 
 			@Override
 			public Object handle(Request request, Response response)
 					throws Exception {
-				final String id = request.params(":id");
-				final String publicKey = request.params(":pk");
+				final String id = request.params(MethodParams.ID);
+				final String publicKey = request
+						.params(MethodParams.PUBLIC_KEY);
 
 				final byte[] bytes = SECURE_CLOUD_SHARE.download(
 						Integer.parseInt(id), publicKey.getBytes());
@@ -130,23 +149,15 @@ public class Server {
 							"Download granted");
 				}
 
-				return httpNotFound(response);
+				return httpBadRequest(response);
 			}
 		}, JSON_RENDERER);
+
 	}
 
-	public interface Methods {
-		public static final String NEW_TORRENT = "/newTorrent/:bytes";
-		public static final String NEW_SECRET_KEY = "/newSecretKey";
-		public static final String NEW_PUBLIC_KEY = "/newPublicKey/:sk";
-		public static final String SHARE = "/share/:id/:pk/:rek";
-		public static final String UPLOAD = "/upload/:bytes";
-		public static final String DOWNLOAD = "/download/:id/:pk";
-	}
-
-	private static CallResponse httpNotFound(Response response) {
-		return new CallResponse(response, "", "An error occurred",
-				HttpURLConnection.HTTP_NOT_FOUND);
+	private CallResponse httpBadRequest(Response response) {
+		return new CallResponse(response, null, "Bad request",
+				HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 
 	/**
@@ -156,7 +167,7 @@ public class Server {
 	 * @param method
 	 *            The corresponding method name
 	 */
-	private static void addRedirect(String method) {
+	private void addRedirect(String method) {
 		String path = String.format("%s/", method);
 
 		Spark.get(path, new Route() {
@@ -168,5 +179,20 @@ public class Server {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public List<InterfaceEntry> ui() {
+		final ArrayList<InterfaceEntry> ui = new ArrayList<InterfaceEntry>();
+
+		ui.add(new InterfaceEntry(UI, null, "this"));
+		ui.add(new InterfaceEntry(NEW_TORRENT, "bytes", "int"));
+		ui.add(new InterfaceEntry(NEW_SECRET_KEY, null, "bytes"));
+		ui.add(new InterfaceEntry(NEW_PUBLIC_KEY, "bytes", "bytes"));
+		ui.add(new InterfaceEntry(SHARE, "int/bytes/bytes", "boolean"));
+		ui.add(new InterfaceEntry(UPLOAD, "bytes", "int"));
+		ui.add(new InterfaceEntry(DOWNLOAD, "int/bytes", "bytes"));
+
+		return ui;
 	}
 }

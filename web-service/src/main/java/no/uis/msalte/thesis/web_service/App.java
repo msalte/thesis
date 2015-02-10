@@ -5,6 +5,6 @@ import no.uis.msalte.thesis.web_service.server.Server;
 public class App {
 
 	public static void main(String[] args) {
-		Server.start();
+		new Server().start();
 	}
 }

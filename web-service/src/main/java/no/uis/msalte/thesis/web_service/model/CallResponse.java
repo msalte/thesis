@@ -6,17 +6,17 @@ import spark.Response;
 
 public class CallResponse {
 	private int status;
-	private String content;
+	private Object content;
 	private String message;
 
-	public CallResponse(Response response, String content, String message) {
+	public CallResponse(Response response, Object content, String message) {
 		this.content = content;
 		this.message = message;
 
 		response.status(this.status = HttpURLConnection.HTTP_OK);
 	}
 
-	public CallResponse(Response response, String content, String message,
+	public CallResponse(Response response, Object content, String message,
 			int status) {
 		this.content = content;
 		this.message = message;
@@ -41,11 +41,11 @@ public class CallResponse {
 		this.message = message;
 	}
 
-	public String getContent() {
+	public Object getContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
+	public void setContent(Object content) {
 		this.content = content;
 	}
 
