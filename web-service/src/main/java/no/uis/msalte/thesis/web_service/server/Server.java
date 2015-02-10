@@ -71,6 +71,23 @@ public class Server {
 			}
 		}, JSON_RENDERER);
 
+		Spark.get(Methods.UPLOAD, ACCEPT_TYPE, new Route() {
+			@Override
+			public Object handle(Request request, Response response)
+					throws Exception {
+				final String bytes = request.params(":bytes");
+
+				if (bytes != null) {
+					int result = SECURE_CLOUD_SHARE.upload(bytes.getBytes());
+
+					return new CallResponse(response, String.valueOf(result),
+							"Upload stored");
+				}
+
+				return httpNotFound(response);
+			}
+		}, JSON_RENDERER);
+
 		Spark.get(Methods.SHARE, ACCEPT_TYPE, new Route() {
 			@Override
 			public Object handle(Request request, Response response)
@@ -80,12 +97,40 @@ public class Server {
 				final String pk = request.params(":pk");
 				final String rek = request.params(":rek");
 
-				return new CallResponse(
-						response,
-						null,
-						String.format(
-								"Shared torrent: [%s] with public key holder: [%s] (re-encrypted by: [%s])",
-								id, pk, rek));
+				boolean shared = SECURE_CLOUD_SHARE.share(Integer.parseInt(id),
+						pk.getBytes(), rek.getBytes());
+
+				if (shared) {
+					return new CallResponse(
+							response,
+							null,
+							String.format(
+									"Shared torrent: [%s] with public key holder: [%s] (re-encrypted by: [%s])",
+									id, pk, rek));
+				}
+
+				return httpNotFound(response);
+
+			}
+		}, JSON_RENDERER);
+
+		Spark.get(Methods.DOWNLOAD, ACCEPT_TYPE, new Route() {
+
+			@Override
+			public Object handle(Request request, Response response)
+					throws Exception {
+				final String id = request.params(":id");
+				final String publicKey = request.params(":pk");
+
+				final byte[] bytes = SECURE_CLOUD_SHARE.download(
+						Integer.parseInt(id), publicKey.getBytes());
+
+				if (bytes != null) {
+					return new CallResponse(response, bytes.toString(),
+							"Download granted");
+				}
+
+				return httpNotFound(response);
 			}
 		}, JSON_RENDERER);
 	}
@@ -95,6 +140,8 @@ public class Server {
 		public static final String NEW_SECRET_KEY = "/newSecretKey";
 		public static final String NEW_PUBLIC_KEY = "/newPublicKey/:sk";
 		public static final String SHARE = "/share/:id/:pk/:rek";
+		public static final String UPLOAD = "/upload/:bytes";
+		public static final String DOWNLOAD = "/download/:id/:pk";
 	}
 
 	private static CallResponse httpNotFound(Response response) {
