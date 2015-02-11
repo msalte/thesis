@@ -5,11 +5,11 @@ import spark.ResponseTransformer;
 import com.google.gson.Gson;
 
 public class JsonRenderer implements ResponseTransformer {
-	private Gson gson = new Gson();
+	public static final Gson RENDERER = new Gson();
 	
 	@Override
 	public String render(Object obj) throws Exception {
-		return gson.toJson(obj);
+		return RENDERER.toJson(obj);
 	}
 	
 }

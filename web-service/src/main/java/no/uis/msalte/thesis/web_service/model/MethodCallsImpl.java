@@ -99,7 +99,10 @@ public class MethodCallsImpl implements MethodCalls {
 			// ignore
 		}
 
-		return setHttpBadRequest(res);
+		Spark.halt(HttpURLConnection.HTTP_BAD_REQUEST, String.format(
+				"%d Bad Request", HttpURLConnection.HTTP_BAD_REQUEST));
+
+		return null;
 	}
 
 	@Override

@@ -3,6 +3,9 @@ package no.uis.msalte.thesis.web_service.server;
 import no.uis.msalte.thesis.web_service.model.MethodCalls;
 import no.uis.msalte.thesis.web_service.model.MethodCallsImpl;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 import spark.Spark;
 
 public class Server {
@@ -16,6 +19,8 @@ public class Server {
 	public void start() {
 		Spark.port(HTTP_PORT);
 
+		// TODO use http post for argumented calls
+		// TODO evaluate using halt() for errors instead of returning bad request response
 		Spark.get(MethodCalls.PATH_UI, ACCEPT_TYPE, (req, res) -> {
 			return METHOD_CALLS.ui(req, res);
 		}, JSON_RENDERER);
@@ -44,5 +49,18 @@ public class Server {
 			return METHOD_CALLS.download(req, res);
 		}, JSON_RENDERER);
 
+		
+		
+		Spark.post("/upload", ACCEPT_TYPE,new Route() {
+			
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+
+				String bytes = request.queryParams("bytes");
+				
+				return bytes;
+			}
+		} , JSON_RENDERER);
+		
 	}
 }
