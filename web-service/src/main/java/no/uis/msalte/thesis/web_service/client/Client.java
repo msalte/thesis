@@ -50,7 +50,11 @@ public class Client {
 
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				return getResponse(conn.getInputStream());
+			} else {
+				return String.format("%d %s", conn.getResponseCode(),
+						conn.getResponseMessage());
 			}
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

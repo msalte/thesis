@@ -1,18 +1,20 @@
 package no.uis.msalte.thesis.web_service.model;
 
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import no.uis.msalte.thesis.secure_cloud.model.SecureCloudShareImpl;
 import spark.Request;
 import spark.Response;
-import spark.Route;
 import spark.Spark;
 
 public class FunctionCallsImpl implements FunctionCalls {
 
 	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
+	private static final String OUTPUT_DIRECTORY = "C:\\Users\\Morten\\Desktop\\secure_cloud";
 
 	@Override
 	public CallResponse ui(Request req, Response res) {
@@ -21,43 +23,50 @@ public class FunctionCallsImpl implements FunctionCalls {
 		final String message = "The user interface";
 		final ArrayList<InterfaceEntry> content = new ArrayList<InterfaceEntry>();
 
-		content.add(new InterfaceEntry(PATH_UI, null, "this"));
-		content.add(new InterfaceEntry(PATH_NEW_TORRENT, "bytes", "int"));
-		content.add(new InterfaceEntry(PATH_NEW_SECRET_KEY, null, "bytes"));
-		content.add(new InterfaceEntry(PATH_NEW_PUBLIC_KEY, "bytes", "bytes"));
-		content.add(new InterfaceEntry(PATH_SHARE, "int/bytes/bytes", "boolean"));
-		content.add(new InterfaceEntry(PATH_UPLOAD, "bytes", "int"));
-		content.add(new InterfaceEntry(PATH_DOWNLOAD, "int/bytes", "bytes"));
+		content.add(new InterfaceEntry(HttpMethod.GET.name(), FUNC_UI, null,
+				null,
+				"Calling this function gives an overview of the user interface"));
+
+		content.add(new InterfaceEntry(HttpMethod.POST.name(),
+				FUNC_NEW_TORRENT, null, null, "Not implemented"));
+
+		content.add(new InterfaceEntry(HttpMethod.GET.name(),
+				FUNC_NEW_SECRET_KEY, null, null,
+				"Calling this function generates a new secret key"));
+
+		content.add(new InterfaceEntry(HttpMethod.POST.name(),
+				FUNC_NEW_PUBLIC_KEY, new String[] { PARAM_SECRET_KEY },
+				new String[] { "bytes" },
+				"Calling this function generates a new public key"));
+
+		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_SHARE,
+				new String[] { PARAM_ID, PARAM_PUBLIC_KEY,
+						PARAM_RE_ENCRYPTION_KEY },
+				new String[] { "int, bytes, bytes" },
+				"Call this function to share a torrent with someone else"));
+
+		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_UPLOAD,
+				new String[] { PARAM_TORRENT }, new String[] { "bytes" },
+				"Call this function to upload a torrent"));
+
+		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_DOWNLOAD,
+				new String[] { PARAM_ID, PARAM_PUBLIC_KEY },
+				new String[] { "int, bytes" },
+				"Call this function to download a torrent"));
 
 		ui.setMessage(message);
 		ui.setContent(content);
 
-		setRedirectTo(PATH_UI);
+		setRedirectTo(HttpMethod.GET, FUNC_UI);
 
 		return ui;
 	}
 
 	@Override
 	public CallResponse newTorrent(Request req, Response res) {
-		final CallResponse newTorrent = getDefaultCallResponse(res);
+		setBadRequest();
 
-		final String bytes = req.params(FunctionParams.BYTES);
-
-		if (bytes != null) {
-			// TODO validate bytes
-			// TODO put in torrent directory
-
-			final String message = "Torrent added";
-			final String content = String
-					.valueOf((int) (Math.random() * 100) + 1); // random 1-100
-
-			newTorrent.setMessage(message);
-			newTorrent.setContent(content);
-
-			return newTorrent;
-		}
-
-		return setHttpBadRequest(res);
+		return null;
 	}
 
 	@Override
@@ -72,7 +81,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 		newSecretKey.setMessage(message);
 		newSecretKey.setContent(content);
 
-		setRedirectTo(PATH_NEW_SECRET_KEY);
+		setRedirectTo(HttpMethod.GET, FUNC_NEW_SECRET_KEY);
 
 		return newSecretKey;
 	}
@@ -81,7 +90,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 	public CallResponse newPublicKey(Request req, Response res) {
 		final CallResponse newPublicKey = getDefaultCallResponse(res);
 
-		final String secretKeyParam = req.params(FunctionParams.SECRET_KEY);
+		final String secretKeyParam = req.queryParams(PARAM_SECRET_KEY);
 
 		try {
 			final BigInteger secretKey = new BigInteger(secretKeyParam);
@@ -99,8 +108,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 			// ignore
 		}
 
-		Spark.halt(HttpURLConnection.HTTP_BAD_REQUEST, String.format(
-				"%d Bad Request", HttpURLConnection.HTTP_BAD_REQUEST));
+		setBadRequest();
 
 		return null;
 	}
@@ -109,10 +117,10 @@ public class FunctionCallsImpl implements FunctionCalls {
 	public CallResponse share(Request req, Response res) {
 		final CallResponse share = getDefaultCallResponse(res);
 
-		final String idParam = req.params(FunctionParams.ID);
-		final String publicKeyParam = req.params(FunctionParams.PUBLIC_KEY);
+		final String idParam = req.queryParams(PARAM_ID);
+		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
 		final String reEncryptionKeyParam = req
-				.params(FunctionParams.RE_ENCRYPTION_KEY);
+				.queryParams(PARAM_RE_ENCRYPTION_KEY);
 
 		final boolean isParamsValid = idParam != null && publicKeyParam != null
 				&& reEncryptionKeyParam != null;
@@ -141,37 +149,49 @@ public class FunctionCallsImpl implements FunctionCalls {
 			}
 		}
 
-		return setHttpBadRequest(res);
+		return null;
 	}
 
 	@Override
 	public CallResponse upload(Request req, Response res) {
 		final CallResponse upload = getDefaultCallResponse(res);
 
-		final String bytesParam = req.params(FunctionParams.BYTES);
+		final String bytes = req.queryParams(PARAM_TORRENT);
 
-		if (bytesParam != null) {
-			final int torrentId = SECURE_CLOUD_SHARE.upload(bytesParam
-					.getBytes());
+		try {
+			// TODO debate moving file stuff into secure cloud project
+			final byte[] file = Base64.getDecoder().decode(bytes);
 
-			final String message = "Torrent uploaded";
-			final String content = String.valueOf(torrentId);
+			final int torrent = SECURE_CLOUD_SHARE.upload(file);
+			final String fileName = String
+					.format("torrent_%d.torrent", torrent);
+
+			final FileOutputStream fos = new FileOutputStream(String.format(
+					"%s//%s", OUTPUT_DIRECTORY, fileName));
+
+			fos.write(file);
+			fos.close();
+
+			final String message = String.format("File %s uploaded", fileName);
+			final String content = String.valueOf(torrent);
 
 			upload.setMessage(message);
 			upload.setContent(content);
 
 			return upload;
+		} catch (Exception e) {
+			setBadRequest();
 		}
 
-		return setHttpBadRequest(res);
+		return null;
 	}
 
 	@Override
 	public CallResponse download(Request req, Response res) {
 		final CallResponse download = getDefaultCallResponse(res);
 
-		final String idParam = req.params(FunctionParams.ID);
-		final String publicKeyParam = req.params(FunctionParams.PUBLIC_KEY);
+		final String idParam = req.queryParams(PARAM_ID);
+		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
 
 		final boolean isParamsValid = idParam != null && publicKeyParam != null;
 
@@ -181,8 +201,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 				final byte[] publicKey = publicKeyParam.getBytes();
 
 				final String message = "Download granted";
-				final String content = SECURE_CLOUD_SHARE.download(torrentId,
-						publicKey).toString();
+				final String content = Base64.getEncoder().encodeToString(
+						SECURE_CLOUD_SHARE.download(torrentId, publicKey));
 
 				download.setMessage(message);
 				download.setContent(content);
@@ -191,10 +211,9 @@ public class FunctionCallsImpl implements FunctionCalls {
 			} catch (Exception e) {
 				// ignore
 			}
-
 		}
 
-		return setHttpBadRequest(res);
+		return null;
 	}
 
 	private CallResponse getDefaultCallResponse(Response res) {
@@ -204,28 +223,37 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	/**
-	 * This will ensure that a call to some.url/method/ will be redirected to
-	 * some.url/method
+	 * This will ensure that a call to some.url/function/ will be redirected to
+	 * some.url/function
 	 * 
 	 * @param method
-	 *            The corresponding method name
+	 *            The HTTP method
+	 * @param function
+	 *            The corresponding function name
 	 */
-	private void setRedirectTo(String method) {
-		String path = String.format("%s/", method);
+	public void setRedirectTo(HttpMethod method, String function) {
+		String path = String.format("%s/", function);
+		String redirect = String.format("/%s", function);
 
-		Spark.get(path, new Route() {
-
-			@Override
-			public Object handle(Request request, Response response)
-					throws Exception {
-				response.redirect(method);
+		switch (method) {
+		case POST:
+			Spark.post(path, (req, res) -> {
+				res.redirect(redirect);
 				return null;
-			}
-		});
+			});
+			break;
+		case GET:
+			Spark.get(path, (req, res) -> {
+				res.redirect(redirect);
+				return null;
+			});
+			break;
+		default:
+			break;
+		}
 	}
 
-	private CallResponse setHttpBadRequest(Response res) {
-		return new CallResponse(res, null, "Bad request",
-				HttpURLConnection.HTTP_BAD_REQUEST);
+	private void setBadRequest() {
+		Spark.halt(HttpURLConnection.HTTP_BAD_REQUEST, "HTTP Bad Request");
 	}
 }

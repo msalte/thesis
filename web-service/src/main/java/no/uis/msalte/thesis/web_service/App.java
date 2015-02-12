@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 
 import no.uis.msalte.thesis.web_service.client.Client;
+import no.uis.msalte.thesis.web_service.model.FunctionCalls;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.server.Server;
 
@@ -16,12 +17,34 @@ public class App {
 
 		String path = "C:\\Users\\Morten\\Desktop\\ttorrent\\torrents\\document.pdf.torrent";
 
-		String function = "upload";
+		String function = FunctionCalls.FUNC_UPLOAD;
 
-		String[] params = new String[] { "bytes" };
+		String[] params = new String[] { FunctionCalls.PARAM_TORRENT };
 		String[] argz = new String[] { fileAsByteString(path) };
 
+		System.out.println(argz[0]);
 		String result = Client.call(HttpMethod.POST, function, params, argz);
+
+		System.out.println(result);
+
+		function = FunctionCalls.FUNC_SHARE;
+
+		params = new String[] { FunctionCalls.PARAM_ID,
+				FunctionCalls.PARAM_PUBLIC_KEY,
+				FunctionCalls.PARAM_RE_ENCRYPTION_KEY };
+		
+		argz = new String[] {"1", "public", "re-enc"};
+
+		result = Client.call(HttpMethod.POST, function, params, argz);
+
+		System.out.println(result);
+		
+		function = FunctionCalls.FUNC_DOWNLOAD;
+		
+		params = new String[] {FunctionCalls.PARAM_ID, FunctionCalls.PARAM_PUBLIC_KEY};
+		argz = new String[] {"1", "public"};
+
+		result = Client.call(HttpMethod.POST, function, params, argz);
 		
 		System.out.println(result);
 	}
