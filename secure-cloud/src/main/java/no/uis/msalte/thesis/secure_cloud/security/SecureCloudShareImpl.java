@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.model;
+package no.uis.msalte.thesis.secure_cloud.security;
 
 import java.math.BigInteger;
 
@@ -25,11 +25,11 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return null;
 	}
 
-	public int upload(byte[] torrent) {
-		return torrentDirectory.store(torrent.toString());
+	public String upload(byte[] torrent) {
+		return torrentDirectory.store(torrent);
 	}
 
-	public boolean share(int id, byte[] publicKey, byte[] reEncryptionKey) {
+	public boolean share(String id, byte[] publicKey, byte[] reEncryptionKey) {
 		if (torrentDirectory.get(id) != null) {
 
 			accessControl.grant(id, publicKey, reEncryptionKey);
@@ -40,9 +40,18 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return false;
 	}
 
-	public byte[] download(int id, byte[] publicKey) {
-		if (accessControl.hasAccess(id, publicKey)) {
-			return torrentDirectory.get(id).getBytes();
+	public byte[] download(String id, byte[] publicKey) {
+		final byte[] reEncryptionKey = accessControl.reEncryptionKeyFor(id,
+				publicKey);
+
+		final boolean hasAccess = reEncryptionKey != null;
+
+		if (hasAccess) {
+			byte[] torrent = torrentDirectory.get(id);
+
+			// TODO perform re-encryption
+
+			return torrent;
 		}
 
 		return null;

@@ -1,21 +1,21 @@
 package no.uis.msalte.thesis.secure_cloud.model;
 
 public class AccessTuple {
-	private int id;
+	private String id;
 	private byte[] publicKey;
 	private byte[] reEncryptionKey;
 
-	public AccessTuple(int id, byte[] publicKey, byte[] reEncryptionKey) {
+	public AccessTuple(String id, byte[] publicKey, byte[] reEncryptionKey) {
 		this.id = id;
 		this.publicKey = publicKey;
 		this.reEncryptionKey = reEncryptionKey;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -1,24 +1,24 @@
 package no.uis.msalte.thesis.secure_cloud.storage;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class TorrentDirectory {
-
-	private int nextId;
-	private HashMap<Integer, String> torrents;
+	private HashMap<String, byte[]> torrents;
 
 	public TorrentDirectory() {
-		nextId = 1;
-		torrents = new HashMap<Integer, String>();
+		torrents = new HashMap<String, byte[]>();
 	}
 
-	public int store(String bytes) {
-		torrents.put(nextId, bytes);
+	public String store(byte[] value) {
+		final String key = UUID.randomUUID().toString();
 
-		return nextId++;
+		torrents.put(key, value);
+
+		return key;
 	}
 
-	public String get(int id) {
-		return torrents.get(id);
+	public byte[] get(String key) {
+		return torrents.get(key);
 	}
 }

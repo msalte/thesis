@@ -123,15 +123,13 @@ public class FunctionCallsImpl implements FunctionCalls {
 
 		if (isParamsValid) {
 			try {
-				final int torrentId = Integer.parseInt(idParam);
-
-				final boolean isShared = SECURE_CLOUD_SHARE.share(torrentId,
+				final boolean isShared = SECURE_CLOUD_SHARE.share(idParam,
 						publicKeyParam.getBytes(),
 						reEncryptionKeyParam.getBytes());
 
 				if (isShared) {
 					final String message = String.format(
-							"Torrent with id %d shared", torrentId);
+							"Torrent with id %d shared", idParam);
 					final String content = String.valueOf(isShared);
 
 					share.setMessage(message);
@@ -158,9 +156,9 @@ public class FunctionCallsImpl implements FunctionCalls {
 			// TODO debate moving file stuff into secure cloud project
 			final byte[] file = Base64.getDecoder().decode(bytes);
 
-			final int torrent = SECURE_CLOUD_SHARE.upload(file);
+			final String torrent = SECURE_CLOUD_SHARE.upload(file);
 			final String fileName = String
-					.format("torrent_%d.torrent", torrent);
+					.format("%s.torrent", torrent);
 
 			final FileOutputStream fos = new FileOutputStream(String.format(
 					"%s//%s", OUTPUT_DIRECTORY, fileName));
@@ -193,16 +191,15 @@ public class FunctionCallsImpl implements FunctionCalls {
 
 		if (isParamsValid) {
 			try {
-				final int torrentId = Integer.parseInt(idParam);
 				final byte[] publicKey = publicKeyParam.getBytes();
 
-				final byte[] file = SECURE_CLOUD_SHARE.download(torrentId,
+				final byte[] file = SECURE_CLOUD_SHARE.download(idParam,
 						publicKey);
 
 				if (file != null) {
 					final String message = "Download granted";
 					final String content = new String(Base64.getEncoder()
-							.encode(SECURE_CLOUD_SHARE.download(torrentId,
+							.encode(SECURE_CLOUD_SHARE.download(idParam,
 									publicKey)));
 
 					download.setMessage(message);

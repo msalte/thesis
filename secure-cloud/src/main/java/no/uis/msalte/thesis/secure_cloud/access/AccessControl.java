@@ -12,18 +12,18 @@ public class AccessControl {
 		accessList = new ArrayList<AccessTuple>();
 	}
 
-	public void grant(int id, byte[] publicKey, byte[] reEncryptionKey) {
+	public void grant(String id, byte[] publicKey, byte[] reEncryptionKey) {
 		accessList.add(new AccessTuple(id, publicKey, reEncryptionKey));
 	}
 
-	public boolean hasAccess(int id, byte[] publicKey) {
+	public byte[] reEncryptionKeyFor(String id, byte[] publicKey) {
 		for (AccessTuple tuple : accessList) {
-			if (tuple.getId() == id
+			if (tuple.getId().equals(id)
 					&& Arrays.equals(tuple.getPublicKey(), publicKey)) {
-				return true;
+				return tuple.getReEncryptionKey();
 			}
 		}
 
-		return false;
+		return null;
 	}
 }

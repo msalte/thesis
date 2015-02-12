@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.UUID;
 
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.CallResponse;
@@ -49,7 +50,12 @@ public class ServerTest {
 		final String id = JsonRenderer.RENDERER
 				.fromJson(result, CallResponse.class).getContent().toString();
 
-		assertTrue(new Integer(id) instanceof Integer);
+		try {
+			UUID.fromString(id);
+			assertTrue(true);
+		} catch (IllegalArgumentException e) {
+			assertTrue(false);
+		}
 	}
 
 	@Test
