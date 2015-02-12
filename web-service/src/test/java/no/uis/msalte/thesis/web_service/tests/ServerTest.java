@@ -12,8 +12,8 @@ import java.util.Base64;
 import java.util.UUID;
 
 import no.uis.msalte.thesis.web_service.client.Client;
-import no.uis.msalte.thesis.web_service.model.CallResponse;
-import no.uis.msalte.thesis.web_service.model.FunctionCalls;
+import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
+import no.uis.msalte.thesis.web_service.model.WebService;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.server.Server;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
@@ -43,12 +43,12 @@ public class ServerTest {
 
 		// upload file
 		final String result = Client.call(HttpMethod.POST,
-				FunctionCalls.FUNC_UPLOAD,
-				new String[] { FunctionCalls.PARAM_TORRENT },
+				WebService.FUNC_UPLOAD,
+				new String[] { WebService.PARAM_TORRENT },
 				new String[] { fileAsBytes });
 
 		final String id = JsonRenderer.RENDERER
-				.fromJson(result, CallResponse.class).getContent().toString();
+				.fromJson(result, WebServiceResponse.class).getContent().toString();
 
 		try {
 			UUID.fromString(id);
@@ -68,30 +68,30 @@ public class ServerTest {
 
 		// upload file
 		final String uploadResult = Client.call(HttpMethod.POST,
-				FunctionCalls.FUNC_UPLOAD,
-				new String[] { FunctionCalls.PARAM_TORRENT },
+				WebService.FUNC_UPLOAD,
+				new String[] { WebService.PARAM_TORRENT },
 				new String[] { fileAsBytes });
 
 		// retrieve id
 		final String id = JsonRenderer.RENDERER
-				.fromJson(uploadResult, CallResponse.class).getContent()
+				.fromJson(uploadResult, WebServiceResponse.class).getContent()
 				.toString();
 
 		// share
-		Client.call(HttpMethod.POST, FunctionCalls.FUNC_SHARE, new String[] {
-				FunctionCalls.PARAM_ID, FunctionCalls.PARAM_PUBLIC_KEY,
-				FunctionCalls.PARAM_RE_ENCRYPTION_KEY }, new String[] { id,
+		Client.call(HttpMethod.POST, WebService.FUNC_SHARE, new String[] {
+				WebService.PARAM_ID, WebService.PARAM_PUBLIC_KEY,
+				WebService.PARAM_RE_ENCRYPTION_KEY }, new String[] { id,
 				publicKey, reEncryptionKey });
 
 		// download
 		final String downloadResult = Client.call(HttpMethod.POST,
-				FunctionCalls.FUNC_DOWNLOAD,
-				new String[] { FunctionCalls.PARAM_ID,
-						FunctionCalls.PARAM_PUBLIC_KEY }, new String[] { id,
+				WebService.FUNC_DOWNLOAD,
+				new String[] { WebService.PARAM_ID,
+						WebService.PARAM_PUBLIC_KEY }, new String[] { id,
 						publicKey });
 
 		final String downloadedFileBytes = JsonRenderer.RENDERER
-				.fromJson(downloadResult, CallResponse.class).getContent()
+				.fromJson(downloadResult, WebServiceResponse.class).getContent()
 				.toString();
 
 		assertEquals(fileAsBytes, downloadedFileBytes);

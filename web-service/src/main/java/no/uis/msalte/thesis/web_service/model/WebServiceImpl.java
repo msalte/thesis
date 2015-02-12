@@ -11,16 +11,16 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
-public class FunctionCallsImpl implements FunctionCalls {
+public class WebServiceImpl implements WebService {
 
 	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	private static final String OUTPUT_DIRECTORY = "C:\\Users\\Morten\\Desktop\\secure_cloud";
 
 	@Override
-	public CallResponse ui(Request req, Response res) {
-		final CallResponse ui = getDefaultCallResponse(res);
+	public WebServiceResponse ui(Request req, Response res) {
+		final WebServiceResponse ui = getDefaultCallResponse(res);
 
-		final String message = "The user interface";
+		final String message = "The user interface - All valid function calls return a JSON object";
 		final ArrayList<InterfaceEntry> content = new ArrayList<InterfaceEntry>();
 
 		content.add(new InterfaceEntry(HttpMethod.GET.name(), FUNC_UI, null,
@@ -42,7 +42,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_SHARE,
 				new String[] { PARAM_ID, PARAM_PUBLIC_KEY,
 						PARAM_RE_ENCRYPTION_KEY },
-				new String[] { "int, bytes, bytes" },
+				new String[] { "string, bytes, bytes" },
 				"Call this function to share a torrent with someone else"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_UPLOAD,
@@ -51,7 +51,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_DOWNLOAD,
 				new String[] { PARAM_ID, PARAM_PUBLIC_KEY },
-				new String[] { "int, bytes" },
+				new String[] { "string, bytes" },
 				"Call this function to download a torrent"));
 
 		ui.setMessage(message);
@@ -63,13 +63,13 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	@Override
-	public CallResponse newTorrent(Request req, Response res) {
+	public WebServiceResponse newTorrent(Request req, Response res) {
 		return getBadRequest(res);
 	}
 
 	@Override
-	public CallResponse newSecretKey(Request req, Response res) {
-		final CallResponse newSecretKey = getDefaultCallResponse(res);
+	public WebServiceResponse newSecretKey(Request req, Response res) {
+		final WebServiceResponse newSecretKey = getDefaultCallResponse(res);
 
 		final byte[] secretKeyBytes = SECURE_CLOUD_SHARE.newSecretKey();
 
@@ -85,8 +85,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	@Override
-	public CallResponse newPublicKey(Request req, Response res) {
-		final CallResponse newPublicKey = getDefaultCallResponse(res);
+	public WebServiceResponse newPublicKey(Request req, Response res) {
+		final WebServiceResponse newPublicKey = getDefaultCallResponse(res);
 
 		final String secretKeyParam = req.queryParams(PARAM_SECRET_KEY);
 
@@ -110,8 +110,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	@Override
-	public CallResponse share(Request req, Response res) {
-		final CallResponse share = getDefaultCallResponse(res);
+	public WebServiceResponse share(Request req, Response res) {
+		final WebServiceResponse share = getDefaultCallResponse(res);
 
 		final String idParam = req.queryParams(PARAM_ID);
 		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
@@ -147,8 +147,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	@Override
-	public CallResponse upload(Request req, Response res) {
-		final CallResponse upload = getDefaultCallResponse(res);
+	public WebServiceResponse upload(Request req, Response res) {
+		final WebServiceResponse upload = getDefaultCallResponse(res);
 
 		final String bytes = req.queryParams(PARAM_TORRENT);
 
@@ -157,8 +157,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 			final byte[] file = Base64.getDecoder().decode(bytes);
 
 			final String torrent = SECURE_CLOUD_SHARE.upload(file);
-			final String fileName = String
-					.format("%s.torrent", torrent);
+			final String fileName = String.format("%s.torrent", torrent);
 
 			final FileOutputStream fos = new FileOutputStream(String.format(
 					"%s//%s", OUTPUT_DIRECTORY, fileName));
@@ -181,8 +180,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 	}
 
 	@Override
-	public CallResponse download(Request req, Response res) {
-		final CallResponse download = getDefaultCallResponse(res);
+	public WebServiceResponse download(Request req, Response res) {
+		final WebServiceResponse download = getDefaultCallResponse(res);
 
 		final String idParam = req.queryParams(PARAM_ID);
 		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
@@ -215,10 +214,11 @@ public class FunctionCallsImpl implements FunctionCalls {
 		return getBadRequest(res);
 	}
 
-	private CallResponse getDefaultCallResponse(Response res) {
+	private WebServiceResponse getDefaultCallResponse(Response res) {
 		res.status(HttpURLConnection.HTTP_OK);
 
-		return new CallResponse(res, null, null, HttpURLConnection.HTTP_OK);
+		return new WebServiceResponse(res, null, null,
+				HttpURLConnection.HTTP_OK);
 	}
 
 	/**
@@ -252,8 +252,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 		}
 	}
 
-	private CallResponse getBadRequest(Response res) {
-		return new CallResponse(res, null, "Bad Request",
+	private WebServiceResponse getBadRequest(Response res) {
+		return new WebServiceResponse(res, null, "Bad Request",
 				HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 }

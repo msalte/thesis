@@ -1,14 +1,14 @@
 package no.uis.msalte.thesis.web_service.server;
 
-import no.uis.msalte.thesis.web_service.model.FunctionCalls;
-import no.uis.msalte.thesis.web_service.model.FunctionCallsImpl;
+import no.uis.msalte.thesis.web_service.model.WebService;
+import no.uis.msalte.thesis.web_service.model.WebServiceImpl;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 import spark.Spark;
 
 public class Server {
 
-	private static final FunctionCallsImpl FUNCTION_CALLS = new FunctionCallsImpl();
+	private static final WebServiceImpl WEB_SERVICE = new WebServiceImpl();
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonRenderer JSON_RENDERER = new JsonRenderer();
 
@@ -19,43 +19,42 @@ public class Server {
 		Spark.port(HTTP_PORT);
 
 		// ---- GET FUNCTIONS ---- //
-		Spark.get(getPath(FunctionCalls.FUNC_NEW_SECRET_KEY), ACCEPT_TYPE, (
-				req, res) -> {
-			return FUNCTION_CALLS.newSecretKey(req, res);
+		Spark.get(getPath(WebService.FUNC_NEW_SECRET_KEY), ACCEPT_TYPE, (req,
+				res) -> {
+			return WEB_SERVICE.newSecretKey(req, res);
 		}, JSON_RENDERER);
 
-		FUNCTION_CALLS.setRedirectTo(HttpMethod.GET,
-				FunctionCalls.FUNC_NEW_SECRET_KEY);
+		WEB_SERVICE.setRedirectTo(HttpMethod.GET,
+				WebService.FUNC_NEW_SECRET_KEY);
 
-		Spark.get(getPath(FunctionCalls.FUNC_UI), ACCEPT_TYPE, (req, res) -> {
-			return FUNCTION_CALLS.ui(req, res);
+		Spark.get(getPath(WebService.FUNC_UI), ACCEPT_TYPE, (req, res) -> {
+			return WEB_SERVICE.ui(req, res);
 		}, JSON_RENDERER);
 
-		FUNCTION_CALLS.setRedirectTo(HttpMethod.GET, FunctionCalls.FUNC_UI);
+		WEB_SERVICE.setRedirectTo(HttpMethod.GET, WebService.FUNC_UI);
 
 		// ---- POST FUNCTIONS ---- //
-		Spark.post(getPath(FunctionCalls.FUNC_UPLOAD), ACCEPT_TYPE,
+		Spark.post(getPath(WebService.FUNC_UPLOAD), ACCEPT_TYPE,
 				(req, res) -> {
-					return FUNCTION_CALLS.upload(req, res);
+					return WEB_SERVICE.upload(req, res);
 				}, JSON_RENDERER);
 
-		Spark.post(getPath(FunctionCalls.FUNC_NEW_PUBLIC_KEY), ACCEPT_TYPE, (
-				req, res) -> {
-			return FUNCTION_CALLS.newPublicKey(req, res);
+		Spark.post(getPath(WebService.FUNC_NEW_PUBLIC_KEY), ACCEPT_TYPE, (req,
+				res) -> {
+			return WEB_SERVICE.newPublicKey(req, res);
 		}, JSON_RENDERER);
 
-		Spark.post(getPath(FunctionCalls.FUNC_SHARE), ACCEPT_TYPE,
-				(req, res) -> {
-					return FUNCTION_CALLS.share(req, res);
-				}, JSON_RENDERER);
+		Spark.post(getPath(WebService.FUNC_SHARE), ACCEPT_TYPE, (req, res) -> {
+			return WEB_SERVICE.share(req, res);
+		}, JSON_RENDERER);
 
-		Spark.post(getPath(FunctionCalls.FUNC_DOWNLOAD), ACCEPT_TYPE,
+		Spark.post(getPath(WebService.FUNC_DOWNLOAD), ACCEPT_TYPE,
 				(req, res) -> {
-					return FUNCTION_CALLS.download(req, res);
+					return WEB_SERVICE.download(req, res);
 				}, JSON_RENDERER);
 
 	}
-	
+
 	public void stop() {
 		Spark.stop();
 	}
