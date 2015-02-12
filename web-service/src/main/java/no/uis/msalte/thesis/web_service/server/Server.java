@@ -55,6 +55,10 @@ public class Server {
 				}, JSON_RENDERER);
 
 	}
+	
+	public void stop() {
+		Spark.stop();
+	}
 
 	private static String getPath(String function) {
 		return String.format("/%s", function);

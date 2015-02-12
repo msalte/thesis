@@ -6,7 +6,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Base64;
 
-import no.uis.msalte.thesis.secure_cloud.model.SecureCloudShareImpl;
+import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -64,9 +64,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 
 	@Override
 	public CallResponse newTorrent(Request req, Response res) {
-		setBadRequest();
-
-		return null;
+		return getBadRequest(res);
 	}
 
 	@Override
@@ -108,9 +106,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 			// ignore
 		}
 
-		setBadRequest();
-
-		return null;
+		return getBadRequest(res);
 	}
 
 	@Override
@@ -149,7 +145,7 @@ public class FunctionCallsImpl implements FunctionCalls {
 			}
 		}
 
-		return null;
+		return getBadRequest(res);
 	}
 
 	@Override
@@ -180,10 +176,10 @@ public class FunctionCallsImpl implements FunctionCalls {
 
 			return upload;
 		} catch (Exception e) {
-			setBadRequest();
+			// ignore
 		}
 
-		return null;
+		return getBadRequest(res);
 	}
 
 	@Override
@@ -200,20 +196,26 @@ public class FunctionCallsImpl implements FunctionCalls {
 				final int torrentId = Integer.parseInt(idParam);
 				final byte[] publicKey = publicKeyParam.getBytes();
 
-				final String message = "Download granted";
-				final String content = Base64.getEncoder().encodeToString(
-						SECURE_CLOUD_SHARE.download(torrentId, publicKey));
+				final byte[] file = SECURE_CLOUD_SHARE.download(torrentId,
+						publicKey);
 
-				download.setMessage(message);
-				download.setContent(content);
+				if (file != null) {
+					final String message = "Download granted";
+					final String content = new String(Base64.getEncoder()
+							.encode(SECURE_CLOUD_SHARE.download(torrentId,
+									publicKey)));
 
-				return download;
+					download.setMessage(message);
+					download.setContent(content);
+
+					return download;
+				}
 			} catch (Exception e) {
 				// ignore
 			}
 		}
 
-		return null;
+		return getBadRequest(res);
 	}
 
 	private CallResponse getDefaultCallResponse(Response res) {
@@ -253,7 +255,8 @@ public class FunctionCallsImpl implements FunctionCalls {
 		}
 	}
 
-	private void setBadRequest() {
-		Spark.halt(HttpURLConnection.HTTP_BAD_REQUEST, "HTTP Bad Request");
+	private CallResponse getBadRequest(Response res) {
+		return new CallResponse(res, null, "Bad Request",
+				HttpURLConnection.HTTP_BAD_REQUEST);
 	}
 }
