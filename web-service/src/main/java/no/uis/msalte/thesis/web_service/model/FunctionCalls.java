@@ -3,26 +3,26 @@ package no.uis.msalte.thesis.web_service.model;
 import spark.Request;
 import spark.Response;
 
-public interface MethodCalls {
+public interface FunctionCalls {
 	public static final String PATH_UI = "/ui";
 
 	public static final String PATH_NEW_TORRENT = String.format(
-			"/newTorrent/%s", MethodParams.BYTES);
+			"/newTorrent/%s", FunctionParams.BYTES);
 
 	public static final String PATH_NEW_SECRET_KEY = "/newSecretKey";
 
 	public static final String PATH_NEW_PUBLIC_KEY = String.format(
-			"/newPublicKey/%s", MethodParams.SECRET_KEY);
+			"/newPublicKey/%s", FunctionParams.SECRET_KEY);
 
 	public static final String PATH_SHARE = String.format("/share/%s/%s/%s",
-			MethodParams.ID, MethodParams.PUBLIC_KEY,
-			MethodParams.RE_ENCRYPTION_KEY);
+			FunctionParams.ID, FunctionParams.PUBLIC_KEY,
+			FunctionParams.RE_ENCRYPTION_KEY);
 
 	public static final String PATH_UPLOAD = String.format("/upload/%s",
-			MethodParams.BYTES);
+			FunctionParams.BYTES);
 
 	public static final String PATH_DOWNLOAD = String.format("/download/%s/%s",
-			MethodParams.ID, MethodParams.PUBLIC_KEY);
+			FunctionParams.ID, FunctionParams.PUBLIC_KEY);
 
 	public CallResponse ui(Request req, Response res);
 	public CallResponse newTorrent(Request req, Response res);

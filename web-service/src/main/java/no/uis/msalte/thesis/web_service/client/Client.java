@@ -5,34 +5,51 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.server.Server;
-import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 
 public class Client {
 
 	private static final String URL_TEMPLATE = "http://localhost:%d/%s";
 
-	public static String call(String method, String param) {
-		HttpURLConnection conn = null;
+	public static String call(HttpMethod method, String function,
+			String[] params, String[] args) {
 
-		if (param != null) {
-			// TODO support multiple parameters
-
-			// convert /method/:parameter to /method/argument
-			method = method.substring(0, method.indexOf(":")).concat(param);
-		}
+		String url = String.format(URL_TEMPLATE, Server.HTTP_PORT, function);
 
 		try {
-			conn = (HttpURLConnection) new URL(String.format(URL_TEMPLATE,
-					Server.HTTP_PORT, method)).openConnection();
+			if (method == HttpMethod.GET) {
+				// Write parameters as part of the URL
+				url.concat(String.format("?%s",
+						getParameterString(params, args)));
+			}
+
+			final HttpURLConnection conn = (HttpURLConnection) new URL(
+					url.toString()).openConnection();
+
+			conn.setRequestMethod(method.name());
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+
+			if (method == HttpMethod.POST) {
+				// Write the parameters in the body of the POST request
+
+				final DataOutputStream stream = new DataOutputStream(
+						conn.getOutputStream());
+
+				stream.writeBytes(getParameterString(params, args));
+				stream.flush();
+				stream.close();
+			}
 
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				return parseResponse(conn.getInputStream());
+				return getResponse(conn.getInputStream());
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -43,68 +60,39 @@ public class Client {
 		return "";
 	}
 
-	public static String post(String method, String[] params, String[] args) {
+	private static String getParameterString(String[] params, String[] args)
+			throws UnsupportedEncodingException {
+
 		final boolean hasParameters = params != null && params.length > 0
 				&& args != null && args.length > 0;
-		final String url = String
-				.format(URL_TEMPLATE, Server.HTTP_PORT, method);
 
 		final StringBuilder paramString = new StringBuilder();
 
-		try {
-			if (hasParameters) {
-				for (int i = 0; i < params.length; i++) {
-					paramString.append(params[i]);
-					paramString.append("=");
-					paramString.append(URLEncoder.encode(args[i], "UTF-8"));
+		if (hasParameters) {
+			for (int i = 0; i < params.length; i++) {
+				paramString.append(params[i]);
+				paramString.append("=");
+				paramString.append(URLEncoder.encode(args[i], "UTF-8"));
 
-					if (i + 1 < params.length) {
-						/*
-						 * if more parameters, append "&"
-						 */
-						paramString.append("&");
-					}
+				if (i + 1 < params.length) {
+					/*
+					 * if more parameters, append "&"
+					 */
+					paramString.append("&");
 				}
 			}
-
-			HttpURLConnection conn = (HttpURLConnection) new URL(url.toString())
-					.openConnection();
-
-			conn.setRequestMethod("POST");
-			conn.setDoOutput(true);
-
-			DataOutputStream stream = new DataOutputStream(
-					conn.getOutputStream());
-
-			stream.writeBytes(paramString.toString());
-			stream.flush();
-			stream.close();
-
-			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				
-				String result = JsonRenderer.RENDERER.fromJson(
-						parseResponse(conn.getInputStream()), String.class);
-
-				System.out.println(result);
-			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
-		return "";
+		return paramString.toString();
 	}
 
-	private static String parseResponse(InputStream stream) throws IOException {
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(stream));
-
-		StringBuffer response = new StringBuffer();
+	private static String getResponse(InputStream is) throws IOException {
+		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		final StringBuilder response = new StringBuilder();
 
 		String line;
 
-		while ((line = reader.readLine()) != null) {
+		while ((line = br.readLine()) != null) {
 			response.append(line);
 		}
 

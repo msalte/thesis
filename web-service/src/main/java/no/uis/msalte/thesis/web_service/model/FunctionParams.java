@@ -1,6 +1,6 @@
 package no.uis.msalte.thesis.web_service.model;
 
-public interface MethodParams {
+public interface FunctionParams {
 	public static final String BYTES = ":bytes";
 	public static final String SECRET_KEY = ":secretKey";
 	public static final String PUBLIC_KEY = ":publicKey";

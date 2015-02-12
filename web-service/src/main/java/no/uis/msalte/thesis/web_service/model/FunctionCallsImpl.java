@@ -10,7 +10,7 @@ import spark.Response;
 import spark.Route;
 import spark.Spark;
 
-public class MethodCallsImpl implements MethodCalls {
+public class FunctionCallsImpl implements FunctionCalls {
 
 	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 
@@ -41,7 +41,7 @@ public class MethodCallsImpl implements MethodCalls {
 	public CallResponse newTorrent(Request req, Response res) {
 		final CallResponse newTorrent = getDefaultCallResponse(res);
 
-		final String bytes = req.params(MethodParams.BYTES);
+		final String bytes = req.params(FunctionParams.BYTES);
 
 		if (bytes != null) {
 			// TODO validate bytes
@@ -81,7 +81,7 @@ public class MethodCallsImpl implements MethodCalls {
 	public CallResponse newPublicKey(Request req, Response res) {
 		final CallResponse newPublicKey = getDefaultCallResponse(res);
 
-		final String secretKeyParam = req.params(MethodParams.SECRET_KEY);
+		final String secretKeyParam = req.params(FunctionParams.SECRET_KEY);
 
 		try {
 			final BigInteger secretKey = new BigInteger(secretKeyParam);
@@ -109,10 +109,10 @@ public class MethodCallsImpl implements MethodCalls {
 	public CallResponse share(Request req, Response res) {
 		final CallResponse share = getDefaultCallResponse(res);
 
-		final String idParam = req.params(MethodParams.ID);
-		final String publicKeyParam = req.params(MethodParams.PUBLIC_KEY);
+		final String idParam = req.params(FunctionParams.ID);
+		final String publicKeyParam = req.params(FunctionParams.PUBLIC_KEY);
 		final String reEncryptionKeyParam = req
-				.params(MethodParams.RE_ENCRYPTION_KEY);
+				.params(FunctionParams.RE_ENCRYPTION_KEY);
 
 		final boolean isParamsValid = idParam != null && publicKeyParam != null
 				&& reEncryptionKeyParam != null;
@@ -148,7 +148,7 @@ public class MethodCallsImpl implements MethodCalls {
 	public CallResponse upload(Request req, Response res) {
 		final CallResponse upload = getDefaultCallResponse(res);
 
-		final String bytesParam = req.params(MethodParams.BYTES);
+		final String bytesParam = req.params(FunctionParams.BYTES);
 
 		if (bytesParam != null) {
 			final int torrentId = SECURE_CLOUD_SHARE.upload(bytesParam
@@ -170,8 +170,8 @@ public class MethodCallsImpl implements MethodCalls {
 	public CallResponse download(Request req, Response res) {
 		final CallResponse download = getDefaultCallResponse(res);
 
-		final String idParam = req.params(MethodParams.ID);
-		final String publicKeyParam = req.params(MethodParams.PUBLIC_KEY);
+		final String idParam = req.params(FunctionParams.ID);
+		final String publicKeyParam = req.params(FunctionParams.PUBLIC_KEY);
 
 		final boolean isParamsValid = idParam != null && publicKeyParam != null;
 
