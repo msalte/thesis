@@ -38,7 +38,7 @@ public class WebServiceImpl implements WebService {
 				"Calling this function generates a new public key"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_SHARE,
-				new String[] { PARAM_ID, PARAM_PUBLIC_KEY,
+				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY,
 						PARAM_RE_ENCRYPTION_KEY },
 				new String[] { "string, bytes, bytes" },
 				"Call this function to share a torrent with someone else"));
@@ -48,7 +48,7 @@ public class WebServiceImpl implements WebService {
 				"Call this function to upload a torrent"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_DOWNLOAD,
-				new String[] { PARAM_ID, PARAM_PUBLIC_KEY },
+				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY },
 				new String[] { "string, bytes" },
 				"Call this function to download a torrent"));
 
@@ -111,23 +111,22 @@ public class WebServiceImpl implements WebService {
 	public WebServiceResponse share(Request req, Response res) {
 		final WebServiceResponse share = getDefaultWebServiceResponse(res);
 
-		final String idParam = req.queryParams(PARAM_ID);
-		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
-		final String reEncryptionKeyParam = req
-				.queryParams(PARAM_RE_ENCRYPTION_KEY);
+		final String fileName = req.queryParams(PARAM_FILE_NAME);
+		final String publicKey = req.queryParams(PARAM_PUBLIC_KEY);
+		final String reEncryptionKey = req.queryParams(PARAM_RE_ENCRYPTION_KEY);
 
-		final boolean isParamsValid = idParam != null && publicKeyParam != null
-				&& reEncryptionKeyParam != null;
+		final boolean isParamsValid = fileName != null && publicKey != null
+				&& reEncryptionKey != null;
 
 		if (isParamsValid) {
 			try {
-				final boolean isShared = SECURE_CLOUD_SHARE.share(idParam,
-						publicKeyParam.getBytes(),
-						reEncryptionKeyParam.getBytes());
+				final boolean isShared = SECURE_CLOUD_SHARE.share(fileName,
+						Base64.getDecoder().decode(publicKey), Base64
+								.getDecoder().decode(reEncryptionKey));
 
 				if (isShared) {
 					final String message = String.format(
-							"Torrent with id %d shared", idParam);
+							"Torrent %s shared", fileName);
 					final String content = String.valueOf(isShared);
 
 					share.setMessage(message);
@@ -155,7 +154,7 @@ public class WebServiceImpl implements WebService {
 		final String fileName = SECURE_CLOUD_SHARE.upload(file);
 
 		if (fileName != null) {
-			final String message = String.format("File %s uploaded", fileName);
+			final String message = String.format("Torrent %s uploaded", fileName);
 			final String content = fileName;
 
 			upload.setMessage(message);
@@ -171,23 +170,20 @@ public class WebServiceImpl implements WebService {
 	public WebServiceResponse download(Request req, Response res) {
 		final WebServiceResponse download = getDefaultWebServiceResponse(res);
 
-		final String idParam = req.queryParams(PARAM_ID);
-		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
+		final String fileName = req.queryParams(PARAM_FILE_NAME);
+		final String publicKey = req.queryParams(PARAM_PUBLIC_KEY);
 
-		final boolean isParamsValid = idParam != null && publicKeyParam != null;
+		final boolean isParamsValid = fileName != null && publicKey != null;
 
 		if (isParamsValid) {
 			try {
-				final byte[] publicKey = publicKeyParam.getBytes();
-
-				final byte[] file = SECURE_CLOUD_SHARE.download(idParam,
-						publicKey);
+				final byte[] file = SECURE_CLOUD_SHARE.download(fileName,
+						Base64.getDecoder().decode(publicKey));
 
 				if (file != null) {
 					final String message = "Download granted";
 					final String content = new String(Base64.getEncoder()
-							.encode(SECURE_CLOUD_SHARE.download(idParam,
-									publicKey)));
+							.encode(file));
 
 					download.setMessage(message);
 					download.setContent(content);

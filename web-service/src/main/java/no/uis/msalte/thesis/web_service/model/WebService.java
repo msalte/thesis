@@ -7,7 +7,7 @@ public interface WebService {
 	public static final String PARAM_TORRENT = "torrent";
 	public static final String PARAM_SECRET_KEY = "secretKey";
 	public static final String PARAM_PUBLIC_KEY = "publicKey";
-	public static final String PARAM_ID = "id";
+	public static final String PARAM_FILE_NAME = "fileName";
 	public static final String PARAM_RE_ENCRYPTION_KEY = "reEncryptionKey";
 
 	public static final String FUNC_UI = "ui";

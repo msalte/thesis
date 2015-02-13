@@ -71,21 +71,22 @@ public class ServerTest {
 				new String[] { WebService.PARAM_TORRENT },
 				new String[] { fileAsBytes });
 
-		// retrieve id
-		final String id = JsonRenderer.RENDERER
+		// retrieve file name
+		final String fileName = JsonRenderer.RENDERER
 				.fromJson(uploadResult, WebServiceResponse.class).getContent()
 				.toString();
 
 		// share
 		Client.call(HttpMethod.POST, WebService.FUNC_SHARE, new String[] {
-				WebService.PARAM_ID, WebService.PARAM_PUBLIC_KEY,
-				WebService.PARAM_RE_ENCRYPTION_KEY }, new String[] { id,
+				WebService.PARAM_FILE_NAME, WebService.PARAM_PUBLIC_KEY,
+				WebService.PARAM_RE_ENCRYPTION_KEY }, new String[] { fileName,
 				publicKey, reEncryptionKey });
 
 		// download
 		final String downloadResult = Client.call(HttpMethod.POST,
-				WebService.FUNC_DOWNLOAD, new String[] { WebService.PARAM_ID,
-						WebService.PARAM_PUBLIC_KEY }, new String[] { id,
+				WebService.FUNC_DOWNLOAD,
+				new String[] { WebService.PARAM_FILE_NAME,
+						WebService.PARAM_PUBLIC_KEY }, new String[] { fileName,
 						publicKey });
 
 		final String downloadedFileBytes = JsonRenderer.RENDERER
