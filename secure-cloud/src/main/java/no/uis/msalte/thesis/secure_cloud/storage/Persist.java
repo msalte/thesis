@@ -14,8 +14,9 @@ public class Persist {
 	private static final String DB_FILE = "C:\\Users\\Morten\\Desktop\\db\\test";
 	private static final String SEPARATOR = ",";
 
-	public static final String MAP_TORRENTS = "torrents"; // torrentId, file
-	public static final String MAP_PUBLIC_KEYS = "public_keys"; // torrentId, pk
+	public static final String MAP_TORRENTS = "torrents"; // torrentName, file
+	public static final String MAP_PUBLIC_KEYS = "public_keys"; // torrentName,
+																// pk
 	public static final String MAP_RE_ENCRYPTION_KEYS = "re_encryption_keys"; // pk,
 																				// rek
 
@@ -45,8 +46,8 @@ public class Persist {
 		if (current != null) {
 			String[] parts = current.split(SEPARATOR);
 
-			for (String p : parts) {
-				if (p.trim().equals(value.trim())) {
+			for (String item : parts) {
+				if (item.trim().equals(value.trim())) {
 					LOGGER.log(
 							Level.INFO,
 							String.format(
@@ -134,13 +135,13 @@ public class Persist {
 		sb.append("---------------------");
 		sb.append("\n");
 
-		sb.append(String.format("%-45s %s", "KEY:", "VALUE:"));
+		sb.append(String.format("%-60s %s", "KEY:", "VALUE:"));
 		sb.append("\n");
 
 		int length = sb.length();
 
 		for (String key : getMap(map).keySet()) {
-			sb.append(String.format("%-45s %s", key, read(map, key)));
+			sb.append(String.format("%-60s %s", key, read(map, key)));
 			sb.append("\n");
 		}
 
