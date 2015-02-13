@@ -4,7 +4,7 @@ import spark.Request;
 import spark.Response;
 
 public interface WebService {
-	public static final String PARAM_TORRENT = "torrent";
+	public static final String PARAM_FILE = "file";
 	public static final String PARAM_SECRET_KEY = "secretKey";
 	public static final String PARAM_PUBLIC_KEY = "publicKey";
 	public static final String PARAM_FILE_NAME = "fileName";

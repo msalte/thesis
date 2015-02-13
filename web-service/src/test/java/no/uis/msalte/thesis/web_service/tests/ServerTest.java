@@ -1,13 +1,12 @@
 package no.uis.msalte.thesis.web_service.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
@@ -38,13 +37,14 @@ public class ServerTest {
 	@Test
 	public void testGivenUploadFileSuccessThenShouldReturnNewFileName()
 			throws Exception {
-		final String fileAsBytes = fileAsByteString(getPath("file.torrent"));
+
+		final byte[] file = Files.readAllBytes(Paths
+				.get(getPath("file.torrent")));
 
 		// upload file
 		final String result = Client.call(HttpMethod.POST,
-				WebService.FUNC_UPLOAD,
-				new String[] { WebService.PARAM_TORRENT },
-				new String[] { fileAsBytes });
+				WebService.FUNC_UPLOAD, new String[] { WebService.PARAM_FILE },
+				new String[] { FilesUtil.encode(file) });
 
 		final String fileName = JsonRenderer.RENDERER
 				.fromJson(result, WebServiceResponse.class).getContent()
@@ -60,16 +60,18 @@ public class ServerTest {
 	@Test
 	public void testGivenShareFileSuccessThenRecipientShouldBeGrantedDownload()
 			throws Exception {
-		final String publicKey = "public_key";
-		final String reEncryptionKey = "re_encryption_key";
 
-		final String fileAsBytes = fileAsByteString(getPath("file.torrent"));
+		final String publicKey = FilesUtil.encode("public_key".getBytes());
+		final String reEncryptionKey = FilesUtil.encode("re_encryption_key"
+				.getBytes());
+
+		final byte[] file = Files.readAllBytes(Paths
+				.get(getPath("file.torrent")));
 
 		// upload file
 		final String uploadResult = Client.call(HttpMethod.POST,
-				WebService.FUNC_UPLOAD,
-				new String[] { WebService.PARAM_TORRENT },
-				new String[] { fileAsBytes });
+				WebService.FUNC_UPLOAD, new String[] { WebService.PARAM_FILE },
+				new String[] { FilesUtil.encode(file) });
 
 		// retrieve file name
 		final String fileName = JsonRenderer.RENDERER
@@ -89,23 +91,15 @@ public class ServerTest {
 						WebService.PARAM_PUBLIC_KEY }, new String[] { fileName,
 						publicKey });
 
-		final String downloadedFileBytes = JsonRenderer.RENDERER
+		final String downloadedFile = JsonRenderer.RENDERER
 				.fromJson(downloadResult, WebServiceResponse.class)
 				.getContent().toString();
 
-		assertEquals(fileAsBytes, downloadedFileBytes);
+		assertTrue(Arrays.equals(file, FilesUtil.decode(downloadedFile)));
 	}
 
 	private String getPath(String filename) throws URISyntaxException {
 		return new File(getClass().getClassLoader().getResource(filename)
 				.toURI()).getAbsolutePath();
-	}
-
-	private String fileAsByteString(String path) {
-		try {
-			return FilesUtil.encode(Files.readAllBytes(Paths.get(path)));
-		} catch (IOException e) {
-			return "";
-		}
 	}
 }

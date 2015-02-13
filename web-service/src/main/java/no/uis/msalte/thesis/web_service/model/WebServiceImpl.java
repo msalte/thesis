@@ -1,11 +1,9 @@
 package no.uis.msalte.thesis.web_service.model;
 
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
-import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -44,7 +42,7 @@ public class WebServiceImpl implements WebService {
 				"Call this function to share a torrent with someone else"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_UPLOAD,
-				new String[] { PARAM_TORRENT }, new String[] { "bytes" },
+				new String[] { PARAM_FILE }, new String[] { "bytes" },
 				"Call this function to upload a torrent"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_DOWNLOAD,
@@ -69,10 +67,10 @@ public class WebServiceImpl implements WebService {
 	public WebServiceResponse newSecretKey(Request req, Response res) {
 		final WebServiceResponse newSecretKey = getDefaultWebServiceResponse(res);
 
-		final byte[] secretKeyBytes = SECURE_CLOUD_SHARE.newSecretKey();
+		final String secretKey = SECURE_CLOUD_SHARE.newSecretKey();
 
 		final String message = "Secret key generated";
-		final String content = new BigInteger(secretKeyBytes).toString();
+		final String content = secretKey;
 
 		newSecretKey.setMessage(message);
 		newSecretKey.setContent(content);
@@ -86,15 +84,13 @@ public class WebServiceImpl implements WebService {
 	public WebServiceResponse newPublicKey(Request req, Response res) {
 		final WebServiceResponse newPublicKey = getDefaultWebServiceResponse(res);
 
-		final String secretKeyParam = req.queryParams(PARAM_SECRET_KEY);
+		final String secretKey = req.queryParams(PARAM_SECRET_KEY);
 
 		try {
-			final BigInteger secretKey = new BigInteger(secretKeyParam);
-			final byte[] publicKeyBytes = SECURE_CLOUD_SHARE
-					.newPublicKey(secretKey.toByteArray());
+			final String publicKey = SECURE_CLOUD_SHARE.newPublicKey(secretKey);
 
 			final String message = "Public key generated";
-			final String content = new BigInteger(publicKeyBytes).toString();
+			final String content = publicKey;
 
 			newPublicKey.setMessage(message);
 			newPublicKey.setContent(content);
@@ -121,7 +117,7 @@ public class WebServiceImpl implements WebService {
 		if (isParamsValid) {
 			try {
 				final boolean isShared = SECURE_CLOUD_SHARE.share(fileName,
-						publicKey.getBytes(), reEncryptionKey.getBytes());
+						publicKey, reEncryptionKey);
 
 				if (isShared) {
 					final String message = String.format("Torrent %s shared",
@@ -146,10 +142,7 @@ public class WebServiceImpl implements WebService {
 	public WebServiceResponse upload(Request req, Response res) {
 		final WebServiceResponse upload = getDefaultWebServiceResponse(res);
 
-		final String bytes = req.queryParams(PARAM_TORRENT);
-
-		final byte[] file = FilesUtil.decode(bytes);
-
+		final String file = req.queryParams(PARAM_FILE);
 		final String fileName = SECURE_CLOUD_SHARE.upload(file);
 
 		if (fileName != null) {
@@ -177,12 +170,12 @@ public class WebServiceImpl implements WebService {
 
 		if (isParamsValid) {
 			try {
-				final byte[] file = SECURE_CLOUD_SHARE.download(fileName,
-						publicKey.getBytes());
+				final String file = SECURE_CLOUD_SHARE.download(fileName,
+						publicKey);
 
 				if (file != null) {
 					final String message = "Download granted";
-					final String content = FilesUtil.encode(file);
+					final String content = file;
 
 					download.setMessage(message);
 					download.setContent(content);
