@@ -9,12 +9,11 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.UUID;
 
 import no.uis.msalte.thesis.web_service.client.Client;
-import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
-import no.uis.msalte.thesis.web_service.model.WebService;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
+import no.uis.msalte.thesis.web_service.model.WebService;
+import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.server.Server;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 
@@ -37,7 +36,7 @@ public class ServerTest {
 	}
 
 	@Test
-	public void testGivenUploadFileSuccessThenShouldReturnNewId()
+	public void testGivenUploadFileSuccessThenShouldReturnNewFileName()
 			throws Exception {
 		final String fileAsBytes = fileAsByteString(getPath("file.torrent"));
 
@@ -47,12 +46,12 @@ public class ServerTest {
 				new String[] { WebService.PARAM_TORRENT },
 				new String[] { fileAsBytes });
 
-		final String id = JsonRenderer.RENDERER
-				.fromJson(result, WebServiceResponse.class).getContent().toString();
+		final String fileName = JsonRenderer.RENDERER
+				.fromJson(result, WebServiceResponse.class).getContent()
+				.toString();
 
 		try {
-			UUID.fromString(id);
-			assertTrue(true);
+			assertTrue(fileName.endsWith(".torrent"));
 		} catch (IllegalArgumentException e) {
 			assertTrue(false);
 		}
@@ -85,14 +84,13 @@ public class ServerTest {
 
 		// download
 		final String downloadResult = Client.call(HttpMethod.POST,
-				WebService.FUNC_DOWNLOAD,
-				new String[] { WebService.PARAM_ID,
+				WebService.FUNC_DOWNLOAD, new String[] { WebService.PARAM_ID,
 						WebService.PARAM_PUBLIC_KEY }, new String[] { id,
 						publicKey });
 
 		final String downloadedFileBytes = JsonRenderer.RENDERER
-				.fromJson(downloadResult, WebServiceResponse.class).getContent()
-				.toString();
+				.fromJson(downloadResult, WebServiceResponse.class)
+				.getContent().toString();
 
 		assertEquals(fileAsBytes, downloadedFileBytes);
 	}
