@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Base64;
 
+import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.model.WebService;
@@ -103,8 +103,7 @@ public class ServerTest {
 
 	private String fileAsByteString(String path) {
 		try {
-			return new String(Base64.getEncoder().encode(
-					Files.readAllBytes(Paths.get(path))));
+			return FilesUtil.encode(Files.readAllBytes(Paths.get(path)));
 		} catch (IOException e) {
 			return "";
 		}

@@ -3,9 +3,9 @@ package no.uis.msalte.thesis.web_service.model;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Base64;
 
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
+import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -124,8 +124,8 @@ public class WebServiceImpl implements WebService {
 						publicKey.getBytes(), reEncryptionKey.getBytes());
 
 				if (isShared) {
-					final String message = String.format(
-							"Torrent %s shared", fileName);
+					final String message = String.format("Torrent %s shared",
+							fileName);
 					final String content = String.valueOf(isShared);
 
 					share.setMessage(message);
@@ -148,12 +148,13 @@ public class WebServiceImpl implements WebService {
 
 		final String bytes = req.queryParams(PARAM_TORRENT);
 
-		final byte[] file = Base64.getDecoder().decode(bytes);
+		final byte[] file = FilesUtil.decode(bytes);
 
 		final String fileName = SECURE_CLOUD_SHARE.upload(file);
 
 		if (fileName != null) {
-			final String message = String.format("Torrent %s uploaded", fileName);
+			final String message = String.format("Torrent %s uploaded",
+					fileName);
 			final String content = fileName;
 
 			upload.setMessage(message);
@@ -181,8 +182,7 @@ public class WebServiceImpl implements WebService {
 
 				if (file != null) {
 					final String message = "Download granted";
-					final String content = new String(Base64.getEncoder()
-							.encode(file));
+					final String content = FilesUtil.encode(file);
 
 					download.setMessage(message);
 					download.setContent(content);
