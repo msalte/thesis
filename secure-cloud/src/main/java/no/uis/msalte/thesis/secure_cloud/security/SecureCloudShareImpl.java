@@ -1,15 +1,14 @@
 package no.uis.msalte.thesis.secure_cloud.security;
 
 import java.math.BigInteger;
+import java.util.Base64;
+import java.util.UUID;
 
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
-import no.uis.msalte.thesis.secure_cloud.storage.TorrentDirectory;
+import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
-
-	private TorrentDirectory torrentDirectory = new TorrentDirectory();
-	private AccessControl accessControl = new AccessControl();
 	private ElGamalParams params = new ElGamalParams(512);
 
 	public byte[] newSecretKey() {
@@ -25,14 +24,27 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return null;
 	}
 
-	public String upload(byte[] torrent) {
-		return torrentDirectory.store(torrent);
+	public String upload(byte[] file) {
+		final String fileName = String.format("%s.%s", UUID.randomUUID()
+				.toString(), ".torrent");
+
+		final String bytes = Base64.getEncoder().encodeToString(file);
+
+		Persist.getInstance().write(Persist.MAP_TORRENTS, fileName, bytes);
+
+		return fileName;
 	}
 
-	public boolean share(String id, byte[] publicKey, byte[] reEncryptionKey) {
-		if (torrentDirectory.get(id) != null) {
+	public boolean share(String fileName, byte[] publicKey,
+			byte[] reEncryptionKey) {
+		Persist persist = Persist.getInstance();
 
-			accessControl.grant(id, publicKey, reEncryptionKey);
+		if (persist.hasKey(Persist.MAP_TORRENTS, fileName)) {
+			String pk = Base64.getEncoder().encodeToString(publicKey);
+			String rek = Base64.getEncoder().encodeToString(reEncryptionKey);
+
+			persist.write(Persist.MAP_PUBLIC_KEYS, fileName, pk);
+			persist.write(Persist.MAP_RE_ENCRYPTION_KEYS, pk, rek);
 
 			return true;
 		}
@@ -40,18 +52,20 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return false;
 	}
 
-	public byte[] download(String id, byte[] publicKey) {
-		final byte[] reEncryptionKey = accessControl.reEncryptionKeyFor(id,
-				publicKey);
+	public byte[] download(String fileName, byte[] publicKey) {
+		String pk = Base64.getEncoder().encodeToString(publicKey);
 
-		final boolean hasAccess = reEncryptionKey != null;
+		final boolean hasAccess = AccessControl.hasAccess(fileName, pk);
 
 		if (hasAccess) {
-			byte[] torrent = torrentDirectory.get(id);
+			// String rek = AccessControl.getReEncryptionKeyFor(pk);
 
-			// TODO perform re-encryption
+			String file = Persist.getInstance().read(Persist.MAP_TORRENTS,
+					fileName);
 
-			return torrent;
+			// TODO re-encrypt
+
+			return Base64.getDecoder().decode(file);
 		}
 
 		return null;
