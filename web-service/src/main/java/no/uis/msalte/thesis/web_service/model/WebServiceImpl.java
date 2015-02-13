@@ -121,8 +121,7 @@ public class WebServiceImpl implements WebService {
 		if (isParamsValid) {
 			try {
 				final boolean isShared = SECURE_CLOUD_SHARE.share(fileName,
-						Base64.getDecoder().decode(publicKey), Base64
-								.getDecoder().decode(reEncryptionKey));
+						publicKey.getBytes(), reEncryptionKey.getBytes());
 
 				if (isShared) {
 					final String message = String.format(
@@ -178,7 +177,7 @@ public class WebServiceImpl implements WebService {
 		if (isParamsValid) {
 			try {
 				final byte[] file = SECURE_CLOUD_SHARE.download(fileName,
-						Base64.getDecoder().decode(publicKey));
+						publicKey.getBytes());
 
 				if (file != null) {
 					final String message = "Download granted";
