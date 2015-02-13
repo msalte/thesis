@@ -1,6 +1,5 @@
 package no.uis.msalte.thesis.web_service.model;
 
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -14,11 +13,10 @@ import spark.Spark;
 public class WebServiceImpl implements WebService {
 
 	private static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
-	private static final String OUTPUT_DIRECTORY = "C:\\Users\\Morten\\Desktop\\secure_cloud";
 
 	@Override
 	public WebServiceResponse ui(Request req, Response res) {
-		final WebServiceResponse ui = getDefaultCallResponse(res);
+		final WebServiceResponse ui = getDefaultWebServiceResponse(res);
 
 		final String message = "The user interface - All valid function calls return a JSON object";
 		final ArrayList<InterfaceEntry> content = new ArrayList<InterfaceEntry>();
@@ -69,7 +67,7 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse newSecretKey(Request req, Response res) {
-		final WebServiceResponse newSecretKey = getDefaultCallResponse(res);
+		final WebServiceResponse newSecretKey = getDefaultWebServiceResponse(res);
 
 		final byte[] secretKeyBytes = SECURE_CLOUD_SHARE.newSecretKey();
 
@@ -86,7 +84,7 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse newPublicKey(Request req, Response res) {
-		final WebServiceResponse newPublicKey = getDefaultCallResponse(res);
+		final WebServiceResponse newPublicKey = getDefaultWebServiceResponse(res);
 
 		final String secretKeyParam = req.queryParams(PARAM_SECRET_KEY);
 
@@ -111,7 +109,7 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse share(Request req, Response res) {
-		final WebServiceResponse share = getDefaultCallResponse(res);
+		final WebServiceResponse share = getDefaultWebServiceResponse(res);
 
 		final String idParam = req.queryParams(PARAM_ID);
 		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
@@ -148,32 +146,22 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse upload(Request req, Response res) {
-		final WebServiceResponse upload = getDefaultCallResponse(res);
+		final WebServiceResponse upload = getDefaultWebServiceResponse(res);
 
 		final String bytes = req.queryParams(PARAM_TORRENT);
 
-		try {
-			// TODO debate moving file stuff into secure cloud project
-			final byte[] file = Base64.getDecoder().decode(bytes);
+		final byte[] file = Base64.getDecoder().decode(bytes);
 
-			final String torrent = SECURE_CLOUD_SHARE.upload(file);
-			final String fileName = String.format("%s.torrent", torrent);
+		final String fileName = SECURE_CLOUD_SHARE.upload(file);
 
-			final FileOutputStream fos = new FileOutputStream(String.format(
-					"%s//%s", OUTPUT_DIRECTORY, fileName));
-
-			fos.write(file);
-			fos.close();
-
+		if (fileName != null) {
 			final String message = String.format("File %s uploaded", fileName);
-			final String content = String.valueOf(torrent);
+			final String content = fileName;
 
 			upload.setMessage(message);
 			upload.setContent(content);
 
 			return upload;
-		} catch (Exception e) {
-			// ignore
 		}
 
 		return getBadRequest(res);
@@ -181,7 +169,7 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse download(Request req, Response res) {
-		final WebServiceResponse download = getDefaultCallResponse(res);
+		final WebServiceResponse download = getDefaultWebServiceResponse(res);
 
 		final String idParam = req.queryParams(PARAM_ID);
 		final String publicKeyParam = req.queryParams(PARAM_PUBLIC_KEY);
@@ -214,7 +202,7 @@ public class WebServiceImpl implements WebService {
 		return getBadRequest(res);
 	}
 
-	private WebServiceResponse getDefaultCallResponse(Response res) {
+	private WebServiceResponse getDefaultWebServiceResponse(Response res) {
 		res.status(HttpURLConnection.HTTP_OK);
 
 		return new WebServiceResponse(res, null, null,
