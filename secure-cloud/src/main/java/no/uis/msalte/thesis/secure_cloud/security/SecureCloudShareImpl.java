@@ -1,12 +1,12 @@
 package no.uis.msalte.thesis.secure_cloud.security;
 
 import java.math.BigInteger;
-import java.util.Base64;
 import java.util.UUID;
 
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
 import no.uis.msalte.thesis.secure_cloud.storage.Persist;
+import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
 	private ElGamalParams params = new ElGamalParams(512);
@@ -25,10 +25,10 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public String upload(byte[] file) {
-		final String fileName = String.format("%s.%s", UUID.randomUUID()
-				.toString(), ".torrent");
+		final String fileName = String.format("%s.torrent", UUID.randomUUID()
+				.toString());
 
-		final String bytes = Base64.getEncoder().encodeToString(file);
+		final String bytes = FilesUtil.encode(file);
 
 		Persist.getInstance().write(Persist.MAP_TORRENTS, fileName, bytes);
 
@@ -37,14 +37,17 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 	public boolean share(String fileName, byte[] publicKey,
 			byte[] reEncryptionKey) {
-		Persist persist = Persist.getInstance();
+		
+		final boolean torrentExists = Persist.getInstance().hasKey(
+				Persist.MAP_TORRENTS, fileName);
 
-		if (persist.hasKey(Persist.MAP_TORRENTS, fileName)) {
-			String pk = Base64.getEncoder().encodeToString(publicKey);
-			String rek = Base64.getEncoder().encodeToString(reEncryptionKey);
+		if (torrentExists) {
+			String pk = FilesUtil.encode(publicKey);
+			String rek = FilesUtil.encode(reEncryptionKey);
 
-			persist.write(Persist.MAP_PUBLIC_KEYS, fileName, pk);
-			persist.write(Persist.MAP_RE_ENCRYPTION_KEYS, pk, rek);
+			Persist.getInstance().write(Persist.MAP_PUBLIC_KEYS, fileName, pk);
+			Persist.getInstance()
+					.write(Persist.MAP_RE_ENCRYPTION_KEYS, pk, rek);
 
 			return true;
 		}
@@ -53,7 +56,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public byte[] download(String fileName, byte[] publicKey) {
-		String pk = Base64.getEncoder().encodeToString(publicKey);
+		String pk = FilesUtil.encode(publicKey);
 
 		final boolean hasAccess = AccessControl.hasAccess(fileName, pk);
 
@@ -65,7 +68,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 			// TODO re-encrypt
 
-			return Base64.getDecoder().decode(file);
+			return FilesUtil.decode(file);
 		}
 
 		return null;

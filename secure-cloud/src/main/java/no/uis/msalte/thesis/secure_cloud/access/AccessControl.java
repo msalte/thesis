@@ -4,13 +4,14 @@ import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class AccessControl {
 	public static boolean hasAccess(String torrent, String publicKey) {
-		Persist p = Persist.getInstance();
 
-		boolean torrentExists = p.hasKey(Persist.MAP_TORRENTS, torrent);
-		boolean hasPublicKey = p.hasValue(Persist.MAP_PUBLIC_KEYS, torrent,
-				publicKey);
+		final boolean torrentExists = Persist.getInstance().hasKey(
+				Persist.MAP_TORRENTS, torrent);
 
-		return torrentExists && hasPublicKey;
+		final boolean hasCorrespondingPublicKey = Persist.getInstance()
+				.hasValue(Persist.MAP_PUBLIC_KEYS, torrent, publicKey);
+
+		return torrentExists && hasCorrespondingPublicKey;
 	}
 
 	public static String getReEncryptionKeyFor(String publicKey) {
