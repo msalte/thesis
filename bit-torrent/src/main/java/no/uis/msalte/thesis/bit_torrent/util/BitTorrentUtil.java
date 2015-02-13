@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import no.uis.msalte.thesis.bit_torrent.App;
@@ -15,7 +14,6 @@ import com.turn.ttorrent.common.Torrent;
 public class BitTorrentUtil {
 	private static final int PIECE_LENGTH = 256 * 1000;
 	private static final String ANNOUNCE_URI = "http://localhost:6969/announce";
-	private static final String OUTPUT_DIRECTORY = "C:\\Users\\Morten\\Desktop\\ttorrent\\torrents";
 
 	/**
 	 * Creates and stores a new torrent file for the given source file
@@ -52,22 +50,5 @@ public class BitTorrentUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static boolean writeTorrentFromBytes(String fileName, String bytes) {
-		try {
-			final byte[] file = Base64.getDecoder().decode(bytes);
-			FileOutputStream fos = new FileOutputStream(String.format("%s//%s",
-					OUTPUT_DIRECTORY, fileName));
-
-			fos.write(file);
-			fos.close();
-
-			return true;
-		} catch (Exception e) {
-			// ignore
-		}
-
-		return false;
 	}
 }
