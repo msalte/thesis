@@ -7,7 +7,7 @@ public class App {
 	public static void main(String[] args) {
 		 Persist p = Persist.getInstance();
 		 
-		 System.out.println(p.formatMap(Persist.MAP_TORRENTS));
-		 System.out.println(p.formatMap(Persist.MAP_KEY_TUPLES));
+		 System.out.println(p.formatMap(Persist.Maps.TORRENTS));
+		 System.out.println(p.formatMap(Persist.Maps.KEY_TUPLES));
 	}
 }

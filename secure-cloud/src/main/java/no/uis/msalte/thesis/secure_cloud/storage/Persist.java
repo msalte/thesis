@@ -22,12 +22,8 @@ public class Persist {
 	private static final Type GSON_TYPE = new TypeToken<ArrayList<KeyTuple>>() {
 	}.getType();
 
-	private static final Logger LOGGER = Logger.getLogger(Persist.class
-			.getName());
+	private static final Logger L = Logger.getLogger(Persist.class.getName());
 	private static final String DB_FILE = "C:\\Users\\Morten\\Desktop\\db\\test";
-
-	public static final String MAP_TORRENTS = "torrents";
-	public static final String MAP_KEY_TUPLES = "key_tuples";
 
 	private static Persist instance;
 
@@ -50,28 +46,29 @@ public class Persist {
 	}
 
 	public void storeTorrent(String fileName, String fileBytes) {
-		final boolean torrentExists = getMap(MAP_TORRENTS).get(fileName) != null;
+		final boolean torrentExists = getMap(Maps.TORRENTS.name())
+				.get(fileName) != null;
 
 		if (!torrentExists) {
-			getMap(MAP_TORRENTS).put(fileName, fileBytes);
+			getMap(Maps.TORRENTS.name()).put(fileName, fileBytes);
 
-			LOGGER.log(Level.INFO,
+			L.log(Level.INFO,
 					String.format("Stored new torrent file [%s]", fileName));
 
 			db.commit();
 			return;
 		}
 
-		LOGGER.log(Level.INFO, String.format(
+		L.log(Level.INFO, String.format(
 				"The torrent file [%s] is already stored", fileName));
 	}
 
 	public boolean storeKeysTuple(String fileName, KeyTuple keysTuple) {
-		final boolean torrentExists = hasKey(MAP_TORRENTS, fileName);
+		final boolean torrentExists = hasKey(Maps.TORRENTS.name(), fileName);
 
 		if (torrentExists) {
-			ArrayList<KeyTuple> tuples = GSON.fromJson(getMap(MAP_KEY_TUPLES)
-					.get(fileName), GSON_TYPE);
+			ArrayList<KeyTuple> tuples = GSON.fromJson(
+					getMap(Maps.KEY_TUPLES.name()).get(fileName), GSON_TYPE);
 
 			if (tuples == null) {
 				tuples = new ArrayList<KeyTuple>();
@@ -79,10 +76,9 @@ public class Persist {
 
 			tuples.add(keysTuple);
 
-			getMap(MAP_KEY_TUPLES).put(fileName, GSON.toJson(tuples));
+			getMap(Maps.KEY_TUPLES.name()).put(fileName, GSON.toJson(tuples));
 
-			LOGGER.log(
-					Level.INFO,
+			L.log(Level.INFO,
 					String.format("Stored [%s] for file [%s]",
 							GSON.toJson(keysTuple), fileName));
 
@@ -90,19 +86,19 @@ public class Persist {
 			return true;
 		}
 
-		LOGGER.log(Level.WARNING, String.format(
+		L.log(Level.WARNING, String.format(
 				"The file [%s] does not exist in map [%s]", fileName,
-				MAP_TORRENTS));
+				Maps.TORRENTS.name()));
 
 		return false;
 	}
 
 	public String readTorrent(String fileName) {
-		return getMap(MAP_TORRENTS).get(fileName);
+		return getMap(Maps.TORRENTS.name()).get(fileName);
 	}
 
 	public ArrayList<KeyTuple> readKeyTuples(String fileName) {
-		final String json = getMap(MAP_KEY_TUPLES).get(fileName);
+		final String json = getMap(Maps.KEY_TUPLES.name()).get(fileName);
 
 		if (json != null) {
 			return GSON.fromJson(json, GSON_TYPE);
@@ -111,31 +107,27 @@ public class Persist {
 		return null;
 	}
 
-	private void deleteKey(String map, String key) {
-		getMap(map).remove(key);
+	public void reset() {
+		for (Maps m : Maps.values()) {
+			for (String key : getMap(m.name()).keySet()) {
+				getMap(m.name()).remove(key);
 
-		LOGGER.log(Level.INFO,
-				String.format("Deleted key [%s] from map [%s]", key, map));
+				L.log(Level.INFO,
+						String.format("Deleted key [%s] from map [%s]", key,
+								m.name()));
+			}
+		}
 
 		db.commit();
-	}
-
-	public void reset() {
-		for (String key : getMap(MAP_TORRENTS).keySet()) {
-			deleteKey(MAP_TORRENTS, key);
-		}
-
-		for (String key : getMap(MAP_KEY_TUPLES).keySet()) {
-			deleteKey(MAP_KEY_TUPLES, key);
-		}
 	}
 
 	private boolean hasKey(String map, String key) {
 		return getMap(map).containsKey(key);
 	}
 
-	public String formatMap(String map) {
+	public String formatMap(Maps m) {
 		final StringBuilder sb = new StringBuilder();
+		final String map = m.name();
 
 		sb.append(map);
 		sb.append("\n");
@@ -164,4 +156,7 @@ public class Persist {
 		return db.getTreeMap(map);
 	}
 
+	public enum Maps {
+		TORRENTS, KEY_TUPLES
+	}
 }
