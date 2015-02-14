@@ -1,24 +1,33 @@
 package no.uis.msalte.thesis.secure_cloud.storage;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
+
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 public class Persist {
-	private final static Logger LOGGER = Logger.getLogger(Persist.class
+	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping()
+			.create();
+	private static final Type GSON_TYPE = new TypeToken<ArrayList<KeyTuple>>() {
+	}.getType();
+
+	private static final Logger LOGGER = Logger.getLogger(Persist.class
 			.getName());
 	private static final String DB_FILE = "C:\\Users\\Morten\\Desktop\\db\\test";
-	private static final String SEPARATOR = ",";
 
-	public static final String MAP_TORRENTS = "torrents"; // torrentName, file
-	public static final String MAP_PUBLIC_KEYS = "public_keys"; // torrentName,
-																// pk
-	public static final String MAP_RE_ENCRYPTION_KEYS = "re_encryption_keys"; // pk,
-																				// rek
+	public static final String MAP_TORRENTS = "torrents";
+	public static final String MAP_KEY_TUPLES = "key_tuples";
 
 	private static Persist instance;
 
@@ -40,63 +49,69 @@ public class Persist {
 		db = DBMaker.newFileDB(new File(DB_FILE)).closeOnJvmShutdown().make();
 	}
 
-	public void write(String map, String key, String value) {
-		String current = getMap(map).get(key);
+	public void storeTorrent(String fileName, String fileBytes) {
+		final boolean torrentExists = getMap(MAP_TORRENTS).get(fileName) != null;
 
-		if (current != null) {
-			String[] parts = current.split(SEPARATOR);
+		if (!torrentExists) {
+			getMap(MAP_TORRENTS).put(fileName, fileBytes);
 
-			for (String item : parts) {
-				if (item.trim().equals(value.trim())) {
-					LOGGER.log(
-							Level.INFO,
-							String.format(
-									"Value [%s] already exists for key [%s] in map [%s]",
-									value, key, map));
-					return;
-				}
-			}
-
-			current = appendValue(current, value);
-		} else {
-			current = new String(value);
-		}
-
-		getMap(map).put(key, current);
-
-		LOGGER.log(Level.INFO, String.format(
-				"Wrote value [%s] to key [%s] in map [%s]", value, key, map));
-
-		db.commit();
-	}
-
-	public String read(String map, String key) {
-		return getMap(map).get(key);
-	}
-
-	public void deleteValue(String map, String key, String value) {
-		String current = read(map, key);
-
-		if (current.contains(value)) {
-			getMap(map).put(key, removeValue(current, value));
-
-			LOGGER.log(Level.INFO, String.format(
-					"Deleted value [%s] from key [%s] in map [%s]", value, key,
-					map));
+			LOGGER.log(Level.INFO,
+					String.format("Stored new torrent file [%s]", fileName));
 
 			db.commit();
-
 			return;
 		}
 
-		LOGGER.log(
-				Level.INFO,
-				String.format(
-						"Tried to delete value [%s] from key [%s] in map [%s], but it did not exist",
-						value, key, map));
+		LOGGER.log(Level.INFO, String.format(
+				"The torrent file [%s] is already stored", fileName));
 	}
 
-	public void deleteKey(String map, String key) {
+	public boolean storeKeysTuple(String fileName, KeyTuple keysTuple) {
+		final boolean torrentExists = hasKey(MAP_TORRENTS, fileName);
+
+		if (torrentExists) {
+			ArrayList<KeyTuple> tuples = GSON.fromJson(getMap(MAP_KEY_TUPLES)
+					.get(fileName), GSON_TYPE);
+
+			if (tuples == null) {
+				tuples = new ArrayList<KeyTuple>();
+			}
+
+			tuples.add(keysTuple);
+
+			getMap(MAP_KEY_TUPLES).put(fileName, GSON.toJson(tuples));
+
+			LOGGER.log(
+					Level.INFO,
+					String.format("Stored [%s] for file [%s]",
+							GSON.toJson(keysTuple), fileName));
+
+			db.commit();
+			return true;
+		}
+
+		LOGGER.log(Level.WARNING, String.format(
+				"The file [%s] does not exist in map [%s]", fileName,
+				MAP_TORRENTS));
+
+		return false;
+	}
+
+	public String readTorrent(String fileName) {
+		return getMap(MAP_TORRENTS).get(fileName);
+	}
+
+	public ArrayList<KeyTuple> readKeyTuples(String fileName) {
+		final String json = getMap(MAP_KEY_TUPLES).get(fileName);
+
+		if (json != null) {
+			return GSON.fromJson(json, GSON_TYPE);
+		}
+
+		return null;
+	}
+
+	private void deleteKey(String map, String key) {
 		getMap(map).remove(key);
 
 		LOGGER.log(Level.INFO,
@@ -105,26 +120,18 @@ public class Persist {
 		db.commit();
 	}
 
-	public boolean hasKey(String map, String key) {
-		return getMap(map).containsKey(key);
-	}
-
-	public boolean hasValue(String map, String key, String value) {
-		return getMap(map).get(key).contains(value);
-	}
-
 	public void reset() {
 		for (String key : getMap(MAP_TORRENTS).keySet()) {
 			deleteKey(MAP_TORRENTS, key);
 		}
 
-		for (String key : getMap(MAP_PUBLIC_KEYS).keySet()) {
-			deleteKey(MAP_PUBLIC_KEYS, key);
+		for (String key : getMap(MAP_KEY_TUPLES).keySet()) {
+			deleteKey(MAP_KEY_TUPLES, key);
 		}
+	}
 
-		for (String key : getMap(MAP_RE_ENCRYPTION_KEYS).keySet()) {
-			deleteKey(MAP_RE_ENCRYPTION_KEYS, key);
-		}
+	private boolean hasKey(String map, String key) {
+		return getMap(map).containsKey(key);
 	}
 
 	public String formatMap(String map) {
@@ -141,7 +148,7 @@ public class Persist {
 		int length = sb.length();
 
 		for (String key : getMap(map).keySet()) {
-			sb.append(String.format("%-60s %s", key, read(map, key)));
+			sb.append(String.format("%-60s %s", key, getMap(map).get(key)));
 			sb.append("\n");
 		}
 
@@ -153,26 +160,8 @@ public class Persist {
 		return sb.toString();
 	}
 
-	private String appendValue(String current, String value) {
-		return String.format("%s%s%s", current, SEPARATOR, value);
-	}
-
-	private String removeValue(String current, String value) {
-		int startIndex = current.indexOf(value);
-
-		if (startIndex >= 0) {
-			String before = current.substring(0, startIndex);
-			String after = current.substring(startIndex + value.length(),
-					current.length());
-
-			return before.concat(after.substring(SEPARATOR.length(),
-					after.length()));
-		}
-
-		return current;
-	}
-
 	private ConcurrentNavigableMap<String, String> getMap(String map) {
 		return db.getTreeMap(map);
 	}
+
 }

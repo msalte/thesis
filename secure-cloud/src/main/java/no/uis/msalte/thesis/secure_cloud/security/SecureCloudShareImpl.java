@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
+import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
@@ -27,40 +28,24 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		final String fileName = String.format("%s.torrent", UUID.randomUUID()
 				.toString());
 
-		Persist.getInstance().write(Persist.MAP_TORRENTS, fileName, file);
+		Persist.getInstance().storeTorrent(fileName, file);
 
 		return fileName;
 	}
 
 	public boolean share(String fileName, String publicKey,
 			String reEncryptionKey) {
-
-		final boolean torrentExists = Persist.getInstance().hasKey(
-				Persist.MAP_TORRENTS, fileName);
-
-		if (torrentExists) {
-			
-			Persist.getInstance().write(Persist.MAP_PUBLIC_KEYS, fileName,
-					publicKey);
-			
-			Persist.getInstance().write(Persist.MAP_RE_ENCRYPTION_KEYS,
-					publicKey, reEncryptionKey);
-
-			return true;
-		}
-
-		return false;
+		return Persist.getInstance().storeKeysTuple(fileName,
+				new KeyTuple(publicKey, reEncryptionKey));
 	}
 
 	public String download(String fileName, String publicKey) {
+		final String reEncryptionKey = AccessControl.getReEncryptionKey(fileName, publicKey);
 		
-		final boolean hasAccess = AccessControl.hasAccess(fileName, publicKey);
+		final boolean hasAccess = reEncryptionKey != null;
 
 		if (hasAccess) {
-			// String rek = AccessControl.getReEncryptionKeyFor(pk);
-
-			String file = Persist.getInstance().read(Persist.MAP_TORRENTS,
-					fileName);
+			String file = Persist.getInstance().readTorrent(fileName);
 
 			// TODO re-encrypt
 
