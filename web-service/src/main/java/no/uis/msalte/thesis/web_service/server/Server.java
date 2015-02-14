@@ -27,11 +27,11 @@ public class Server {
 		WEB_SERVICE.setRedirectTo(HttpMethod.GET,
 				WebService.FUNC_NEW_SECRET_KEY);
 
-		Spark.get(getPath(WebService.FUNC_UI), ACCEPT_TYPE, (req, res) -> {
+		Spark.get(getPath(WebService.FUNC_API), ACCEPT_TYPE, (req, res) -> {
 			return WEB_SERVICE.ui(req, res);
 		}, JSON_RENDERER);
 
-		WEB_SERVICE.setRedirectTo(HttpMethod.GET, WebService.FUNC_UI);
+		WEB_SERVICE.setRedirectTo(HttpMethod.GET, WebService.FUNC_API);
 
 		// ---- POST FUNCTIONS ---- //
 		Spark.post(getPath(WebService.FUNC_UPLOAD), ACCEPT_TYPE,

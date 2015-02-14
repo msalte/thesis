@@ -10,7 +10,7 @@ public interface WebService {
 	public static final String PARAM_FILE_NAME = "fileName";
 	public static final String PARAM_RE_ENCRYPTION_KEY = "reEncryptionKey";
 
-	public static final String FUNC_UI = "ui";
+	public static final String FUNC_API = "api";
 	public static final String FUNC_NEW_TORRENT = "newTorrent";
 	public static final String FUNC_NEW_SECRET_KEY = "newSecretKey";
 	public static final String FUNC_NEW_PUBLIC_KEY = "newPublicKey";

@@ -14,14 +14,13 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse ui(Request req, Response res) {
-		final WebServiceResponse ui = getDefaultWebServiceResponse(res);
+		final WebServiceResponse api = getDefaultWebServiceResponse(res);
 
-		final String message = "The user interface - All valid function calls return a JSON object";
+		final String message = "The API - All valid function calls return a JSON object";
 		final ArrayList<InterfaceEntry> content = new ArrayList<InterfaceEntry>();
 
-		content.add(new InterfaceEntry(HttpMethod.GET.name(), FUNC_UI, null,
-				null,
-				"Calling this function gives an overview of the user interface"));
+		content.add(new InterfaceEntry(HttpMethod.GET.name(), FUNC_API, null,
+				null, "Calling this function gives an overview of the API"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(),
 				FUNC_NEW_TORRENT, null, null, "Not implemented"));
@@ -50,12 +49,12 @@ public class WebServiceImpl implements WebService {
 				new String[] { "string, bytes" },
 				"Call this function to download a torrent"));
 
-		ui.setMessage(message);
-		ui.setContent(content);
+		api.setMessage(message);
+		api.setContent(content);
 
-		setRedirectTo(HttpMethod.GET, FUNC_UI);
+		setRedirectTo(HttpMethod.GET, FUNC_API);
 
-		return ui;
+		return api;
 	}
 
 	@Override
