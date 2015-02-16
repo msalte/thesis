@@ -3,6 +3,7 @@ package no.uis.msalte.thesis.secure_cloud.security;
 import java.math.BigInteger;
 import java.util.UUID;
 
+import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
 import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
@@ -55,9 +56,10 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return null;
 	}
 
-	public String newTorrent(String file) {
-		// TODO Auto-generated method stub
-		return null;
+	public String newTorrent(String file, String extension) {
+		String fileName = UUID.randomUUID().toString();
+		
+		return TorrentUtil.create(fileName, extension, file);
 	}
 
 }
