@@ -1,8 +1,6 @@
 package no.uis.msalte.thesis.web_service.server;
 
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
-import no.uis.msalte.thesis.web_service.model.WebService;
-import no.uis.msalte.thesis.web_service.model.WebServiceImpl;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 import spark.Spark;
 

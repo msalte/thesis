@@ -1,9 +1,12 @@
-package no.uis.msalte.thesis.web_service.model;
+package no.uis.msalte.thesis.web_service.server;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
+import no.uis.msalte.thesis.web_service.model.HttpMethod;
+import no.uis.msalte.thesis.web_service.model.InterfaceEntry;
+import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -25,7 +28,7 @@ public class WebServiceImpl implements WebService {
 		content.add(new InterfaceEntry(HttpMethod.POST.name(),
 				FUNC_NEW_TORRENT, new String[] { PARAM_FILE, PARAM_FILE_EXT },
 				new String[] { "bytes, string" },
-				"Call this function to generate a new torrent for the given file"));
+				"Call this function to generate a new torrent for the given file (Note: nothing is stored on the server)"));
 
 		content.add(new InterfaceEntry(HttpMethod.GET.name(),
 				FUNC_NEW_SECRET_KEY, null, null,

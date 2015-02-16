@@ -18,6 +18,19 @@ public class Client {
 
 	private static final String URL_TEMPLATE = "http://localhost:%d/%s";
 
+	/**
+	 * Call a method exposed by the Web Service API
+	 * 
+	 * @param method
+	 *            The HTTP method of the call, i.e. GET/POST
+	 * @param function
+	 *            The name of the function to call
+	 * @param params
+	 *            An array of parameters for the function
+	 * @param args
+	 *            An array of arguments corresponding to the parameters
+	 * @return The result of the call, as a string
+	 */
 	public static String call(HttpMethod method, String function,
 			String[] params, String[] args) {
 

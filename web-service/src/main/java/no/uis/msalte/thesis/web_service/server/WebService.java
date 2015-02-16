@@ -1,5 +1,6 @@
-package no.uis.msalte.thesis.web_service.model;
+package no.uis.msalte.thesis.web_service.server;
 
+import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import spark.Request;
 import spark.Response;
 

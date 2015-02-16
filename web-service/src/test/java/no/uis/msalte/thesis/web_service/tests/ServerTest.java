@@ -14,9 +14,9 @@ import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
 import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
-import no.uis.msalte.thesis.web_service.model.WebService;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.server.Server;
+import no.uis.msalte.thesis.web_service.server.WebService;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 
 import org.junit.AfterClass;
@@ -41,27 +41,26 @@ public class ServerTest {
 	public void testGivenNewTorrentSuccessThenReturnedContentShouldBeValidTorrent()
 			throws Exception {
 
-		final byte[] localFile = Files.readAllBytes(Paths
-				.get(getPath("test.txt")));
+		final byte[] file = Files.readAllBytes(Paths.get(getPath("test.txt")));
 
-		final String localDocumentString = Base64.getEncoder().encodeToString(
-				localFile);
+		final String byteString = Base64.getEncoder().encodeToString(file);
+		final String extension = "txt";
 
 		// new torrent web service call
 		final String result = Client.call(HttpMethod.POST,
-				WebService.FUNC_NEW_TORRENT,
-				new String[] { WebService.PARAM_FILE },
-				new String[] { localDocumentString });
+				WebService.FUNC_NEW_TORRENT, new String[] {
+						WebService.PARAM_FILE, WebService.PARAM_FILE_EXT },
+				new String[] { byteString, extension });
 
 		// response parse
-		final WebServiceResponse res = JsonRenderer.RENDERER.fromJson(result,
+		final WebServiceResponse res = JsonRenderer.GSON.fromJson(result,
 				WebServiceResponse.class);
 
 		// validate
 		if (res.getStatus() == HttpURLConnection.HTTP_OK) {
-			String returnedTorrent = res.getContent().toString();
+			String torrentBytes = res.getContent().toString();
 
-			assertTrue(TorrentUtil.validate(returnedTorrent));
+			assertTrue(TorrentUtil.validate(torrentBytes));
 		} else {
 			assertTrue(false);
 		}
@@ -79,7 +78,7 @@ public class ServerTest {
 				WebService.FUNC_UPLOAD, new String[] { WebService.PARAM_FILE },
 				new String[] { FilesUtil.encode(file) });
 
-		final String fileName = JsonRenderer.RENDERER
+		final String fileName = JsonRenderer.GSON
 				.fromJson(result, WebServiceResponse.class).getContent()
 				.toString();
 
@@ -107,7 +106,7 @@ public class ServerTest {
 				new String[] { FilesUtil.encode(file) });
 
 		// retrieve file name
-		final String fileName = JsonRenderer.RENDERER
+		final String fileName = JsonRenderer.GSON
 				.fromJson(uploadResult, WebServiceResponse.class).getContent()
 				.toString();
 
@@ -124,7 +123,7 @@ public class ServerTest {
 						WebService.PARAM_PUBLIC_KEY }, new String[] { fileName,
 						publicKey });
 
-		final String downloadedFile = JsonRenderer.RENDERER
+		final String downloadedFile = JsonRenderer.GSON
 				.fromJson(downloadResult, WebServiceResponse.class)
 				.getContent().toString();
 
