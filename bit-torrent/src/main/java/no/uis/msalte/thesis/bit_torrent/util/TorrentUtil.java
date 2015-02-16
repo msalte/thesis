@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import no.uis.msalte.thesis.bit_torrent.App;
-
 import com.turn.ttorrent.common.Torrent;
 
 public class TorrentUtil {
@@ -55,7 +53,7 @@ public class TorrentUtil {
 	}
 
 	private static String create(String fileName, String fileExt, String file,
-			boolean writeToDisk, String outputDirectory) {
+			boolean saveToDisk, String outputDirectory) {
 
 		File localFile = null;
 		File localTorrent = null;
@@ -77,7 +75,7 @@ public class TorrentUtil {
 
 			// Determine whether to write the torrent to disk or to create a
 			// temporary file
-			if (writeToDisk) {
+			if (saveToDisk) {
 				localTorrent = new File(String.format("%s//%s.%s.%s",
 						outputDirectory, fileName, fileExt, "torrent"));
 			} else {
@@ -87,7 +85,7 @@ public class TorrentUtil {
 
 			// Write the torrent contents into the permanent/temporary file
 			fos = new FileOutputStream(localTorrent);
-			writeTorrentContents(localFile, fos);
+			writeBencodedContents(localFile, fos);
 
 			fos.flush();
 			fos.close();
@@ -106,7 +104,7 @@ public class TorrentUtil {
 				localFile.delete();
 			}
 
-			if (localTorrent != null && !writeToDisk) {
+			if (localTorrent != null && !saveToDisk) {
 				localTorrent.delete();
 			}
 		}
@@ -114,7 +112,7 @@ public class TorrentUtil {
 		return null;
 	}
 
-	private static Torrent writeTorrentContents(File file, FileOutputStream fos)
+	private static Torrent writeBencodedContents(File file, FileOutputStream fos)
 			throws InterruptedException, IOException {
 
 		final URI announce = URI.create(ANNOUNCE_URI);
@@ -126,7 +124,7 @@ public class TorrentUtil {
 		announceTiers.add(announceTier1);
 
 		final Torrent torrent = Torrent.create(file, PIECE_LENGTH,
-				announceTiers, App.class.getPackage().getName());
+				announceTiers, TorrentUtil.class.getPackage().getName());
 
 		torrent.save(fos);
 
