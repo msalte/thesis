@@ -1,13 +1,14 @@
 package no.uis.msalte.thesis.bit_torrent;
 
 import java.io.File;
+import java.io.IOException;
 
 public class App {
 	private static final String OWNER_DIR = "C:\\Users\\Morten\\Desktop\\ttorrent\\owner_dir";
 	private static final String RECIPIENT_DIR = "C:\\Users\\Morten\\Desktop\\ttorrent\\recipient_dir";
 	private static final String TORRENTS_DIR = "C:\\Users\\Morten\\Desktop\\ttorrent\\torrents";
 
-	private static final String OWNER_FILE = "document.pdf";
+	private static final String OWNER_FILE = "test.txt";
 	private static final String TORRENT_FILE = String.format("%s%s",
 			OWNER_FILE, BitTorrentTracker.TORRENT_SUFFIX);
 
@@ -15,11 +16,7 @@ public class App {
 			TORRENTS_DIR, TORRENT_FILE);
 
 	public static void main(String[] args) {
-//		BitTorrentUtil.newTorrent(OWNER_DIR, OWNER_FILE, TORRENTS_DIR, TORRENT_FILE);
-
-		startTracker();
-		share(TORRENT_FULL_PATH, OWNER_DIR);
-		download(TORRENT_FULL_PATH, RECIPIENT_DIR);
+		// TODO
 	}
 
 	private static void share(String torrentPath, String outputDir) {
