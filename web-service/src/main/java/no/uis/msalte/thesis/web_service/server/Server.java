@@ -1,8 +1,8 @@
 package no.uis.msalte.thesis.web_service.server;
 
+import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.model.WebService;
 import no.uis.msalte.thesis.web_service.model.WebServiceImpl;
-import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 import spark.Spark;
 
@@ -53,6 +53,10 @@ public class Server {
 					return WEB_SERVICE.download(req, res);
 				}, JSON_RENDERER);
 
+		Spark.post(getPath(WebService.FUNC_NEW_TORRENT), ACCEPT_TYPE,
+				(req, res) -> {
+					return WEB_SERVICE.newTorrent(req, res);
+				}, JSON_RENDERER);
 	}
 
 	public void stop() {

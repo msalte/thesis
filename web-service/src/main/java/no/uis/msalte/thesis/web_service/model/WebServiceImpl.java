@@ -23,7 +23,9 @@ public class WebServiceImpl implements WebService {
 				null, "Calling this function gives an overview of the API"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(),
-				FUNC_NEW_TORRENT, null, null, "Not implemented"));
+				FUNC_NEW_TORRENT, new String[] { PARAM_FILE, PARAM_FILE_EXT },
+				new String[] { "bytes, string" },
+				"Call this function to generate a new torrent for the given file"));
 
 		content.add(new InterfaceEntry(HttpMethod.GET.name(),
 				FUNC_NEW_SECRET_KEY, null, null,
@@ -59,6 +61,21 @@ public class WebServiceImpl implements WebService {
 
 	@Override
 	public WebServiceResponse newTorrent(Request req, Response res) {
+		final WebServiceResponse newTorrent = getDefaultWebServiceResponse(res);
+
+		final String file = req.queryParams(PARAM_FILE);
+		final String extension = req.queryParams(PARAM_FILE_EXT);
+		final String torrent = SECURE_CLOUD_SHARE.newTorrent(file, extension);
+
+		if (torrent != null) {
+			final String message = "New torrent generated";
+
+			newTorrent.setMessage(message);
+			newTorrent.setContent(torrent);
+
+			return newTorrent;
+		}
+
 		return getBadRequest(res);
 	}
 

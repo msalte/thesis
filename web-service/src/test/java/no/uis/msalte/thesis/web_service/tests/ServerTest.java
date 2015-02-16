@@ -3,11 +3,14 @@ package no.uis.msalte.thesis.web_service.tests;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Base64;
 
+import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
 import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
@@ -32,6 +35,36 @@ public class ServerTest {
 	@AfterClass
 	public static void stopServer() {
 		server.stop();
+	}
+
+	@Test
+	public void testGivenNewTorrentSuccessThenReturnedContentShouldBeValidTorrent()
+			throws Exception {
+
+		final byte[] localFile = Files.readAllBytes(Paths
+				.get(getPath("test.txt")));
+
+		final String localDocumentString = Base64.getEncoder().encodeToString(
+				localFile);
+
+		// new torrent web service call
+		final String result = Client.call(HttpMethod.POST,
+				WebService.FUNC_NEW_TORRENT,
+				new String[] { WebService.PARAM_FILE },
+				new String[] { localDocumentString });
+
+		// response parse
+		final WebServiceResponse res = JsonRenderer.RENDERER.fromJson(result,
+				WebServiceResponse.class);
+
+		// validate
+		if (res.getStatus() == HttpURLConnection.HTTP_OK) {
+			String returnedTorrent = res.getContent().toString();
+
+			assertTrue(TorrentUtil.validate(returnedTorrent));
+		} else {
+			assertTrue(false);
+		}
 	}
 
 	@Test
