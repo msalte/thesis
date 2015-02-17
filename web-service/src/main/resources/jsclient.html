@@ -12,7 +12,7 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
 </head>
-<body ng-controller="controller">
+<body ng-controller="mainController">
 	<div class="jumbotron" style="margin-top: 50px">
 		<div class="container">
 			<h2>{{title}}</h2>
@@ -26,8 +26,8 @@
 				<ul class="dropdown-menu" role="menu"
 					aria-labelledby="dropdownMenu1">
 					<li role="presentation" ng-repeat="f in functions"
-						ng-controller="puller"><a role="menuitem" tabindex="-1"
-						href="#" ng-click="setSelectedFunction(f)">{{f}}</a></li>
+						ng-controller="testController"><a role="menuitem"
+						tabindex="-1" href="#" ng-click="setSelectedFunction(f)">{{f}}</a></li>
 				</ul>
 			</div>
 
@@ -64,21 +64,41 @@
 
 			</tbody>
 		</table>
-		<hr>
-		<h3>Test function</h3>
-		Not implemented yet
+		<div ng-controller="testController">
+			<hr>
+			<h3>Test function</h3>
+			<div class="well">
+				<form>
+					<div class="form-group"
+						ng-repeat="p in selectedFunction.params track by $index">
+						<label for="paramInput">{{p}}</label> <input type="text"
+							class="form-control" id="{{p}}" name="paramInput"
+							ng-model="form[p]"
+							placeholder="Enter argument for parameter {{p}}">
+					</div>
+					<button class="btn btn-default" ng-click="submitForm()">Submit</button>
+				</form>
+			</div>
+		</div>
+		<div ng-controller="testController" ng-show="response.content">
+			<hr>
+			<h3>Response</h3>
+			<div class="well">{{response}}</div>
+		</div>
 	</div>
 
 	<script>
-		var controller = function($scope, $http) {
+		var mainController = function($scope, $http) {
+			$scope.title = '';
+			$scope.content = {};
+			
+			$scope.selectedFunction = {};
+			$scope.functions = [];
 			
 			$http.get('/api').success(function(data, status, headers, config) {
 				$scope.title = data.message;
 				$scope.content = data.content;
-				
-				$scope.functions = [];
-				$scope.selectedFunction = {};
-				
+
 				for(var i=0;i<data.content.length;i++) {
 					$scope.functions.push(data.content[i].function);					
 				}
@@ -86,19 +106,18 @@
 			})
 		};
 	
-		var puller = function($scope) {
+		var testController = function($scope, $http) {				
+			$scope.form = {};
+			$scope.response = {};
 			
 			$scope.setSelectedFunction = function(func) {
-
+				
 				for(var i=0;i<$scope.content.length;i++) {
 					var obj = $scope.content[i];
 					
 					var ok = obj.function == func;
 					
 					if(ok) {
-						
-						console.log(obj.args);
-						
 						$scope.selectedFunction.function = obj.function;
 						$scope.selectedFunction.params = obj.params;
 						$scope.selectedFunction.args = obj.args;
@@ -106,7 +125,38 @@
 						$scope.selectedFunction.method = obj.method;
 					}
 				}
-			}
+			};
+			
+			$scope.submitForm = function() {
+				var method = $scope.selectedFunction.method;
+				var data = {};
+				
+				if($scope.selectedFunction.params != null) {
+					for(var i=0;i<$scope.selectedFunction.params.length;i++) {
+						var param = $scope.selectedFunction.params[i];
+						var arg = $scope.form[param];
+						
+						data[param] = arg;
+					}
+				}
+
+				var url = "/" + $scope.selectedFunction.function;
+				
+				$http({
+				    method: method,
+				    url: url,
+				    data: $.param(data),
+				    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+				}).success(function(data) {
+				    $scope.response.content = data.content;
+				    $scope.response.status = data.status;
+				    $scope.response.message = data.message;
+				    
+				    console.log($scope.response);
+				});
+				
+			};
+			
 		};
 	</script>
 </body>
