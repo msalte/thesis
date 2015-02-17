@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" ng-app>
+<head>
+<meta charset="utf-8">
+<title>JavaScript Client</title>
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+</head>
+<body ng-controller="controller">
+	<div class="jumbotron" style="margin-top: 50px">
+		<div class="container">
+			<h2>{{title}}</h2>
+
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button"
+					id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+					Select Function <span class="caret"></span>
+				</button>
+
+				<ul class="dropdown-menu" role="menu"
+					aria-labelledby="dropdownMenu1">
+					<li role="presentation" ng-repeat="f in functions"
+						ng-controller="puller"><a role="menuitem" tabindex="-1"
+						href="#" ng-click="setSelectedFunction(f)">{{f}}</a></li>
+				</ul>
+			</div>
+
+
+		</div>
+	</div>
+	<div class="container" ng-show="selectedFunction.function">
+		<h3>
+			Selected function <span class="label label-info">{{selectedFunction.function}}</span>
+		</h3>
+		<hr>
+		<table class="table table-striped">
+			<tbody>
+				<tr>
+					<td class="col-md-2">Details</td>
+					<td class="col-md-10">{{selectedFunction.details}}</td>
+				</tr>
+				<tr>
+					<td class="col-md-2">Method</td>
+					<td class="col-md-10"><span class="label label-success">{{selectedFunction.method}}</span></td>
+				</tr>
+				<tr>
+					<td class="col-md-2">Parameters</td>
+					<td class="col-md-10"><span class="label label-primary"
+						style="margin-right: 5px"
+						ng-repeat="p in selectedFunction.params track by $index">{{p}}</span></td>
+				</tr>
+				<tr>
+					<td class="col-md-2">Arguments</td>
+					<td class="col-md-10"><span class="label label-warning"
+						style="margin-right: 5px"
+						ng-repeat="a in selectedFunction.args track by $index">{{a}}</span></td>
+				</tr>
+
+			</tbody>
+		</table>
+		<hr>
+		<h3>Test function</h3>
+		Not implemented yet
+	</div>
+
+	<script>
+		var controller = function($scope, $http) {
+			
+			$http.get('/api').success(function(data, status, headers, config) {
+				$scope.title = data.message;
+				$scope.content = data.content;
+				
+				$scope.functions = [];
+				$scope.selectedFunction = {};
+				
+				for(var i=0;i<data.content.length;i++) {
+					$scope.functions.push(data.content[i].function);					
+				}
+				
+			})
+		};
+	
+		var puller = function($scope) {
+			
+			$scope.setSelectedFunction = function(func) {
+
+				for(var i=0;i<$scope.content.length;i++) {
+					var obj = $scope.content[i];
+					
+					var ok = obj.function == func;
+					
+					if(ok) {
+						
+						console.log(obj.args);
+						
+						$scope.selectedFunction.function = obj.function;
+						$scope.selectedFunction.params = obj.params;
+						$scope.selectedFunction.args = obj.args;
+						$scope.selectedFunction.details = obj.details;
+						$scope.selectedFunction.method = obj.method;
+					}
+				}
+			}
+		};
+	</script>
+</body>
+</html>

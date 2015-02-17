@@ -41,7 +41,7 @@ public class ServerTest {
 	public void testGivenNewTorrentSuccessThenReturnedContentShouldBeValidTorrent()
 			throws Exception {
 
-		final byte[] file = Files.readAllBytes(Paths.get(getPath("test.txt")));
+		final byte[] file = Files.readAllBytes(Paths.get(getFileResource("test.txt")));
 
 		final String byteString = Base64.getEncoder().encodeToString(file);
 		final String extension = "txt";
@@ -71,7 +71,7 @@ public class ServerTest {
 			throws Exception {
 
 		final byte[] file = Files.readAllBytes(Paths
-				.get(getPath("file.torrent")));
+				.get(getFileResource("file.torrent")));
 
 		// upload file
 		final String result = Client.call(HttpMethod.POST,
@@ -98,7 +98,7 @@ public class ServerTest {
 				.getBytes());
 
 		final byte[] file = Files.readAllBytes(Paths
-				.get(getPath("file.torrent")));
+				.get(getFileResource("file.torrent")));
 
 		// upload file
 		final String uploadResult = Client.call(HttpMethod.POST,
@@ -130,7 +130,7 @@ public class ServerTest {
 		assertTrue(Arrays.equals(file, FilesUtil.decode(downloadedFile)));
 	}
 
-	private String getPath(String filename) throws URISyntaxException {
+	private String getFileResource(String filename) throws URISyntaxException {
 		return new File(getClass().getClassLoader().getResource(filename)
 				.toURI()).getAbsolutePath();
 	}

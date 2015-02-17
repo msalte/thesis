@@ -1,10 +1,7 @@
 package no.uis.msalte.thesis.web_service.client;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -13,6 +10,7 @@ import java.net.URLEncoder;
 
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.server.Server;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
 
 public class Client {
 
@@ -62,7 +60,7 @@ public class Client {
 			}
 
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				return getResponse(conn.getInputStream());
+				return WebServiceUtil.parseInputStream(conn.getInputStream());
 			} else {
 				return String.format("%d %s", conn.getResponseCode(),
 						conn.getResponseMessage());
@@ -101,18 +99,5 @@ public class Client {
 		}
 
 		return paramString.toString();
-	}
-
-	private static String getResponse(InputStream is) throws IOException {
-		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		final StringBuilder response = new StringBuilder();
-
-		String line;
-
-		while ((line = br.readLine()) != null) {
-			response.append(line);
-		}
-
-		return response.toString();
 	}
 }

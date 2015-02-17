@@ -25,9 +25,11 @@ public class WebServiceImpl implements WebService {
 		content.add(new InterfaceEntry(HttpMethod.GET.name(), FUNC_API, null,
 				null, "Calling this function gives an overview of the API"));
 
-		content.add(new InterfaceEntry(HttpMethod.POST.name(),
-				FUNC_NEW_TORRENT, new String[] { PARAM_FILE, PARAM_FILE_EXT },
-				new String[] { "bytes, string" },
+		content.add(new InterfaceEntry(
+				HttpMethod.POST.name(),
+				FUNC_NEW_TORRENT,
+				new String[] { PARAM_FILE, PARAM_FILE_EXT },
+				new String[] { "bytes", "string" },
 				"Call this function to generate a new torrent for the given file (Note: nothing is stored on the server)"));
 
 		content.add(new InterfaceEntry(HttpMethod.GET.name(),
@@ -41,8 +43,8 @@ public class WebServiceImpl implements WebService {
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_SHARE,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY,
-						PARAM_RE_ENCRYPTION_KEY },
-				new String[] { "string, bytes, bytes" },
+						PARAM_RE_ENCRYPTION_KEY }, new String[] { "string",
+						"bytes", "bytes" },
 				"Call this function to share a torrent with someone else"));
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_UPLOAD,
@@ -51,7 +53,7 @@ public class WebServiceImpl implements WebService {
 
 		content.add(new InterfaceEntry(HttpMethod.POST.name(), FUNC_DOWNLOAD,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY },
-				new String[] { "string, bytes" },
+				new String[] { "string", "bytes" },
 				"Call this function to download a torrent"));
 
 		api.setMessage(message);
