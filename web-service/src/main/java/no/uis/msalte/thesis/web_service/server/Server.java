@@ -2,15 +2,15 @@ package no.uis.msalte.thesis.web_service.server;
 
 import java.net.URISyntaxException;
 
+import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
+import no.uis.msalte.thesis.web_service.routes.DownloadPostRoute;
+import no.uis.msalte.thesis.web_service.routes.NewPublicKeyPostRoute;
+import no.uis.msalte.thesis.web_service.routes.NewSecretKeyGetRoute;
+import no.uis.msalte.thesis.web_service.routes.NewTorrentPostRoute;
+import no.uis.msalte.thesis.web_service.routes.SharePostRoute;
+import no.uis.msalte.thesis.web_service.routes.UploadPostRoute;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
-import no.uis.thesis.web_service.routes.ApiGetRoute;
-import no.uis.thesis.web_service.routes.DownloadPostRoute;
-import no.uis.thesis.web_service.routes.NewPublicKeyPostRoute;
-import no.uis.thesis.web_service.routes.NewSecretKeyGetRoute;
-import no.uis.thesis.web_service.routes.NewTorrentPostRoute;
-import no.uis.thesis.web_service.routes.SharePostRoute;
-import no.uis.thesis.web_service.routes.UploadPostRoute;
 import spark.Spark;
 
 public class Server {

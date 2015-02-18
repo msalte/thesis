@@ -1,4 +1,4 @@
-package no.uis.thesis.web_service.routes;
+package no.uis.msalte.thesis.web_service.routes;
 
 import java.net.HttpURLConnection;
 
@@ -9,11 +9,11 @@ import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
 
-public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
+public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 
-	public static final String PATH = String.format("/%s", FUNC_NEW_TORRENT);
+	public static final String PATH = String.format("/%s", FUNC_UPLOAD);
 
-	public NewTorrentPostRoute() {
+	public UploadPostRoute() {
 		super(PATH);
 	}
 
@@ -27,20 +27,18 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 		r.setContent(null);
 
 		final String file = request.queryParams(PARAM_FILE);
-		final String extension = request.queryParams(PARAM_FILE_EXT);
 
-		final boolean isParamsValid = file != null && !file.isEmpty()
-				&& extension != null && !extension.isEmpty();
+		final boolean isParamValid = file != null && !file.isEmpty();
 
-		if (isParamsValid) {
+		if (isParamValid) {
 			try {
-				final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
-						.newTorrent(file, extension);
+				final String fileName = WebServiceUtil.SECURE_CLOUD_SHARE
+						.upload(file);
 
-				if (torrent != null) {
+				if (fileName != null) {
 					// everything fine, treat as HTTP_OK
-					final String message = "New torrent generated";
-					final String content = torrent;
+					final String message = "Torrent uploaded";
+					final String content = fileName;
 
 					r.setStatus(HttpURLConnection.HTTP_OK);
 					r.setMessage(message);

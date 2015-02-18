@@ -1,4 +1,4 @@
-package no.uis.thesis.web_service.routes;
+package no.uis.msalte.thesis.web_service.routes;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
