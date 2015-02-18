@@ -1,8 +1,10 @@
 package no.uis.msalte.thesis.web_service.server;
 
+import java.net.URISyntaxException;
+
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
-import no.uis.thesis.web_service.routes.JsApiGetRoute;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
 import spark.Spark;
 
 public class Server {
@@ -17,9 +19,9 @@ public class Server {
 		// ---- SETUP ---- //
 		Spark.port(HTTP_PORT);
 
-		// ---- GET FUNCTIONS ---- //
-		Spark.get(JsApiGetRoute.PATH, new JsApiGetRoute()); // serves js client
+		setStaticFileLocation();
 
+		// ---- GET FUNCTIONS ---- //
 		Spark.get(getPath(WebService.FUNC_NEW_SECRET_KEY), ACCEPT_TYPE, (req,
 				res) -> {
 			return WEB_SERVICE.newSecretKey(req, res);
@@ -66,5 +68,15 @@ public class Server {
 
 	private static String getPath(String function) {
 		return String.format("/%s", function);
+	}
+
+	private static void setStaticFileLocation() {
+		try {
+			String location = WebServiceUtil.getFileResource("script.js")
+					.getParent();
+			Spark.externalStaticFileLocation(location);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 }
