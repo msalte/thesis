@@ -1,10 +1,6 @@
-package no.uis.msalte.thesis.web_service.server;
+package no.uis.msalte.thesis.web_service.model;
 
-import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
-import spark.Request;
-import spark.Response;
-
-public interface WebService {
+public interface WebServiceRoute {
 	public static final String PARAM_FILE = "file";
 	public static final String PARAM_FILE_EXT = "extension";
 	public static final String PARAM_SECRET_KEY = "secretKey";
@@ -19,18 +15,4 @@ public interface WebService {
 	public static final String FUNC_SHARE = "share";
 	public static final String FUNC_UPLOAD = "upload";
 	public static final String FUNC_DOWNLOAD = "download";
-
-	public WebServiceResponse ui(Request req, Response res);
-
-	public WebServiceResponse newTorrent(Request req, Response res);
-
-	public WebServiceResponse newSecretKey(Request req, Response res);
-
-	public WebServiceResponse newPublicKey(Request req, Response res);
-
-	public WebServiceResponse share(Request req, Response res);
-
-	public WebServiceResponse upload(Request req, Response res);
-
-	public WebServiceResponse download(Request req, Response res);
 }

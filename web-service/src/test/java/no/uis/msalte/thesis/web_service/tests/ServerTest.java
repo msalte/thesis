@@ -15,8 +15,8 @@ import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
+import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
-import no.uis.msalte.thesis.web_service.server.WebService;
 import no.uis.msalte.thesis.web_service.util.JsonRenderer;
 
 import org.junit.AfterClass;
@@ -48,8 +48,8 @@ public class ServerTest {
 
 		// new torrent web service call
 		final String result = Client.call(HttpMethod.POST,
-				WebService.FUNC_NEW_TORRENT, new String[] {
-						WebService.PARAM_FILE, WebService.PARAM_FILE_EXT },
+				WebServiceRoute.FUNC_NEW_TORRENT, new String[] {
+				WebServiceRoute.PARAM_FILE, WebServiceRoute.PARAM_FILE_EXT },
 				new String[] { byteString, extension });
 
 		// response parse
@@ -75,7 +75,7 @@ public class ServerTest {
 
 		// upload file
 		final String result = Client.call(HttpMethod.POST,
-				WebService.FUNC_UPLOAD, new String[] { WebService.PARAM_FILE },
+				WebServiceRoute.FUNC_UPLOAD, new String[] { WebServiceRoute.PARAM_FILE },
 				new String[] { FilesUtil.encode(file) });
 
 		final String fileName = JsonRenderer.GSON
@@ -102,7 +102,7 @@ public class ServerTest {
 
 		// upload file
 		final String uploadResult = Client.call(HttpMethod.POST,
-				WebService.FUNC_UPLOAD, new String[] { WebService.PARAM_FILE },
+				WebServiceRoute.FUNC_UPLOAD, new String[] { WebServiceRoute.PARAM_FILE },
 				new String[] { FilesUtil.encode(file) });
 
 		// retrieve file name
@@ -111,16 +111,16 @@ public class ServerTest {
 				.toString();
 
 		// share
-		Client.call(HttpMethod.POST, WebService.FUNC_SHARE, new String[] {
-				WebService.PARAM_FILE_NAME, WebService.PARAM_PUBLIC_KEY,
-				WebService.PARAM_RE_ENCRYPTION_KEY }, new String[] { fileName,
+		Client.call(HttpMethod.POST, WebServiceRoute.FUNC_SHARE, new String[] {
+				WebServiceRoute.PARAM_FILE_NAME, WebServiceRoute.PARAM_PUBLIC_KEY,
+				WebServiceRoute.PARAM_RE_ENCRYPTION_KEY }, new String[] { fileName,
 				publicKey, reEncryptionKey });
 
 		// download
 		final String downloadResult = Client.call(HttpMethod.POST,
-				WebService.FUNC_DOWNLOAD,
-				new String[] { WebService.PARAM_FILE_NAME,
-						WebService.PARAM_PUBLIC_KEY }, new String[] { fileName,
+				WebServiceRoute.FUNC_DOWNLOAD,
+				new String[] { WebServiceRoute.PARAM_FILE_NAME,
+				WebServiceRoute.PARAM_PUBLIC_KEY }, new String[] { fileName,
 						publicKey });
 
 		final String downloadedFile = JsonRenderer.GSON

@@ -1,29 +1,19 @@
 package no.uis.msalte.thesis.web_service.model;
 
-import java.net.HttpURLConnection;
-
-import spark.Response;
-
 public class WebServiceResponse {
 	private int status;
 	private String message;
 	private Object content;
 
-	public WebServiceResponse(Response response, Object content, String message) {
-		this.content = content;
-		this.message = message;
-
-		response.status(this.status = HttpURLConnection.HTTP_OK);
-	}
-
-	public WebServiceResponse(Response response, Object content,
-			String message, int status) {
+	public WebServiceResponse(int status, String message, Object content) {
 		this.content = content;
 		this.message = message;
 		this.status = status;
-
-		response.status(status);
 	}
+
+	public WebServiceResponse() {
+		// empty
+	};
 
 	public int getStatus() {
 		return status;
@@ -49,4 +39,14 @@ public class WebServiceResponse {
 		this.content = content;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		
+		sb.append(String.format("Status: %d\n", getStatus()));
+		sb.append(String.format("Message: %s\n", getMessage()));
+		sb.append(String.format("Content: %s\n", getContent()));
+		
+		return sb.toString();
+	}
 }

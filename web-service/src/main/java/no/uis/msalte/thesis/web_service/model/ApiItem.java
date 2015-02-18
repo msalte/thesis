@@ -1,13 +1,13 @@
 package no.uis.msalte.thesis.web_service.model;
 
-public class InterfaceEntry {
+public class ApiItem {
 	private String function;
 	private String method;
 	private String details;
 	private String[] params;
 	private String[] args;
 
-	public InterfaceEntry(String method, String function, String[] params,
+	public ApiItem(String method, String function, String[] params,
 			String[] args, String message) {
 		this.method = method;
 		this.function = function;

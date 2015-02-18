@@ -7,7 +7,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
+import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
+
 public class WebServiceUtil {
+
+	public static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
+	
 	public static File getFileResource(String filename) throws URISyntaxException {
 		return new File(WebServiceUtil.class.getClassLoader().getResource(filename)
 				.toURI());

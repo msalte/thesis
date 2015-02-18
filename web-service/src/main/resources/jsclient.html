@@ -75,9 +75,9 @@
 				<button class="btn btn-default" ng-click="submitForm()">{{selectedFunction.method}}</button>
 			</form>
 		</div>
-		<hr ng-show="response.content">
-		<h3 ng-show="response.content">Response</h3>
-		<textarea ng-show="response.content" class="form-control col-xs-12"
+		<hr ng-show="response.message">
+		<h3 ng-show="response.message">Response</h3>
+		<textarea ng-show="response.message" class="form-control col-xs-12"
 			rows="10">{{response | json}}</textarea>
 
 	</div>
