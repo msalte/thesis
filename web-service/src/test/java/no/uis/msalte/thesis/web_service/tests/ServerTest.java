@@ -17,7 +17,7 @@ import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
-import no.uis.msalte.thesis.web_service.util.JsonRenderer;
+import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -53,7 +53,7 @@ public class ServerTest {
 				new String[] { byteString, extension });
 
 		// response parse
-		final WebServiceResponse res = JsonRenderer.GSON.fromJson(result,
+		final WebServiceResponse res = JsonTransformer.GSON.fromJson(result,
 				WebServiceResponse.class);
 
 		// validate
@@ -78,7 +78,7 @@ public class ServerTest {
 				WebServiceRoute.FUNC_UPLOAD, new String[] { WebServiceRoute.PARAM_FILE },
 				new String[] { FilesUtil.encode(file) });
 
-		final String fileName = JsonRenderer.GSON
+		final String fileName = JsonTransformer.GSON
 				.fromJson(result, WebServiceResponse.class).getContent()
 				.toString();
 
@@ -106,7 +106,7 @@ public class ServerTest {
 				new String[] { FilesUtil.encode(file) });
 
 		// retrieve file name
-		final String fileName = JsonRenderer.GSON
+		final String fileName = JsonTransformer.GSON
 				.fromJson(uploadResult, WebServiceResponse.class).getContent()
 				.toString();
 
@@ -123,7 +123,7 @@ public class ServerTest {
 				WebServiceRoute.PARAM_PUBLIC_KEY }, new String[] { fileName,
 						publicKey });
 
-		final String downloadedFile = JsonRenderer.GSON
+		final String downloadedFile = JsonTransformer.GSON
 				.fromJson(downloadResult, WebServiceResponse.class)
 				.getContent().toString();
 

@@ -9,14 +9,14 @@ import no.uis.msalte.thesis.web_service.routes.NewSecretKeyGetRoute;
 import no.uis.msalte.thesis.web_service.routes.NewTorrentPostRoute;
 import no.uis.msalte.thesis.web_service.routes.SharePostRoute;
 import no.uis.msalte.thesis.web_service.routes.UploadPostRoute;
-import no.uis.msalte.thesis.web_service.util.JsonRenderer;
+import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
 import spark.Spark;
 
 public class Server {
 
 	private static final String ACCEPT_TYPE = "application/json";
-	private static final JsonRenderer JSON_RENDERER = new JsonRenderer();
+	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
 
 	public static final int HTTP_PORT = 9090;
 
@@ -27,26 +27,26 @@ public class Server {
 
 		// ---- GET FUNCTIONS ---- //
 		Spark.get(NewSecretKeyGetRoute.PATH, ACCEPT_TYPE,
-				new NewSecretKeyGetRoute(), JSON_RENDERER);
+				new NewSecretKeyGetRoute(), JSON_TRANSFORMER);
 
 		Spark.get(ApiGetRoute.PATH, ACCEPT_TYPE, new ApiGetRoute(),
-				JSON_RENDERER);
+				JSON_TRANSFORMER);
 
 		// ---- POST FUNCTIONS ---- //
 		Spark.post(UploadPostRoute.PATH, ACCEPT_TYPE, new UploadPostRoute(),
-				JSON_RENDERER);
+				JSON_TRANSFORMER);
 
 		Spark.post(NewPublicKeyPostRoute.PATH, ACCEPT_TYPE,
-				new NewPublicKeyPostRoute(), JSON_RENDERER);
+				new NewPublicKeyPostRoute(), JSON_TRANSFORMER);
 
 		Spark.post(SharePostRoute.PATH, ACCEPT_TYPE, new SharePostRoute(),
-				JSON_RENDERER);
+				JSON_TRANSFORMER);
 
 		Spark.post(DownloadPostRoute.PATH, ACCEPT_TYPE,
-				new DownloadPostRoute(), JSON_RENDERER);
+				new DownloadPostRoute(), JSON_TRANSFORMER);
 
 		Spark.post(NewTorrentPostRoute.PATH, ACCEPT_TYPE,
-				new NewTorrentPostRoute(), JSON_RENDERER);
+				new NewTorrentPostRoute(), JSON_TRANSFORMER);
 	}
 
 	public void stop() {
@@ -55,7 +55,7 @@ public class Server {
 
 	private static void setStaticFileLocation() {
 		try {
-			String location = WebServiceUtil.getFileResource("script.js")
+			final String location = WebServiceUtil.getFileResource("script.js")
 					.getParent();
 			Spark.externalStaticFileLocation(location);
 		} catch (URISyntaxException e) {
