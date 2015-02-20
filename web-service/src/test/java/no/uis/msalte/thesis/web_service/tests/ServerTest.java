@@ -5,20 +5,17 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
-import no.uis.msalte.thesis.secure_cloud.util.FilesUtil;
 import no.uis.msalte.thesis.web_service.client.Client;
-import no.uis.msalte.thesis.web_service.model.HttpMethod;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,16 +38,13 @@ public class ServerTest {
 	public void testGivenNewTorrentSuccessThenReturnedContentShouldBeValidTorrent()
 			throws Exception {
 
-		final byte[] file = Files.readAllBytes(Paths.get(getFileResource("test.txt")));
-
-		final String byteString = Base64.getEncoder().encodeToString(file);
+		final File file = getFileResource("test.txt");
 		final String extension = "txt";
 
 		// new torrent web service call
-		final String result = Client.call(HttpMethod.POST,
-				WebServiceRoute.FUNC_NEW_TORRENT, new String[] {
-				WebServiceRoute.PARAM_FILE, WebServiceRoute.PARAM_FILE_EXT },
-				new String[] { byteString, extension });
+		final String result = Client.post(WebServiceRoute.FUNC_NEW_TORRENT,
+				new String[] { WebServiceRoute.PARAM_FILE_EXT },
+				new String[] { extension }, file);
 
 		// response parse
 		final WebServiceResponse res = JsonTransformer.GSON.fromJson(result,
@@ -60,7 +54,7 @@ public class ServerTest {
 		if (res.getStatus() == HttpURLConnection.HTTP_OK) {
 			String torrentBytes = res.getContent().toString();
 
-			assertTrue(TorrentUtil.validate(torrentBytes));
+			assertTrue(TorrentUtil.isValidTorrent(torrentBytes));
 		} else {
 			assertTrue(false);
 		}
@@ -70,13 +64,11 @@ public class ServerTest {
 	public void testGivenUploadFileSuccessThenShouldReturnNewFileName()
 			throws Exception {
 
-		final byte[] file = Files.readAllBytes(Paths
-				.get(getFileResource("file.torrent")));
+		final File file = getFileResource("file.torrent");
 
 		// upload file
-		final String result = Client.call(HttpMethod.POST,
-				WebServiceRoute.FUNC_UPLOAD, new String[] { WebServiceRoute.PARAM_FILE },
-				new String[] { FilesUtil.encode(file) });
+		final String result = Client.post(WebServiceRoute.FUNC_UPLOAD,
+				new String[] {}, new String[] {}, file);
 
 		final String fileName = JsonTransformer.GSON
 				.fromJson(result, WebServiceResponse.class).getContent()
@@ -93,17 +85,16 @@ public class ServerTest {
 	public void testGivenShareFileSuccessThenRecipientShouldBeGrantedDownload()
 			throws Exception {
 
-		final String publicKey = FilesUtil.encode("public_key".getBytes());
-		final String reEncryptionKey = FilesUtil.encode("re_encryption_key"
-				.getBytes());
+		final String publicKey = Base64.getEncoder().encodeToString(
+				"public_key".getBytes());
+		final String reEncryptionKey = Base64.getEncoder().encodeToString(
+				"re_encryption_key".getBytes());
 
-		final byte[] file = Files.readAllBytes(Paths
-				.get(getFileResource("file.torrent")));
+		final File file = getFileResource("file.torrent");
 
 		// upload file
-		final String uploadResult = Client.call(HttpMethod.POST,
-				WebServiceRoute.FUNC_UPLOAD, new String[] { WebServiceRoute.PARAM_FILE },
-				new String[] { FilesUtil.encode(file) });
+		final String uploadResult = Client.post(WebServiceRoute.FUNC_UPLOAD,
+				new String[] {}, new String[] {}, file);
 
 		// retrieve file name
 		final String fileName = JsonTransformer.GSON
@@ -111,27 +102,34 @@ public class ServerTest {
 				.toString();
 
 		// share
-		Client.call(HttpMethod.POST, WebServiceRoute.FUNC_SHARE, new String[] {
-				WebServiceRoute.PARAM_FILE_NAME, WebServiceRoute.PARAM_PUBLIC_KEY,
-				WebServiceRoute.PARAM_RE_ENCRYPTION_KEY }, new String[] { fileName,
-				publicKey, reEncryptionKey });
+		Client.post(WebServiceRoute.FUNC_SHARE, new String[] {
+				WebServiceRoute.PARAM_FILE_NAME,
+				WebServiceRoute.PARAM_PUBLIC_KEY,
+				WebServiceRoute.PARAM_RE_ENCRYPTION_KEY }, new String[] {
+				fileName, publicKey, reEncryptionKey }, null);
 
 		// download
-		final String downloadResult = Client.call(HttpMethod.POST,
-				WebServiceRoute.FUNC_DOWNLOAD,
-				new String[] { WebServiceRoute.PARAM_FILE_NAME,
-				WebServiceRoute.PARAM_PUBLIC_KEY }, new String[] { fileName,
-						publicKey });
+		final String downloadResult = Client.post(
+				WebServiceRoute.FUNC_DOWNLOAD, new String[] {
+						WebServiceRoute.PARAM_FILE_NAME,
+						WebServiceRoute.PARAM_PUBLIC_KEY }, new String[] {
+						fileName, publicKey }, null);
 
-		final String downloadedFile = JsonTransformer.GSON
-				.fromJson(downloadResult, WebServiceResponse.class)
-				.getContent().toString();
+		final WebServiceResponse downloaded = JsonTransformer.GSON.fromJson(
+				downloadResult, WebServiceResponse.class);
 
-		assertTrue(Arrays.equals(file, FilesUtil.decode(downloadedFile)));
+		if (downloaded.getContent() != null) {
+			assertTrue(Arrays.equals(
+					FileUtils.readFileToByteArray(file),
+					Base64.getDecoder().decode(
+							downloaded.getContent().toString())));
+		} else {
+			assertTrue(false);
+		}
 	}
 
-	private String getFileResource(String filename) throws URISyntaxException {
+	private File getFileResource(String filename) throws URISyntaxException {
 		return new File(getClass().getClassLoader().getResource(filename)
-				.toURI()).getAbsolutePath();
+				.toURI());
 	}
 }

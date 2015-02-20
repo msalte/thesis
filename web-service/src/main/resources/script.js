@@ -30,7 +30,7 @@ var mainController = function($scope, $http) {
 	// a HTTP request (GET/POST) to the selected web service function
 	$scope.submitForm = function() {
 		var method = $scope.selectedFunction.method;
-		var dataToSend = {};
+		var formData = new FormData();
 		
 		if($scope.selectedFunction.params != null) {
 			for(var i=0;i<$scope.selectedFunction.params.length;i++) {
@@ -42,7 +42,7 @@ var mainController = function($scope, $http) {
 					return;
 				}
 
-				dataToSend[param] = arg;
+				formData.append(param, arg);
 			}
 		}
 		
@@ -51,8 +51,9 @@ var mainController = function($scope, $http) {
 		$http({
 		    method: method,
 		    url: url,
-		    data: $.param(dataToSend),
-		    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+		    data: formData,
+		    headers: { 'Content-Type': undefined },
+		    transformRequest: angular.identity // enables $http to choose the correct content-type
 		}).success(function(data) {
 		    $scope.response = data;
 		});

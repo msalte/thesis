@@ -2,6 +2,8 @@ package no.uis.msalte.thesis.web_service.routes;
 
 import java.net.HttpURLConnection;
 
+import javax.servlet.http.Part;
+
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
@@ -26,11 +28,27 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 		r.setMessage("Invalid parameters");
 		r.setContent(null);
 
-		final String fileName = request.queryParams(PARAM_FILE_NAME);
-		final String publicKey = request.queryParams(PARAM_PUBLIC_KEY);
+		// treating all post requests as multipart/form-data
+		request.raw().setAttribute("org.eclipse.multipartConfig",
+				WebServiceUtil.MULTIPART_CONFIG);
 
-		final boolean isParamsValid = fileName != null && !fileName.isEmpty()
-				&& publicKey != null && !publicKey.isEmpty();
+		String fileName = "";
+		String publicKey = "";
+
+		for (Part part : request.raw().getParts()) {
+			String name = part.getName();
+
+			if (name.equals(PARAM_FILE_NAME)) {
+				fileName = WebServiceUtil.parseInputStream(part
+						.getInputStream());
+			} else if (name.equals(PARAM_PUBLIC_KEY)) {
+				publicKey = WebServiceUtil.parseInputStream(part
+						.getInputStream());
+			}
+		}
+
+		final boolean isParamsValid = !fileName.isEmpty()
+				&& !publicKey.isEmpty();
 
 		if (isParamsValid) {
 			try {

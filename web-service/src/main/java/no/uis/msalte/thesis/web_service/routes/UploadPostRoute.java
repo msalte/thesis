@@ -1,6 +1,10 @@
 package no.uis.msalte.thesis.web_service.routes;
 
+import java.io.File;
 import java.net.HttpURLConnection;
+import java.nio.file.Paths;
+
+import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
@@ -26,26 +30,49 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 		r.setMessage("Invalid parameters");
 		r.setContent(null);
 
-		final String file = request.queryParams(PARAM_FILE);
+		// treating all post requests as multipart/form-data
+		request.raw().setAttribute("org.eclipse.multipartConfig",
+				WebServiceUtil.MULTIPART_CONFIG);
 
-		final boolean isParamValid = file != null && !file.isEmpty();
+		for (Part part : request.raw().getParts()) {
+			if (part.getName().equals(PARAM_FILE)) {
+				// This is the file
 
-		if (isParamValid) {
-			try {
-				final String fileName = WebServiceUtil.SECURE_CLOUD_SHARE
-						.upload(file);
+				File tempFile = null;
+				String extension = ".torrent";
 
-				if (fileName != null) {
-					// everything fine, treat as HTTP_OK
-					final String message = "Torrent uploaded";
-					final String content = fileName;
+				try {
+					final String tempFileName = String.format("Temp%d.%s",
+							System.currentTimeMillis(), extension);
 
-					r.setStatus(HttpURLConnection.HTTP_OK);
-					r.setMessage(message);
-					r.setContent(content);
+					part.write(tempFileName);
+
+					tempFile = Paths.get(
+							String.format("%s//%s",
+									WebServiceUtil.MULTIPART_CONFIG
+											.getLocation(), tempFileName))
+							.toFile();
+
+					final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
+							.upload(tempFile);
+
+					if (torrent != null) {
+						// everything fine, treat as HTTP_OK
+						final String message = "Torrent uploaded successfuly";
+						final String content = torrent;
+
+						r.setStatus(HttpURLConnection.HTTP_OK);
+						r.setMessage(message);
+						r.setContent(content);
+					}
+				} catch (Exception e) {
+					// ignore
+				} finally {
+					if (tempFile != null) {
+						tempFile.delete();
+					}
 				}
-			} catch (Exception e) {
-				// ignore
+
 			}
 		}
 

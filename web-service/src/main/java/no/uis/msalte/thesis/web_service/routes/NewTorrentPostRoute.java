@@ -1,6 +1,10 @@
 package no.uis.msalte.thesis.web_service.routes;
 
+import java.io.File;
 import java.net.HttpURLConnection;
+import java.nio.file.Paths;
+
+import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
@@ -26,16 +30,41 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 		r.setMessage("Invalid parameters");
 		r.setContent(null);
 
-		final String file = request.queryParams(PARAM_FILE);
-		final String extension = request.queryParams(PARAM_FILE_EXT);
+		// treating all post requests as multipart/form-data
+		request.raw().setAttribute("org.eclipse.multipartConfig",
+				WebServiceUtil.MULTIPART_CONFIG);
 
-		final boolean isParamsValid = file != null && !file.isEmpty()
-				&& extension != null && !extension.isEmpty();
+		Part filePart = null;
+		String extension = "";
+
+		for (Part part : request.raw().getParts()) {
+			if (part.getName().equals(PARAM_FILE)) {
+				filePart = part;
+			} else if (part.getName().equals(PARAM_FILE_EXT)) {
+				// Assuming that this part is a string, parsing it immediately
+				// Also removing eventual punctuation as it will be added later
+				extension = WebServiceUtil.parseInputStream(
+						part.getInputStream()).replaceAll("\\.", "");
+			}
+		}
+
+		final boolean isParamsValid = filePart != null && !extension.isEmpty();
 
 		if (isParamsValid) {
+			File tempFile = null;
 			try {
+				String tempFileName = String.format("Temp%d.%s",
+						System.currentTimeMillis(), extension);
+
+				filePart.write(tempFileName);
+
+				tempFile = Paths.get(
+						String.format("%s//%s",
+								WebServiceUtil.MULTIPART_CONFIG.getLocation(),
+								tempFileName)).toFile();
+
 				final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
-						.newTorrent(file, extension);
+						.newTorrent(tempFile, extension);
 
 				if (torrent != null) {
 					// everything fine, treat as HTTP_OK
@@ -48,6 +77,10 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 				}
 			} catch (Exception e) {
 				// ignore
+			} finally {
+				if (tempFile != null) {
+					tempFile.delete();
+				}
 			}
 		}
 

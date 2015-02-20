@@ -7,17 +7,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
+import javax.servlet.MultipartConfigElement;
+
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
 
 public class WebServiceUtil {
 
 	public static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
-	
-	public static File getFileResource(String filename) throws URISyntaxException {
-		return new File(WebServiceUtil.class.getClassLoader().getResource(filename)
-				.toURI());
+	public static final MultipartConfigElement MULTIPART_CONFIG = new MultipartConfigElement(
+			"C:\\Users\\Morten\\Desktop\\tempdir");
+
+	public static File getFileResource(String filename)
+			throws URISyntaxException {
+		return new File(WebServiceUtil.class.getClassLoader()
+				.getResource(filename).toURI());
 	}
-	
+
 	public static String parseInputStream(InputStream is) throws IOException {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		final StringBuilder response = new StringBuilder();
@@ -27,6 +32,9 @@ public class WebServiceUtil {
 		while ((line = br.readLine()) != null) {
 			response.append(line);
 		}
+
+		br.close();
+		is.close();
 
 		return response.toString();
 	}

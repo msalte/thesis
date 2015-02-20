@@ -2,6 +2,8 @@ package no.uis.msalte.thesis.web_service.routes;
 
 import java.net.HttpURLConnection;
 
+import javax.servlet.http.Part;
+
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
@@ -26,9 +28,20 @@ public class NewPublicKeyPostRoute extends RouteImpl implements WebServiceRoute 
 		r.setMessage("Invalid parameter");
 		r.setContent(null);
 
-		final String secretKey = request.queryParams(PARAM_SECRET_KEY);
+		// treating all post requests as multipart/form-data
+		request.raw().setAttribute("org.eclipse.multipartConfig",
+				WebServiceUtil.MULTIPART_CONFIG);
 
-		final boolean isParamValid = secretKey != null && !secretKey.isEmpty();
+		String secretKey = "";
+
+		for (Part part : request.raw().getParts()) {
+			if (part.getName().equals(PARAM_SECRET_KEY)) {
+				secretKey = WebServiceUtil.parseInputStream(part
+						.getInputStream());
+			}
+		}
+
+		final boolean isParamValid = !secretKey.isEmpty();
 
 		if (isParamValid) {
 			try {
