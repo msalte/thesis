@@ -25,7 +25,16 @@ public class TorrentUtil {
 		create(fileName, fileExt, file, true, outputDirectory);
 	}
 
-	public static boolean validate(String torrent) {
+	public static boolean isValidTorrent(File torrent) {
+		try {
+			// The torrent is valid if it contains an announce list
+			return Torrent.load(torrent).getAnnounceList() != null;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	public static boolean isValidTorrent(String torrent) {
 		FileOutputStream fos = null;
 		File tmp = null;
 
@@ -39,10 +48,8 @@ public class TorrentUtil {
 			fos.flush();
 			fos.close();
 
-			Torrent t = Torrent.load(tmp);
-
 			// The torrent is valid if it contains an announce list
-			return t.getAnnounceList() != null;
+			return Torrent.load(tmp).getAnnounceList() != null;
 		} catch (Exception e) {
 			return false;
 		} finally {
