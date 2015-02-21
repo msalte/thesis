@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.UUID;
 
+import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
 import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
@@ -16,6 +17,7 @@ import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
+	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
 	private ElGamalParams params = new ElGamalParams(512);
 
 	public String newSecretKey() {
@@ -44,6 +46,12 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 						bytes);
 
 				Persist.getInstance().storeTorrent(fileName, encodedFile);
+
+				if (!tracker.isStarted()) {
+					tracker.start();
+				}
+
+				tracker.announce(file);
 
 				return fileName;
 			} catch (IOException e) {
