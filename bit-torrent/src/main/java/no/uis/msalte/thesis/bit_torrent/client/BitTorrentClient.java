@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.bit_torrent;
+package no.uis.msalte.thesis.bit_torrent.client;
 
 import java.io.File;
 import java.io.IOException;
