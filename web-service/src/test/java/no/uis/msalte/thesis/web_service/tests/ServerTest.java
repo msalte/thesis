@@ -43,7 +43,7 @@ public class ServerTest {
 
 		// new torrent web service call
 		final String result = Client.post(WebServiceRoute.FUNC_NEW_TORRENT,
-				new String[] { WebServiceRoute.PARAM_FILE_EXT },
+				new String[] { WebServiceRoute.PARAM_FILE_EXTENSION },
 				new String[] { extension }, file);
 
 		// response parse

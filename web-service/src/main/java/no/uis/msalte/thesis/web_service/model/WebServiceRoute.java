@@ -2,7 +2,7 @@ package no.uis.msalte.thesis.web_service.model;
 
 public interface WebServiceRoute {
 	public static final String PARAM_FILE = "file";
-	public static final String PARAM_FILE_EXT = "extension";
+	public static final String PARAM_FILE_EXTENSION = "extension";
 	public static final String PARAM_SECRET_KEY = "secretKey";
 	public static final String PARAM_PUBLIC_KEY = "publicKey";
 	public static final String PARAM_FILE_NAME = "fileName";

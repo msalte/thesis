@@ -40,7 +40,7 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 		for (Part part : request.raw().getParts()) {
 			if (part.getName().equals(PARAM_FILE)) {
 				filePart = part;
-			} else if (part.getName().equals(PARAM_FILE_EXT)) {
+			} else if (part.getName().equals(PARAM_FILE_EXTENSION)) {
 				// Assuming that this part is a string, parsing it immediately
 				// Also removing eventual punctuation as it will be added later
 				extension = WebServiceUtil.parseInputStream(

@@ -71,7 +71,6 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 					content = null;
 				}
 
-				// everything fine, treat as HTTP_OK
 				r.setStatus(status);
 				r.setMessage(message);
 				r.setContent(content);
