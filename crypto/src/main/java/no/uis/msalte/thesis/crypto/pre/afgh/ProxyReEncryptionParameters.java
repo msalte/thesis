@@ -17,7 +17,7 @@ public class ProxyReEncryptionParameters {
 	private Field<?> group1;
 	private Field<?> group2;
 	private Field<?> groupZr;
-	private Generator g, z;
+	private Powable g, z;
 
 	public ProxyReEncryptionParameters initialize() {
 		final CurveParameters cp = new TypeACurveGenerator(new Random(),
@@ -29,8 +29,8 @@ public class ProxyReEncryptionParameters {
 		group2 = e.getG2();
 		groupZr = e.getZr();
 
-		g = new Generator(((CurveField<?>) group1).getGen().getImmutable());
-		z = new Generator(e.pairing(g.getElement(), g.getElement())
+		g = new Powable(((CurveField<?>) group1).getGen().getImmutable());
+		z = new Powable(e.pairing(g.getElement(), g.getElement())
 				.getImmutable());
 
 		return this;
@@ -52,11 +52,11 @@ public class ProxyReEncryptionParameters {
 		return groupZr;
 	}
 
-	public Generator getG() {
+	public Powable getG() {
 		return g;
 	}
 
-	public Generator getZ() {
+	public Powable getZ() {
 		return z;
 	}
 

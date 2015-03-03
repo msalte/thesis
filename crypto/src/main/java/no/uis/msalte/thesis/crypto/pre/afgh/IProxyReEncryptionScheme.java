@@ -11,6 +11,16 @@ public interface IProxyReEncryptionScheme {
 	public Element newReEncryptionKey(Element srcSecretKey,
 			Element destPublicKey);
 
+	public void encrypt();
+
+	public void decrypt();
+
+	public void reEncrypt();
+
+	public void encryptReEncryptable();
+
+	public void decryptReEncryptable();
+
 	public Element stringToElement(String m);
 
 	public String elementToString(Element e);

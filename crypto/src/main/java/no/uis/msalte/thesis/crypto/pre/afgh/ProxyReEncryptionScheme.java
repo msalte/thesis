@@ -58,4 +58,29 @@ public class ProxyReEncryptionScheme implements IProxyReEncryptionScheme {
 		return new String(e.toBytes()).trim();
 	}
 
+	public void encrypt() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void decrypt() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void reEncrypt() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void encryptReEncryptable() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void decryptReEncryptable() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
