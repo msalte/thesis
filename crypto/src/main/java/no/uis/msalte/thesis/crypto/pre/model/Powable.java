@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.crypto.pre.afgh;
+package no.uis.msalte.thesis.crypto.pre.model;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;

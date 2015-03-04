@@ -1,26 +1,28 @@
 package no.uis.msalte.thesis.crypto;
 
-import no.uis.msalte.thesis.crypto.pre.afgh.ProxyReEncryptionParameters;
-import no.uis.msalte.thesis.crypto.pre.afgh.ProxyReEncryptionScheme;
+import it.unisa.dia.gas.jpbc.Element;
+import no.uis.msalte.thesis.crypto.pre.model.CipherTuple;
+import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionParameters;
+import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionScheme;
 
 public class App {
 
 	public static void main(String[] args) {
-		final ProxyReEncryptionScheme scheme = new ProxyReEncryptionScheme(
-				new ProxyReEncryptionParameters().initialize());
+		final ProxyReEncryptionParameters parameters = 
+				new ProxyReEncryptionParameters().initialize();
+		
+		final ProxyReEncryptionScheme scheme = new ProxyReEncryptionScheme(parameters);
 
-		// Element bobSecretKey = scheme.newSecretKey();
-		// Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
-		//
-		// Element aliceSecretKey = scheme.newSecretKey();
-		// Element alicePublicKey = scheme.newPublicKey(aliceSecretKey);
-		//
-		// Element reEncryptAliceToBob =
-		// scheme.newReEncryptionKey(aliceSecretKey, bobPublicKey);
+		Element bobSecretKey = scheme.newSecretKey();
+		Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
 
-		String message = "Hello there!";
+		String m = "Denne meldingen er hemmelig";
+		
+		CipherTuple c = scheme.encrypt(scheme.messageToElement(m), bobPublicKey);
 
-		scheme.stringToElement(message);
+		String decrypted = scheme.elementToMessage(scheme.decrypt(c, bobSecretKey));
+		
+		System.out.println(decrypted);
 	}
 
 }

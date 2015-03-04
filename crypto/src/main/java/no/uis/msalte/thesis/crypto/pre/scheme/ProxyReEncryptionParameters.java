@@ -1,13 +1,12 @@
-package no.uis.msalte.thesis.crypto.pre.afgh;
+package no.uis.msalte.thesis.crypto.pre.scheme;
 
+import no.uis.msalte.thesis.crypto.pre.model.Powable;
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeACurveGenerator;
-
-import java.util.Random;
 
 public class ProxyReEncryptionParameters {
 	private static final int SOLINAS_PRIME_BITS = 256;
@@ -16,18 +15,18 @@ public class ProxyReEncryptionParameters {
 	private Pairing e;
 	private Field<?> group1;
 	private Field<?> group2;
-	private Field<?> groupZr;
+	private Field<?> groupZq;
 	private Powable g, z;
 
 	public ProxyReEncryptionParameters initialize() {
-		final CurveParameters cp = new TypeACurveGenerator(new Random(),
-				SOLINAS_PRIME_BITS, PRIME_ORDER_BITS, false).generate();
+		final CurveParameters cp = new TypeACurveGenerator(SOLINAS_PRIME_BITS,
+				PRIME_ORDER_BITS).generate();
 
 		e = PairingFactory.getPairing(cp);
 
 		group1 = e.getG1();
-		group2 = e.getG2();
-		groupZr = e.getZr();
+		group2 = e.getGT();
+		groupZq = e.getZr();
 
 		g = new Powable(((CurveField<?>) group1).getGen().getImmutable());
 		z = new Powable(e.pairing(g.getElement(), g.getElement())
@@ -48,8 +47,8 @@ public class ProxyReEncryptionParameters {
 		return group2;
 	}
 
-	public Field<?> getGroupZr() {
-		return groupZr;
+	public Field<?> getGroupZq() {
+		return groupZq;
 	}
 
 	public Powable getG() {
