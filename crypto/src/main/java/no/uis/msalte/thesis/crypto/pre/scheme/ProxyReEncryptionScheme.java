@@ -30,7 +30,9 @@ public class ProxyReEncryptionScheme implements IProxyReEncryptionScheme {
 		return destPublicKey.powZn(srcSecretKey.invert()).getImmutable();
 	}
 
-	public CipherTuple encrypt(Element message, Element destPublicKey) {
+	public CipherTuple encrypt(String message, Element destPublicKey) {
+		Element m = messageToElementInGroup2(message);
+
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
@@ -40,15 +42,17 @@ public class ProxyReEncryptionScheme implements IProxyReEncryptionScheme {
 				parameters.getG().getPowPreProcessing().powZn(k));
 
 		// C[1] = m*Z^k
-		Element c1 = message.mul(parameters.getZ().getPowPreProcessing()
-				.powZn(k));
+		Element c1 = m.mul(parameters.getZ().getPowPreProcessing().powZn(k));
 
 		return new CipherTuple(new Element[] { c0, c1 });
 	}
 
-	public Element decrypt(CipherTuple cipher, Element destSecretKey) {
+	public String decrypt(CipherTuple cipher, Element destSecretKey) {
 		// M = C[1]/C[0]^(1/a), where a = destSecretKey
-		return cipher.get(1).div(cipher.get(0).powZn(destSecretKey.invert()));
+		Element m = cipher.get(1).div(
+				cipher.get(0).powZn(destSecretKey.invert()));
+
+		return elementToString(m);
 	}
 
 	public CipherTuple reEncrypt(CipherTuple cipher, Element reEncryptionKey) {
@@ -59,21 +63,18 @@ public class ProxyReEncryptionScheme implements IProxyReEncryptionScheme {
 				parameters.getE().pairing(cipher.get(1), reEncryptionKey) });
 	}
 
-	public CipherTuple encryptReEncryptable(Element message,
+	public CipherTuple encryptReEncryptable(String message,
 			Element destPublicKey) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Element decryptReEncryptable(CipherTuple cipher,
-			Element destSecretKey) {
+	public String decryptReEncryptable(CipherTuple cipher, Element destSecretKey) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Element messageToElement(String message) {
-		// m must exist in group2
-
+	private Element messageToElementInGroup2(String message) {
 		byte[] bytes = message.getBytes();
 
 		int maxLength = parameters.getGroup2().getLengthInBytes();
@@ -92,10 +93,10 @@ public class ProxyReEncryptionScheme implements IProxyReEncryptionScheme {
 		result.setFromBytes(bytes);
 
 		return result.getImmutable();
-
 	}
 
-	public String elementToMessage(Element element) {
+	private String elementToString(Element element) {
 		return new String(element.toBytes()).trim();
 	}
+
 }

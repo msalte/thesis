@@ -14,13 +14,13 @@ public class App {
 		final ProxyReEncryptionScheme scheme = new ProxyReEncryptionScheme(parameters);
 
 		Element bobSecretKey = scheme.newSecretKey();
-		Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
-
+		Element bobPublicKey = scheme.newPublicKey(bobSecretKey); // CurveElement
+		
 		String m = "Denne meldingen er hemmelig";
 		
-		CipherTuple c = scheme.encrypt(scheme.messageToElement(m), bobPublicKey);
+		CipherTuple c = scheme.encrypt(m, bobPublicKey);
 
-		String decrypted = scheme.elementToMessage(scheme.decrypt(c, bobSecretKey));
+		String decrypted = scheme.decrypt(c, bobSecretKey);
 		
 		System.out.println(decrypted);
 	}
