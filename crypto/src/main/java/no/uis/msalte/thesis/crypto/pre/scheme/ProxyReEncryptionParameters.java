@@ -1,6 +1,6 @@
 package no.uis.msalte.thesis.crypto.pre.scheme;
 
-import no.uis.msalte.thesis.crypto.pre.model.Powable;
+import no.uis.msalte.thesis.crypto.pre.model.PowableElement;
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -16,7 +16,7 @@ public class ProxyReEncryptionParameters {
 	private Field<?> group1;
 	private Field<?> group2;
 	private Field<?> groupZq;
-	private Powable g, z;
+	private PowableElement g, z;
 
 	public ProxyReEncryptionParameters initialize() {
 		final CurveParameters cp = new TypeACurveGenerator(SOLINAS_PRIME_BITS,
@@ -28,8 +28,8 @@ public class ProxyReEncryptionParameters {
 		group2 = e.getGT();
 		groupZq = e.getZr();
 
-		g = new Powable(((CurveField<?>) group1).getGen().getImmutable());
-		z = new Powable(e.pairing(g.getElement(), g.getElement())
+		g = new PowableElement(((CurveField<?>) group1).getGen().getImmutable());
+		z = new PowableElement(e.pairing(g.getElement(), g.getElement())
 				.getImmutable());
 
 		return this;
@@ -51,11 +51,11 @@ public class ProxyReEncryptionParameters {
 		return groupZq;
 	}
 
-	public Powable getG() {
+	public PowableElement getG() {
 		return g;
 	}
 
-	public Powable getZ() {
+	public PowableElement getZ() {
 		return z;
 	}
 

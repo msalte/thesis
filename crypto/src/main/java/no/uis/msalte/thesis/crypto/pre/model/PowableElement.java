@@ -3,17 +3,17 @@ package no.uis.msalte.thesis.crypto.pre.model;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;
 
-public class Powable {
+public class PowableElement {
 	private Element element;
 	private ElementPowPreProcessing powPreProcessing;
 
-	public Powable(Element element) {
+	public PowableElement(Element element) {
 		this.element = element;
 		this.powPreProcessing = element.pow();
 	}
 
 	public Element getElement() {
-		return element;
+		return element.getImmutable();
 	}
 
 	public ElementPowPreProcessing getPowPreProcessing() {

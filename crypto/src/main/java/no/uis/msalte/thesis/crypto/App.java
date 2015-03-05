@@ -1,9 +1,9 @@
 package no.uis.msalte.thesis.crypto;
 
 import it.unisa.dia.gas.jpbc.Element;
-import no.uis.msalte.thesis.crypto.pre.model.CipherTuple;
+import no.uis.msalte.thesis.crypto.pre.model.CipherText;
 import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionParameters;
-import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionScheme;
+import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionSchemeImpl;
 
 public class App {
 
@@ -11,18 +11,29 @@ public class App {
 		final ProxyReEncryptionParameters parameters = 
 				new ProxyReEncryptionParameters().initialize();
 		
-		final ProxyReEncryptionScheme scheme = new ProxyReEncryptionScheme(parameters);
-
+		final ProxyReEncryptionSchemeImpl scheme = new ProxyReEncryptionSchemeImpl(parameters);
+		
+		Element aliceSecretKey = scheme.newSecretKey();
+		Element alicePublicKey = scheme.newPublicKey(aliceSecretKey);
+		
 		Element bobSecretKey = scheme.newSecretKey();
-		Element bobPublicKey = scheme.newPublicKey(bobSecretKey); // CurveElement
+		Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
 		
 		String m = "Denne meldingen er hemmelig";
 		
-		CipherTuple c = scheme.encrypt(m, bobPublicKey);
-
-		String decrypted = scheme.decrypt(c, bobSecretKey);
+		CipherText messageToAlice = scheme.encryptReEncryptable(m, alicePublicKey);
 		
-		System.out.println(decrypted);
+		String decryptedByAlice = scheme.decryptReEncryptable(messageToAlice, aliceSecretKey);
+		
+		System.out.println(decryptedByAlice);
+		
+		Element aliceToBobReEncryptionKey = scheme.newReEncryptionKey(aliceSecretKey, bobPublicKey);
+		
+		CipherText reEncryptedForBob = scheme.reEncrypt(messageToAlice, aliceToBobReEncryptionKey);
+		
+		String decryptedByBob = scheme.decrypt(reEncryptedForBob, bobSecretKey);
+		
+		System.out.println(decryptedByBob);
 	}
 
 }
