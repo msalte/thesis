@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.crypto.pre.model;
+package no.uis.msalte.thesis.crypto.model;
 
 import it.unisa.dia.gas.jpbc.Element;
 

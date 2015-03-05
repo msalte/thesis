@@ -1,7 +1,7 @@
-package no.uis.msalte.thesis.crypto.pre.scheme;
+package no.uis.msalte.thesis.crypto.scheme;
 
 import it.unisa.dia.gas.jpbc.Element;
-import no.uis.msalte.thesis.crypto.pre.model.CipherText;
+import no.uis.msalte.thesis.crypto.model.CipherText;
 
 public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private ProxyReEncryptionParameters parameters;
@@ -55,19 +55,6 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return elementToString(m);
 	}
 
-	public String decryptReEncryptable(CipherText cipher, Element destSecretKey) {
-		// M = C[2]/e(C[1], g)^(1/a), where a = destSecretKey
-
-		Element denominator = parameters.getE().pairing(
-				cipher.getC1(),
-				parameters.getG().getPowPreProcessing()
-						.powZn(destSecretKey.invert()));
-
-		Element m = cipher.getC2().div(denominator);
-
-		return elementToString(m);
-	}
-
 	public CipherText reEncrypt(CipherText cipher, Element reEncryptionKey) {
 		// C' = [Z^(bk), mZ^k]
 
@@ -96,6 +83,19 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		Element c2 = m.mul(parameters.getZ().getPowPreProcessing().powZn(k));
 
 		return new CipherText(c1, c2);
+	}
+
+	public String decryptReEncryptable(CipherText cipher, Element destSecretKey) {
+		// M = C[2]/e(C[1], g)^(1/a), where a = destSecretKey
+
+		Element denominator = parameters.getE().pairing(
+				cipher.getC1(),
+				parameters.getG().getPowPreProcessing()
+						.powZn(destSecretKey.invert()));
+
+		Element m = cipher.getC2().div(denominator);
+
+		return elementToString(m);
 	}
 
 	private Element stringToElementInGroup2(String message) {

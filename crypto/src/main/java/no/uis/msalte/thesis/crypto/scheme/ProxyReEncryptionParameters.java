@@ -1,6 +1,6 @@
-package no.uis.msalte.thesis.crypto.pre.scheme;
+package no.uis.msalte.thesis.crypto.scheme;
 
-import no.uis.msalte.thesis.crypto.pre.model.PowableElement;
+import no.uis.msalte.thesis.crypto.model.PowableElement;
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;

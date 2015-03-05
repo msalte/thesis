@@ -1,9 +1,9 @@
 package no.uis.msalte.thesis.crypto;
 
 import it.unisa.dia.gas.jpbc.Element;
-import no.uis.msalte.thesis.crypto.pre.model.CipherText;
-import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionParameters;
-import no.uis.msalte.thesis.crypto.pre.scheme.ProxyReEncryptionSchemeImpl;
+import no.uis.msalte.thesis.crypto.model.CipherText;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
 public class App {
 
@@ -19,7 +19,7 @@ public class App {
 		Element bobSecretKey = scheme.newSecretKey();
 		Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
 		
-		String m = "Denne meldingen er hemmelig";
+		String m = "A secret message";
 		
 		CipherText messageToAlice = scheme.encryptReEncryptable(m, alicePublicKey);
 		

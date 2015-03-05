@@ -1,6 +1,6 @@
-package no.uis.msalte.thesis.crypto.pre.scheme;
+package no.uis.msalte.thesis.crypto.scheme;
 
-import no.uis.msalte.thesis.crypto.pre.model.CipherText;
+import no.uis.msalte.thesis.crypto.model.CipherText;
 import it.unisa.dia.gas.jpbc.Element;
 
 public interface ProxyReEncryptionScheme {
