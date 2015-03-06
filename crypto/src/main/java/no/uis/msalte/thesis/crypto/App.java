@@ -1,28 +1,33 @@
 package no.uis.msalte.thesis.crypto;
 
-import no.uis.msalte.thesis.crypto.model.CipherText;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
-import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
 public class App {
 
 	public static void main(String[] args) {
-		ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(new ProxyReEncryptionParameters().initialize());
+		ProxyReEncryptionSchemeImpl scheme = new ProxyReEncryptionSchemeImpl(new ProxyReEncryptionParameters().initialize());
 		
-		String secretKey = scheme.newSecretKey();
-		String publicKey = scheme.newPublicKey(secretKey);
+		String aliceSecretKey = scheme.newSecretKey();
+		String alicePublicKey = scheme.newPublicKey(aliceSecretKey);
 		
-		System.out.println(secretKey);
-		System.out.println(publicKey);
+		String bobSecretKey = scheme.newSecretKey();
+		String bobPublicKey = scheme.newPublicKey(bobSecretKey);
 		
-		String message = "Denne meldingen er hemmelig!!!!!";
+		String m = "Hello this is a secret message for Alice";
 		
-		CipherText ct = scheme.encrypt(message, publicKey);
+		String cipherForAlice = scheme.encryptReEncryptable(m, alicePublicKey);
+
+		String reEncryptionKeyAliceToBob = scheme.newReEncryptionKey(aliceSecretKey, bobPublicKey);
 		
-		String decrypted = scheme.decrypt(ct, secretKey);
+		String cipherForBob = scheme.reEncrypt(cipherForAlice, reEncryptionKeyAliceToBob);
 		
-		System.out.println(decrypted);
+		String decryptedByAlice = scheme.decryptReEncryptable(cipherForAlice, aliceSecretKey);
+		
+		String decryptedByBob = scheme.decrypt(cipherForBob, bobSecretKey);
+		
+		System.out.println(decryptedByAlice);
+		System.out.println(decryptedByBob);
 	}
 
 }

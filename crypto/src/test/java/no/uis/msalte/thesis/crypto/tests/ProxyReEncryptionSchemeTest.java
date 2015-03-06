@@ -1,7 +1,6 @@
 package no.uis.msalte.thesis.crypto.tests;
 
 import static org.junit.Assert.assertEquals;
-import no.uis.msalte.thesis.crypto.model.CipherText;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
@@ -31,7 +30,7 @@ public class ProxyReEncryptionSchemeTest {
 
 		String message = "This is a secret";
 
-		CipherText cipher = scheme.encrypt(message, pk);
+		String cipher = scheme.encrypt(message, pk);
 
 		String decrypted = scheme.decrypt(cipher, sk);
 
@@ -45,7 +44,7 @@ public class ProxyReEncryptionSchemeTest {
 
 		String message = "This is a secret message";
 		
-		CipherText cipher = scheme.encryptReEncryptable(message, pk);
+		String cipher = scheme.encryptReEncryptable(message, pk);
 		
 		String decrypted = scheme.decryptReEncryptable(cipher, sk);
 		
@@ -62,13 +61,13 @@ public class ProxyReEncryptionSchemeTest {
 
 		String messageForAlice = "Hello Alice!";
 
-		CipherText cipherForAlice = scheme.encryptReEncryptable(
+		String cipherForAlice = scheme.encryptReEncryptable(
 				messageForAlice, alicePublicKey);
 
 		String reEncryptionKeyFromAliceToBob = scheme.newReEncryptionKey(
 				aliceSecretKey, bobPublicKey);
 
-		CipherText cipherForBob = scheme.reEncrypt(cipherForAlice,
+		String cipherForBob = scheme.reEncrypt(cipherForAlice,
 				reEncryptionKeyFromAliceToBob);
 
 		String bobDecryptedMessage = scheme.decrypt(cipherForBob, bobSecretKey);

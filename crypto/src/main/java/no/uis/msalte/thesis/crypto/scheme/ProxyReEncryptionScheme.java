@@ -1,7 +1,5 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
-import no.uis.msalte.thesis.crypto.model.CipherText;
-
 public interface ProxyReEncryptionScheme {
 	/**
 	 * Generates a new secret key
@@ -40,7 +38,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's public key
 	 * @return The encrypted message
 	 */
-	public CipherText encrypt(String message, String destPublicKey);
+	public String encrypt(String message, String destPublicKey);
 
 	/**
 	 * Decrypts a message encrypted in a LVL 1 fashion, in accordance to the
@@ -52,7 +50,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's secret key
 	 * @return The decrypted message
 	 */
-	public String decrypt(CipherText cipher, String destSecretKey);
+	public String decrypt(String cipher, String destSecretKey);
 
 	/**
 	 * Re-encrypts a message that is encrypted in a LVL 2 fashion, in accordance
@@ -64,7 +62,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The re-encryption key
 	 * @return The re-encrypted message
 	 */
-	public CipherText reEncrypt(CipherText cipher, String reEncryptionKey);
+	public String reEncrypt(String cipher, String reEncryptionKey);
 
 	/**
 	 * Encrypts a message in a LVL 2 fashion, in accordance to the AFGH scheme
@@ -75,7 +73,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's public key
 	 * @return The encrypted message
 	 */
-	public CipherText encryptReEncryptable(String message,
+	public String encryptReEncryptable(String message,
 			String destPublicKey);
 
 	/**
@@ -88,7 +86,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's secret key
 	 * @return The decrypted message
 	 */
-	public String decryptReEncryptable(CipherText cipher,
+	public String decryptReEncryptable(String cipher,
 			String destSecretKey);
 
 }

@@ -10,6 +10,8 @@ import java.util.Base64;
 
 import no.uis.msalte.thesis.crypto.model.CipherText;
 
+import org.apache.commons.lang.ArrayUtils;
+
 public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private ProxyReEncryptionParameters parameters;
 
@@ -50,11 +52,66 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return elementToBase64String(rek);
 	}
 
-	public CipherText encrypt(String message, String destPublicKey) {
+	public String encrypt(String message, String destPublicKey) {
+		CipherText c = encryptToCipherText(message, destPublicKey);
+
+		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+				.toBytes());
+	}
+
+	public String decrypt(String cipher, String destSecretKey) {
+		byte[] bytes = Base64.getDecoder().decode(cipher);
+
+		Element c1 = parameters.getGroup2().newElement();
+		Element c2 = parameters.getGroup2().newElement();
+
+		int offset = c1.setFromBytes(bytes, 0);
+		c2.setFromBytes(bytes, offset);
+
+		return decryptCipherText(new CipherText(c1, c2), destSecretKey);
+	}
+
+	public String reEncrypt(String cipher, String reEncryptionKey) {
+		byte[] bytes = Base64.getDecoder().decode(cipher);
+
+		Element c1 = parameters.getGroup1().newElement();
+		Element c2 = parameters.getGroup2().newElement();
+
+		int offset = c1.setFromBytes(bytes, 0);
+		c2.setFromBytes(bytes, offset);
+
+		CipherText c = reEncryptToCipherText(new CipherText(c1, c2),
+				reEncryptionKey);
+
+		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+				.toBytes());
+	}
+
+	public String encryptReEncryptable(String message, String destPublicKey) {
+		CipherText c = encryptReEncryptableToCipherText(message, destPublicKey);
+
+		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+				.toBytes());
+	}
+
+	public String decryptReEncryptable(String cipher, String destSecretKey) {
+		byte[] bytes = Base64.getDecoder().decode(cipher);
+
+		Element c1 = parameters.getGroup1().newElement();
+		Element c2 = parameters.getGroup2().newElement();
+
+		int offset = c1.setFromBytes(bytes, 0);
+		c2.setFromBytes(bytes, offset);
+
+		return decryptReEncryptableCipherText(new CipherText(c1, c2),
+				destSecretKey);
+	}
+
+	private CipherText encryptToCipherText(String message, String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
 
-		Element m = stringToElementInGroup2(message);
+		Element m = messageToElementInGroup2(message);
 		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
@@ -70,7 +127,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return new CipherText(c1, c2);
 	}
 
-	public String decrypt(CipherText cipher, String destSecretKey) {
+	private String decryptCipherText(CipherText cipher, String destSecretKey) {
 		Element dsk = base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
@@ -80,7 +137,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return elementToPlainText(m);
 	}
 
-	public CipherText reEncrypt(CipherText cipher, String reEncryptionKey) {
+	private CipherText reEncryptToCipherText(CipherText cipher,
+			String reEncryptionKey) {
 		Element rek = base64StringToCurveElement(reEncryptionKey, parameters
 				.getG().getElement().getField());
 
@@ -99,11 +157,12 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return new CipherText(c1, c2);
 	}
 
-	public CipherText encryptReEncryptable(String message, String destPublicKey) {
+	private CipherText encryptReEncryptableToCipherText(String message,
+			String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
 
-		Element m = stringToElementInGroup2(message);
+		Element m = messageToElementInGroup2(message);
 		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
@@ -119,7 +178,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return new CipherText(c1, c2);
 	}
 
-	public String decryptReEncryptable(CipherText cipher, String destSecretKey) {
+	private String decryptReEncryptableCipherText(CipherText cipher,
+			String destSecretKey) {
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		Pairing e = parameters.getE();
 
@@ -127,7 +187,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 				parameters.getGroupZq());
 
 		// M = c2/e(c1, g)^(1/a), where a = destSecretKey
-		
+
 		Element denominator = e.pairing(cipher.getC1(), g.powZn(dsk.invert()));
 
 		Element m = cipher.getC2().div(denominator);
@@ -135,21 +195,16 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return elementToPlainText(m);
 	}
 
-	private Element stringToElementInGroup2(String message) {
+	private Element messageToElementInGroup2(String message) {
 		byte[] bytes = message.getBytes();
 
-		int maxLength = parameters.getGroup2().getLengthInBytes();
+		Field<?> group2 = parameters.getGroup2();
 
-		// System.out.println(String.format(
-		// "Message is %d bytes long - Max length is %d", bytes.length,
-		// maxLength));
-
-		if (bytes.length > maxLength) {
-			throw new IllegalArgumentException(
-					"Message is too long in stringToElement()");
+		if (bytes.length > group2.getLengthInBytes()) {
+			throw new IllegalArgumentException("Message is too long");
 		}
 
-		final Element result = parameters.getGroup2().newElement();
+		final Element result = group2.newElement();
 
 		result.setFromBytes(bytes);
 
@@ -160,24 +215,34 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return Base64.getEncoder().encodeToString(element.toBytes());
 	}
 
+	private String mergeByteArraysToBase64String(byte[]... parts) {
+		byte[] merged = parts[0];
+
+		for (int i = 1; i < parts.length; i++) {
+			merged = ArrayUtils.addAll(merged, parts[i]);
+		}
+
+		return Base64.getEncoder().encodeToString(merged);
+	}
+
 	private Element base64StringToElement(String s, Field<?> field) {
 		byte[] bytes = Base64.getDecoder().decode(s);
 
-		Element curveElement = field.newZeroElement();
+		Element element = field.newZeroElement();
 
-		curveElement.setFromBytes(bytes);
+		element.setFromBytes(bytes);
 
-		return curveElement;
+		return element.getImmutable();
 	}
 
-	private CurveElement<?> base64StringToCurveElement(String s, Field<?> field) {
+	private Element base64StringToCurveElement(String s, Field<?> field) {
 		byte[] bytes = Base64.getDecoder().decode(s);
 
 		CurveElement<?> curveElement = (CurveElement<?>) field.newZeroElement();
 
 		curveElement.setFromBytes(bytes);
 
-		return curveElement;
+		return curveElement.getImmutable();
 	}
 
 	private String elementToPlainText(Element element) {
