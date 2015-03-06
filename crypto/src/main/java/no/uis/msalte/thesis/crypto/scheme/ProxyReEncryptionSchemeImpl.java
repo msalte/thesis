@@ -55,7 +55,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	public String encrypt(String message, String destPublicKey) {
 		CipherText c = encryptToCipherText(message, destPublicKey);
 
-		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c.getRight()
 				.toBytes());
 	}
 
@@ -83,14 +83,14 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		CipherText c = reEncryptToCipherText(new CipherText(c1, c2),
 				reEncryptionKey);
 
-		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c.getRight()
 				.toBytes());
 	}
 
 	public String encryptReEncryptable(String message, String destPublicKey) {
 		CipherText c = encryptReEncryptableToCipherText(message, destPublicKey);
 
-		return mergeByteArraysToBase64String(c.getC1().toBytes(), c.getC2()
+		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c.getRight()
 				.toBytes());
 	}
 
@@ -132,7 +132,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 				parameters.getGroupZq());
 
 		// M = c2/c1^(1/a), where a = destSecretKey
-		Element m = cipher.getC2().div(cipher.getC1().powZn(dsk.invert()));
+		Element m = cipher.getRight().div(cipher.getLeft().powZn(dsk.invert()));
 
 		return elementToPlainText(m);
 	}
@@ -151,8 +151,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		// mZ^k = c2
 
-		Element c1 = parameters.getE().pairing(rek, cipher.getC1());
-		Element c2 = cipher.getC2(); // unmodified
+		Element c1 = parameters.getE().pairing(rek, cipher.getLeft());
+		Element c2 = cipher.getRight(); // unmodified
 
 		return new CipherText(c1, c2);
 	}
@@ -188,9 +188,9 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		// M = c2/e(c1, g)^(1/a), where a = destSecretKey
 
-		Element denominator = e.pairing(cipher.getC1(), g.powZn(dsk.invert()));
+		Element denominator = e.pairing(cipher.getLeft(), g.powZn(dsk.invert()));
 
-		Element m = cipher.getC2().div(denominator);
+		Element m = cipher.getRight().div(denominator);
 
 		return elementToPlainText(m);
 	}

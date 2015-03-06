@@ -2,20 +2,49 @@ package no.uis.msalte.thesis.crypto.model;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import org.apache.commons.lang.ArrayUtils;
+
 public class CipherText {
-	private Element c1;
-	private Element c2;
+	private Element[] lefts;
+	private Element right;
 
-	public CipherText(Element c1, Element c2) {
-		this.c1 = c1;
-		this.c2 = c2;
+	public CipherText(Element left, Element right) {
+		appendLeft(left);
+		
+		this.right = right.getImmutable();
 	}
 
-	public Element getC1() {
-		return c1.getImmutable();
+	public CipherText appendLeft(Element element) {
+		int next = ensureLeftsLength();
+
+		if (next != -1 && next < lefts.length) {
+			lefts[next] = element.getImmutable();
+		}
+
+		return this;
 	}
 
-	public Element getC2() {
-		return c2.getImmutable();
+	private int ensureLeftsLength() {
+		Element[] array = new Element[1];
+
+		if (lefts == null) {
+			lefts = array;
+		} else {
+			lefts = (Element[]) ArrayUtils.addAll(lefts, array);
+		}
+
+		return lefts.length - 1;
+	}
+
+	public Element[] getLefts() {
+		return lefts;
+	}
+
+	public Element getLeft() {
+		return lefts[0];
+	}
+
+	public Element getRight() {
+		return right;
 	}
 }
