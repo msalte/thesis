@@ -10,7 +10,7 @@ public interface ProxyReEncryptionScheme {
 	 * @return The new secret key
 	 */
 	public Element newSecretKey();
-
+	
 	/**
 	 * Generates a new public key
 	 * 

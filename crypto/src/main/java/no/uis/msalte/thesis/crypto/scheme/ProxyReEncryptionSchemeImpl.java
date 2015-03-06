@@ -1,6 +1,11 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
+
+import java.util.Base64;
+
 import no.uis.msalte.thesis.crypto.model.CipherText;
 
 public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
@@ -52,7 +57,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		Element m = cipher.getC2().div(
 				cipher.getC1().powZn(destSecretKey.invert()));
 
-		return elementToString(m);
+		return elementToPlainText(m);
 	}
 
 	public CipherText reEncrypt(CipherText cipher, Element reEncryptionKey) {
@@ -95,7 +100,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		Element m = cipher.getC2().div(denominator);
 
-		return elementToString(m);
+		return elementToPlainText(m);
 	}
 
 	private Element stringToElementInGroup2(String message) {
@@ -119,7 +124,31 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return result.getImmutable();
 	}
 
-	private String elementToString(Element element) {
+	private String elementToBase64String(Element element) {
+		return Base64.getEncoder().encodeToString(element.toBytes());
+	}
+
+	private Element base64StringToElement(String s, Field<?> field) {
+		byte[] bytes = Base64.getDecoder().decode(s);
+
+		Element curveElement = field.newZeroElement();
+
+		curveElement.setFromBytes(bytes);
+
+		return curveElement;
+	}
+
+	private CurveElement base64StringToCurveElement(String s, Field<?> field) {
+		byte[] bytes = Base64.getDecoder().decode(s);
+
+		CurveElement<?> curveElement = (CurveElement<?>) field.newZeroElement();
+
+		curveElement.setFromBytes(bytes);
+
+		return curveElement;
+	}
+
+	private String elementToPlainText(Element element) {
 		return new String(element.toBytes()).trim();
 	}
 }
