@@ -1,9 +1,9 @@
 package no.uis.msalte.thesis.crypto.tests;
 
-import static org.junit.Assert.*;
-import it.unisa.dia.gas.jpbc.Element;
+import static org.junit.Assert.assertEquals;
 import no.uis.msalte.thesis.crypto.model.CipherText;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
 import org.junit.AfterClass;
@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProxyReEncryptionSchemeTest {
-	private static ProxyReEncryptionSchemeImpl scheme;
+	private static ProxyReEncryptionScheme scheme;
 
 	@BeforeClass
 	public static void createSchemeInstance() {
@@ -26,8 +26,8 @@ public class ProxyReEncryptionSchemeTest {
 
 	@Test
 	public void testGivenEncryptedMessageDecryptionShouldRecoverMessage() {
-		Element sk = scheme.newSecretKey();
-		Element pk = scheme.newPublicKey(sk);
+		String sk = scheme.newSecretKey();
+		String pk = scheme.newPublicKey(sk);
 
 		String message = "This is a secret";
 
@@ -40,8 +40,8 @@ public class ProxyReEncryptionSchemeTest {
 
 	@Test
 	public void testGivenEncryptedReEncryptableMessageDecryptionShouldRecoverMessage() {
-		Element sk = scheme.newSecretKey();
-		Element pk = scheme.newPublicKey(sk);
+		String sk = scheme.newSecretKey();
+		String pk = scheme.newPublicKey(sk);
 
 		String message = "This is a secret message";
 		
@@ -54,18 +54,18 @@ public class ProxyReEncryptionSchemeTest {
 	
 	@Test
 	public void testGivenReEncryptedMessageDecryptionByDelegateeShouldRecoverMessage() {
-		Element aliceSecretKey = scheme.newSecretKey();
-		Element alicePublicKey = scheme.newPublicKey(aliceSecretKey);
+		String aliceSecretKey = scheme.newSecretKey();
+		String alicePublicKey = scheme.newPublicKey(aliceSecretKey);
 
-		Element bobSecretKey = scheme.newSecretKey();
-		Element bobPublicKey = scheme.newPublicKey(bobSecretKey);
+		String bobSecretKey = scheme.newSecretKey();
+		String bobPublicKey = scheme.newPublicKey(bobSecretKey);
 
 		String messageForAlice = "Hello Alice!";
 
 		CipherText cipherForAlice = scheme.encryptReEncryptable(
 				messageForAlice, alicePublicKey);
 
-		Element reEncryptionKeyFromAliceToBob = scheme.newReEncryptionKey(
+		String reEncryptionKeyFromAliceToBob = scheme.newReEncryptionKey(
 				aliceSecretKey, bobPublicKey);
 
 		CipherText cipherForBob = scheme.reEncrypt(cipherForAlice,

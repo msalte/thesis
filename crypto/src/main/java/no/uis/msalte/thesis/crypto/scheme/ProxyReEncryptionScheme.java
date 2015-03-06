@@ -1,7 +1,6 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
 import no.uis.msalte.thesis.crypto.model.CipherText;
-import it.unisa.dia.gas.jpbc.Element;
 
 public interface ProxyReEncryptionScheme {
 	/**
@@ -9,7 +8,7 @@ public interface ProxyReEncryptionScheme {
 	 * 
 	 * @return The new secret key
 	 */
-	public Element newSecretKey();
+	public String newSecretKey();
 	
 	/**
 	 * Generates a new public key
@@ -18,7 +17,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The corresponding secret key
 	 * @return The new public key
 	 */
-	public Element newPublicKey(Element secretKey);
+	public String newPublicKey(String secretKey);
 
 	/**
 	 * Generates a new re-encryption key
@@ -29,8 +28,8 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's public key
 	 * @return The new re-encryption key
 	 */
-	public Element newReEncryptionKey(Element srcSecretKey,
-			Element destPublicKey);
+	public String newReEncryptionKey(String srcSecretKey,
+			String destPublicKey);
 
 	/**
 	 * Encrypts a message in a LVL 1 fashion, in accordance to the AFGH scheme
@@ -41,7 +40,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's public key
 	 * @return The encrypted message
 	 */
-	public CipherText encrypt(String message, Element destPublicKey);
+	public CipherText encrypt(String message, String destPublicKey);
 
 	/**
 	 * Decrypts a message encrypted in a LVL 1 fashion, in accordance to the
@@ -53,7 +52,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The destination's secret key
 	 * @return The decrypted message
 	 */
-	public String decrypt(CipherText cipher, Element destSecretKey);
+	public String decrypt(CipherText cipher, String destSecretKey);
 
 	/**
 	 * Re-encrypts a message that is encrypted in a LVL 2 fashion, in accordance
@@ -65,7 +64,7 @@ public interface ProxyReEncryptionScheme {
 	 *            The re-encryption key
 	 * @return The re-encrypted message
 	 */
-	public CipherText reEncrypt(CipherText cipher, Element reEncryptionKey);
+	public CipherText reEncrypt(CipherText cipher, String reEncryptionKey);
 
 	/**
 	 * Encrypts a message in a LVL 2 fashion, in accordance to the AFGH scheme
@@ -77,7 +76,7 @@ public interface ProxyReEncryptionScheme {
 	 * @return The encrypted message
 	 */
 	public CipherText encryptReEncryptable(String message,
-			Element destPublicKey);
+			String destPublicKey);
 
 	/**
 	 * Decrypts a message encrypted in a LVL 2 fashion, in accordance to the
@@ -90,6 +89,6 @@ public interface ProxyReEncryptionScheme {
 	 * @return The decrypted message
 	 */
 	public String decryptReEncryptable(CipherText cipher,
-			Element destSecretKey);
+			String destSecretKey);
 
 }

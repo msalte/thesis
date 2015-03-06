@@ -1,7 +1,9 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;
 import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 
 import java.util.Base64;
@@ -15,88 +17,118 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		this.parameters = parameters;
 	}
 
-	public Element newSecretKey() {
+	public String newSecretKey() {
 		// SK = random element a in Zq
-		return parameters.getGroupZq().newRandomElement().getImmutable();
+		Element sk = parameters.getGroupZq().newRandomElement().getImmutable();
+
+		return elementToBase64String(sk);
 	}
 
-	public Element newPublicKey(Element secretKey) {
+	public String newPublicKey(String secretKey) {
+		Element sk = base64StringToElement(secretKey, parameters.getGroupZq());
+
+		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+
 		// PK = g^a, where a = secret key
-		return parameters.getG().getPowPreProcessing().powZn(secretKey)
-				.getImmutable();
+		Element pk = g.powZn(sk).getImmutable();
+
+		return elementToBase64String(pk);
 	}
 
-	public Element newReEncryptionKey(Element srcSecretKey,
-			Element destPublicKey) {
+	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
+		Element ssk = base64StringToElement(srcSecretKey,
+				parameters.getGroupZq());
+		Element dpk = base64StringToCurveElement(destPublicKey, parameters
+				.getG().getElement().getField());
+
 		// RK = (g^b)^1/a
 		// a = source secret key
 		// g^b = destination public key
 
-		return destPublicKey.powZn(srcSecretKey.invert()).getImmutable();
+		Element rek = dpk.powZn(ssk.invert()).getImmutable();
+
+		return elementToBase64String(rek);
 	}
 
-	public CipherText encrypt(String message, Element destPublicKey) {
+	public CipherText encrypt(String message, String destPublicKey) {
+		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
+
 		Element m = stringToElementInGroup2(message);
+		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
-		// C[1] = Z^(ak), where a = destPublicKey
+		// c1 = Z^(ak), where a = destPublicKey
 		// It is provable that Z^(ak) = e(a, g^k)
-		Element c1 = parameters.getE().pairing(destPublicKey,
-				parameters.getG().getPowPreProcessing().powZn(k));
+		Element c1 = parameters.getE().pairing(dpk, g.powZn(k));
 
-		// C[2] = m*Z^k
-		Element c2 = m.mul(parameters.getZ().getPowPreProcessing().powZn(k));
+		// c2 = m*Z^k
+		Element c2 = m.mul(z.powZn(k));
 
 		return new CipherText(c1, c2);
 	}
 
-	public String decrypt(CipherText cipher, Element destSecretKey) {
-		// M = C[2]/C[1]^(1/a), where a = destSecretKey
-		Element m = cipher.getC2().div(
-				cipher.getC1().powZn(destSecretKey.invert()));
+	public String decrypt(CipherText cipher, String destSecretKey) {
+		Element dsk = base64StringToElement(destSecretKey,
+				parameters.getGroupZq());
+
+		// M = c2/c1^(1/a), where a = destSecretKey
+		Element m = cipher.getC2().div(cipher.getC1().powZn(dsk.invert()));
 
 		return elementToPlainText(m);
 	}
 
-	public CipherText reEncrypt(CipherText cipher, Element reEncryptionKey) {
-		// C' = [Z^(bk), mZ^k]
+	public CipherText reEncrypt(CipherText cipher, String reEncryptionKey) {
+		Element rek = base64StringToCurveElement(reEncryptionKey, parameters
+				.getG().getElement().getField());
+
+		// c1' = Z^(bk)
+		// c2' = mZ^k = c2
 
 		// Z^(bk) = e(g^(ak), g^(b/a))
-		// where g^(b/a) = reEncryptionKey and g^(ak) = C[1]
+		// g^(ak) = c1
+		// g^(b/a) = reEncryptionKey
 
-		// mZ^k = C[2]
+		// mZ^k = c2
 
-		Element c1 = parameters.getE().pairing(reEncryptionKey, cipher.getC1());
+		Element c1 = parameters.getE().pairing(rek, cipher.getC1());
 		Element c2 = cipher.getC2(); // unmodified
 
 		return new CipherText(c1, c2);
 	}
 
-	public CipherText encryptReEncryptable(String message, Element destPublicKey) {
+	public CipherText encryptReEncryptable(String message, String destPublicKey) {
+		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
+
 		Element m = stringToElementInGroup2(message);
+		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
-		// C[1] = g^(ak)
+		// c1 = g^(ak)
 		// It can be proven that g^(ak) = a^k, where a = destPublicKey
-		// C[2] = m*Z^k
+		// c2 = m*Z^k
 
-		Element c1 = destPublicKey.powZn(k).getImmutable();
-		Element c2 = m.mul(parameters.getZ().getPowPreProcessing().powZn(k));
+		Element c1 = dpk.powZn(k);
+		Element c2 = m.mul(z.powZn(k));
 
 		return new CipherText(c1, c2);
 	}
 
-	public String decryptReEncryptable(CipherText cipher, Element destSecretKey) {
-		// M = C[2]/e(C[1], g)^(1/a), where a = destSecretKey
+	public String decryptReEncryptable(CipherText cipher, String destSecretKey) {
+		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		Pairing e = parameters.getE();
 
-		Element denominator = parameters.getE().pairing(
-				cipher.getC1(),
-				parameters.getG().getPowPreProcessing()
-						.powZn(destSecretKey.invert()));
+		Element dsk = base64StringToElement(destSecretKey,
+				parameters.getGroupZq());
+
+		// M = c2/e(c1, g)^(1/a), where a = destSecretKey
+		
+		Element denominator = e.pairing(cipher.getC1(), g.powZn(dsk.invert()));
 
 		Element m = cipher.getC2().div(denominator);
 
@@ -138,7 +170,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return curveElement;
 	}
 
-	private CurveElement base64StringToCurveElement(String s, Field<?> field) {
+	private CurveElement<?> base64StringToCurveElement(String s, Field<?> field) {
 		byte[] bytes = Base64.getDecoder().decode(s);
 
 		CurveElement<?> curveElement = (CurveElement<?>) field.newZeroElement();
