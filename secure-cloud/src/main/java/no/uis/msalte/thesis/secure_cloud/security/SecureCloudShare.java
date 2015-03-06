@@ -33,13 +33,13 @@ public interface SecureCloudShare {
 	/**
 	 * Generates a new re-encryption key for the given key pair
 	 * 
-	 * @param secretKey
+	 * @param srcSecretKey
 	 *            The respective secret key
-	 * @param publicKey
+	 * @param destPublicKey
 	 *            The respective public key
 	 * @return The new re-encryption key, represented by bytes
 	 */
-	public String newReEncryptionKey(String secretKey, String publicKey);
+	public String newReEncryptionKey(String srcSecretKey, String destPublicKey);
 
 	/**
 	 * Upload a torrent file to the system

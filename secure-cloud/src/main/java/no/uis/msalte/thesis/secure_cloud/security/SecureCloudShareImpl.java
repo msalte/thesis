@@ -2,7 +2,6 @@ package no.uis.msalte.thesis.secure_cloud.security;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,26 +10,28 @@ import java.util.UUID;
 
 import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
-import no.uis.msalte.thesis.crypto.el_gamal.ElGamalParams;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
+import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
 import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
 	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
-	private ElGamalParams params = new ElGamalParams(512);
+	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(
+			new ProxyReEncryptionParameters().initialize());
 
 	public String newSecretKey() {
-		return params.newSecretKey().toString();
+		return scheme.newSecretKey();
 	}
 
 	public String newPublicKey(String secretKey) {
-		return params.newPublicKey(new BigInteger(secretKey)).toString();
+		return scheme.newPublicKey(secretKey);
 	}
 
-	public String newReEncryptionKey(String secretKey, String publicKey) {
-		// TODO Auto-generated method stub
-		return null;
+	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
+		return scheme.newReEncryptionKey(srcSecretKey, destPublicKey);
 	}
 
 	public String upload(File file) {
