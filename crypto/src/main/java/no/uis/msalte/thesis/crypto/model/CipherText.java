@@ -7,11 +7,15 @@ import org.apache.commons.lang.ArrayUtils;
 public class CipherText {
 	private Element[] lefts;
 	private Element right;
-	
+
 	public CipherText(Element left, Element right) {
 		appendLeft(left);
-		
+
 		this.right = right.getImmutable();
+	}
+
+	public CipherText() {
+
 	}
 
 	public CipherText appendLeft(Element element) {
@@ -46,5 +50,13 @@ public class CipherText {
 
 	public Element getRight() {
 		return right;
+	}
+
+	public void setLefts(Element[] lefts) {
+		this.lefts = lefts;
+	}
+
+	public void setRight(Element right) {
+		this.right = right.getImmutable();
 	}
 }

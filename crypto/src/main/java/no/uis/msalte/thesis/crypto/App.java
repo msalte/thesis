@@ -12,13 +12,15 @@ public class App {
 		String secretKey = scheme.newSecretKey();
 		String publicKey = scheme.newPublicKey(secretKey);
 		
-		String message = "Fuku bla bla bla aokaw oqkwe";
+		String message = "This message is short but it is pretty long still This message is short but it is pretty long still This message is short but it is pretty long still";
 		
 		String encrypted = scheme.encrypt(message, publicKey);
 		String decrypted = scheme.decrypt(encrypted, secretKey);
 		
 		System.out.println(encrypted);
 		System.out.println(decrypted);
+		
+		System.out.println(message.equals(decrypted));
 	}
 
 }

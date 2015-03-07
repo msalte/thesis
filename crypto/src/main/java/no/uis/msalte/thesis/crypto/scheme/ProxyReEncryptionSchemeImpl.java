@@ -56,31 +56,46 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	public String encrypt(String message, String destPublicKey) {
 		CipherText c = encryptToCipherText(message, destPublicKey);
+		
+		int n = c.getLefts().length;
 
-		byte[][] b = new byte[c.getLefts().length + 1][1];
+		// Create a byte array representing the entire cipher text
+		// - the first N elements represents the message's N left parts
+		// - the last element represents the message's single right part
+		byte[][] bytes = new byte[n + 1][1];
 
-		for (int i = 0; i < c.getLefts().length; i++) {
-			b[i] = c.getLefts()[i].toBytes();
+		for (int i = 0; i < n; i++) {
+			bytes[i] = c.getLefts()[i].toBytes();
 		}
 
-		b[b.length - 1] = c.getRight().toBytes();
+		bytes[n] = c.getRight().toBytes();
 
-		return mergeByteArraysToBase64String(b);
+		return mergeByteArraysToBase64String(bytes);
 	}
 
 	public String decrypt(String cipher, String destSecretKey) {
 		byte[] bytes = Base64.getDecoder().decode(cipher);
 
-		Element c1 = parameters.getGroup2().newElement();
-		Element c2 = parameters.getGroup2().newElement();
-		
-		// TODO need to loop through bytes and set the cipher text lefts array
-		// TODO the last iteration should represent the cipher text right element
-		
-		int offset = c1.setFromBytes(bytes, 0);
-		c2.setFromBytes(bytes, offset);
+		Element leftN = parameters.getGroup2().newElement();
+		Element right = parameters.getGroup2().newElement();
 
-		return decryptCipherText(new CipherText(c1, c2), destSecretKey);
+		int elementByteLength = leftN.getLengthInBytes();
+		int messageByteLength = bytes.length;
+
+		CipherText cipherText = new CipherText();
+
+		int offset = 0;
+
+		while (messageByteLength - offset != elementByteLength) {
+			offset += leftN.setFromBytes(bytes, offset);
+			cipherText.appendLeft(leftN);
+		}
+
+		right.setFromBytes(bytes, offset);
+
+		cipherText.setRight(right);
+
+		return decryptCipherText(cipherText, destSecretKey);
 	}
 
 	public String reEncrypt(String cipher, String reEncryptionKey) {
@@ -128,23 +143,25 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
-		// c1 = Z^(ak), where a = destPublicKey
+		// C = (left[], right)
+
+		// right = Z^(ak), where a = destPublicKey
 		// It is provable that Z^(ak) = e(a, g^k)
-		Element c1 = parameters.getE().pairing(dpk, g.powZn(k));
+		Element right = parameters.getE().pairing(dpk, g.powZn(k));
 
-		// c2 = m[i]*Z^k
-		Element[] messageParts = messageToMultipleElementsInGroup2(message);
+		// left = m[i]*Z^k
+		Element[] m = messageToMultipleElementsInGroup2(message);
 
-		Element c2 = null;
+		Element left = null;
 		CipherText cipherText = null;
 
-		for (int i = 0; i < messageParts.length; i++) {
-			c2 = messageParts[i].mul(z.powZn(k));
+		for (int i = 0; i < m.length; i++) {
+			left = m[i].mul(z.powZn(k));
 
 			if (i == 0) {
-				cipherText = new CipherText(c1, c2);
+				cipherText = new CipherText(left, right);
 			} else {
-				cipherText.appendLeft(c2);
+				cipherText.appendLeft(left);
 			}
 		}
 
@@ -155,10 +172,16 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		Element dsk = base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
-		// M = c2/c1^(1/a), where a = destSecretKey
-		Element m = cipher.getRight().div(cipher.getLeft().powZn(dsk.invert()));
+		String plaintext = "";
 
-		return elementToPlainText(m);
+		// M = c1/c2^(1/a), where a = destSecretKey
+		for (Element left : cipher.getLefts()) {
+			Element m = left.div(cipher.getRight().powZn(dsk.invert()));
+
+			plaintext += new String(m.toBytes());
+		}
+
+		return plaintext.trim();
 	}
 
 	private CipherText reEncryptToCipherText(CipherText cipher,
@@ -217,7 +240,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		Element m = cipher.getRight().div(denominator);
 
-		return elementToPlainText(m);
+		return new String(m.toBytes()).trim();
 	}
 
 	private Element messageToElementInGroup2(String message) {
@@ -309,9 +332,5 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		curveElement.setFromBytes(bytes);
 
 		return curveElement.getImmutable();
-	}
-
-	private String elementToPlainText(Element element) {
-		return new String(element.toBytes()).trim();
 	}
 }
