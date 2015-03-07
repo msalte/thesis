@@ -57,8 +57,15 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	public String encrypt(String message, String destPublicKey) {
 		CipherText c = encryptToCipherText(message, destPublicKey);
 
-		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c
-				.getRight().toBytes());
+		byte[][] b = new byte[c.getLefts().length + 1][1];
+
+		for (int i = 0; i < c.getLefts().length; i++) {
+			b[i] = c.getLefts()[i].toBytes();
+		}
+
+		b[b.length - 1] = c.getRight().toBytes();
+
+		return mergeByteArraysToBase64String(b);
 	}
 
 	public String decrypt(String cipher, String destSecretKey) {
@@ -66,7 +73,10 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		Element c1 = parameters.getGroup2().newElement();
 		Element c2 = parameters.getGroup2().newElement();
-
+		
+		// TODO need to loop through bytes and set the cipher text lefts array
+		// TODO the last iteration should represent the cipher text right element
+		
 		int offset = c1.setFromBytes(bytes, 0);
 		c2.setFromBytes(bytes, offset);
 
@@ -113,7 +123,6 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
 
-		Element m = messageToElementInGroup2(message);
 		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
@@ -123,10 +132,23 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		// It is provable that Z^(ak) = e(a, g^k)
 		Element c1 = parameters.getE().pairing(dpk, g.powZn(k));
 
-		// c2 = m*Z^k
-		Element c2 = m.mul(z.powZn(k));
+		// c2 = m[i]*Z^k
+		Element[] messageParts = messageToMultipleElementsInGroup2(message);
 
-		return new CipherText(c1, c2);
+		Element c2 = null;
+		CipherText cipherText = null;
+
+		for (int i = 0; i < messageParts.length; i++) {
+			c2 = messageParts[i].mul(z.powZn(k));
+
+			if (i == 0) {
+				cipherText = new CipherText(c1, c2);
+			} else {
+				cipherText.appendLeft(c2);
+			}
+		}
+
+		return cipherText;
 	}
 
 	private String decryptCipherText(CipherText cipher, String destSecretKey) {

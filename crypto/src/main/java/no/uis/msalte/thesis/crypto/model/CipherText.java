@@ -7,7 +7,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class CipherText {
 	private Element[] lefts;
 	private Element right;
-
+	
 	public CipherText(Element left, Element right) {
 		appendLeft(left);
 		
