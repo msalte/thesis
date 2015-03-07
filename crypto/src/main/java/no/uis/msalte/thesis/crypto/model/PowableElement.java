@@ -9,7 +9,7 @@ public class PowableElement {
 
 	public PowableElement(Element element) {
 		this.element = element;
-		this.powPreProcessing = element.pow();
+		this.powPreProcessing = element.getElementPowPreProcessing();
 	}
 
 	public Element getElement() {

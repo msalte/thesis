@@ -10,9 +10,9 @@ public class App {
 		ProxyReEncryptionSchemeImpl scheme = new ProxyReEncryptionSchemeImpl(
 				new ProxyReEncryptionParameters().initialize());
 
-		String message = new String("Hello there. This message is short and secret.");
+		String message = "I figured out the problem!";
 		
-		Element[] elements = scheme.msgToElementsInGroup2(message);
+		Element[] elements = scheme.messageToElementsInGroup2(message);
 
 		System.out.println(elements.length);
 
@@ -20,7 +20,7 @@ public class App {
 			String byteString = new String(elements[i].toBytes());
 			
 			System.out.println(new String(byteString).trim());
-		}
+		}	
 
 	}
 

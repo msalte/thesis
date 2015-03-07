@@ -1,17 +1,12 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
-import no.uis.msalte.thesis.crypto.model.PowableElement;
-import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
-import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeACurveGenerator;
+import no.uis.msalte.thesis.crypto.model.PowableElement;
 
 public class ProxyReEncryptionParameters {
-	private static final int SOLINAS_PRIME_BITS = 256;
-	private static final int PRIME_ORDER_BITS = 256;
-
 	private Pairing e;
 	private Field<?> group1;
 	private Field<?> group2;
@@ -19,10 +14,7 @@ public class ProxyReEncryptionParameters {
 	private PowableElement g, z;
 
 	public ProxyReEncryptionParameters initialize() {
-		final CurveParameters cp = new TypeACurveGenerator(SOLINAS_PRIME_BITS,
-				PRIME_ORDER_BITS).generate();
-
-		e = PairingFactory.getPairing(cp);
+		e = PairingFactory.getPairing("C:\\source\\jpbc-params\\curves\\a.properties");
 
 		group1 = e.getG1();
 		group2 = e.getGT();

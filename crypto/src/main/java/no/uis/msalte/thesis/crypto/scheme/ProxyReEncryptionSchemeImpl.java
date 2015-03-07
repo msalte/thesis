@@ -9,7 +9,6 @@ import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 
 import no.uis.msalte.thesis.crypto.model.CipherText;
 
@@ -215,75 +214,38 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return result.getImmutable();
 	}
 
-	public Element[] msgToElementsInGroup2(String message) {
+	public Element[] messageToElementsInGroup2(String message) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		Field<?> group2 = parameters.getGroup2();
-		
+
 		byte[] source = message.trim().getBytes();
-		int lengthInBytes = group2.getLengthInBytes();
-		
-		if(source.length < lengthInBytes) {
-			source = Arrays.copyOf(source, lengthInBytes);
+
+		int messageLengthInBytes = source.length;
+		int elementLengthInBytes = group2.getLengthInBytes();
+
+		if (messageLengthInBytes < elementLengthInBytes) {
+			source = Arrays.copyOf(source, elementLengthInBytes);
+		} else if (messageLengthInBytes > elementLengthInBytes) {
+			int factor = messageLengthInBytes / elementLengthInBytes + 1;
+
+			source = Arrays.copyOf(source, factor * elementLengthInBytes);
 		}
+
+		messageLengthInBytes = source.length;
 		
 		int offset = 0;
-		
-		while(true) {
-			Element e = group2.newElement();	
-			offset = e.setFromBytes(source, offset);
-			
-			if(offset == 0) {
+
+		while (true) {
+			Element e = group2.newElement();
+			offset += e.setFromBytes(source, offset);
+			elements.add(e.getImmutable());
+
+			if (offset >= messageLengthInBytes) {
 				break;
 			}
-			
-			elements.add(e.getImmutable());
 		}
-		
+
 		return elements.toArray(new Element[] {});
-	}
-
-	public Element[] messageToElementsInGroup2(String message) {
-		int length = message.length();
-
-		List<String> msgParts = splitMessageEqually(message, length);
-
-		int byteLength = message.getBytes().length;
-		int maxByteLength = parameters.getGroup2().getLengthInBytes();
-
-		while (byteLength > maxByteLength) {
-			length = length / 2;
-
-			msgParts = splitMessageEqually(message, length);
-
-			byteLength = msgParts.get(0).getBytes().length;
-		}
-
-		Element[] elements = new Element[msgParts.size()];
-		Element e = null;
-
-		for (int i = 0; i < msgParts.size(); i++) {
-			byte[] b = msgParts.get(i).getBytes();
-			b = Arrays.copyOf(b, maxByteLength);
-
-			e = parameters.getGroup2().newElement();
-			e.setFromBytes(b); // TODO use the return value here
-			elements[i] = e.getImmutable();
-		}
-
-		return elements;
-	}
-
-	private static List<String> splitMessageEqually(String message, int length) {
-		List<String> messageParts = new ArrayList<String>((message.length()
-				+ length - 1)
-				/ length);
-
-		for (int start = 0; start < message.length(); start += length) {
-			messageParts.add(message.substring(start,
-					Math.min(message.length(), start + length)));
-		}
-
-		return messageParts;
 	}
 
 	private String elementToBase64String(Element element) {
@@ -313,7 +275,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private Element base64StringToCurveElement(String s, Field<?> field) {
 		byte[] bytes = Base64.getDecoder().decode(s);
 
-		CurveElement<?> curveElement = (CurveElement<?>) field.newZeroElement();
+		CurveElement<?, ?> curveElement = (CurveElement<?, ?>) field
+				.newZeroElement();
 
 		curveElement.setFromBytes(bytes);
 
