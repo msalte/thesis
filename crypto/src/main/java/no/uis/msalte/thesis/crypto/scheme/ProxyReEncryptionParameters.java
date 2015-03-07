@@ -10,7 +10,7 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeACurveGenerator;
 
 public class ProxyReEncryptionParameters {
 	private static final int SOLINAS_PRIME_BITS = 256;
-	private static final int PRIME_ORDER_BITS = 1024;
+	private static final int PRIME_ORDER_BITS = 256;
 
 	private Pairing e;
 	private Field<?> group1;
