@@ -12,7 +12,7 @@ public class App {
 
 		String message = "I figured out the problem!";
 		
-		Element[] elements = scheme.messageToElementsInGroup2(message);
+		Element[] elements = scheme.messageToMultipleElementsInGroup2(message);
 
 		System.out.println(elements.length);
 

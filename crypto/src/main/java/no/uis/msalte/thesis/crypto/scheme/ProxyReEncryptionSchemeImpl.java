@@ -214,7 +214,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return result.getImmutable();
 	}
 
-	public Element[] messageToElementsInGroup2(String message) {
+	public Element[] messageToMultipleElementsInGroup2(String message) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		Field<?> group2 = parameters.getGroup2();
 
@@ -223,29 +223,35 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		int messageLengthInBytes = source.length;
 		int elementLengthInBytes = group2.getLengthInBytes();
 
+		// Need to make sure that the message length is divisible
+		// by the element length.
 		if (messageLengthInBytes < elementLengthInBytes) {
+			// If lesser, set message length equal to element length
 			source = Arrays.copyOf(source, elementLengthInBytes);
 		} else if (messageLengthInBytes > elementLengthInBytes) {
+			// If greater, set message length to a multiple of element length
 			int factor = messageLengthInBytes / elementLengthInBytes + 1;
 
 			source = Arrays.copyOf(source, factor * elementLengthInBytes);
 		}
 
 		messageLengthInBytes = source.length;
-		
-		int offset = 0;
 
+		// Begin finding the elements in group 2
+		// representing the message
+		int offset = 0;
 		while (true) {
 			Element e = group2.newElement();
 			offset += e.setFromBytes(source, offset);
 			elements.add(e.getImmutable());
 
 			if (offset >= messageLengthInBytes) {
+				// Finished
 				break;
 			}
 		}
 
-		return elements.toArray(new Element[] {});
+		return elements.toArray(new Element[elements.size()]);
 	}
 
 	private String elementToBase64String(Element element) {
