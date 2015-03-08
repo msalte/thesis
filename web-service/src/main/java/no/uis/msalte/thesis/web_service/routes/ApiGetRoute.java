@@ -45,21 +45,26 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				"Calling this function generates a new secret key"));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_NEW_PUBLIC_KEY,
-				new String[] { PARAM_SECRET_KEY }, new String[] { "bytes" },
+				new String[] { PARAM_SECRET_KEY }, new String[] { "string" },
 				"Calling this function generates a new public key"));
+
+		content.add(new ApiItem(METHOD_POST, FUNC_NEW_RE_ENCRYPTION_KEY,
+				new String[] { PARAM_SECRET_KEY, PARAM_PUBLIC_KEY },
+				new String[] { "string", "string" },
+				"Calling this function generates a new re-encryption key"));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_SHARE, new String[] {
 				PARAM_FILE_NAME, PARAM_PUBLIC_KEY, PARAM_RE_ENCRYPTION_KEY },
-				new String[] { "string", "bytes", "bytes" },
+				new String[] { "string", "string", "string" },
 				"Call this function to share a torrent with someone else"));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_UPLOAD,
-				new String[] { PARAM_FILE }, new String[] { "bytes" },
+				new String[] { PARAM_FILE }, new String[] { "string" },
 				"Call this function to upload a torrent"));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_DOWNLOAD, new String[] {
 				PARAM_FILE_NAME, PARAM_PUBLIC_KEY }, new String[] { "string",
-				"bytes" }, "Call this function to download a torrent"));
+				"string" }, "Call this function to download a torrent"));
 
 		wsr.setStatus(status);
 		wsr.setMessage(message);

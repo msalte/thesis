@@ -12,6 +12,7 @@ public interface WebServiceRoute {
 	public static final String FUNC_NEW_TORRENT = "newTorrent";
 	public static final String FUNC_NEW_SECRET_KEY = "newSecretKey";
 	public static final String FUNC_NEW_PUBLIC_KEY = "newPublicKey";
+	public static final String FUNC_NEW_RE_ENCRYPTION_KEY = "newReEncryptionKey";
 	public static final String FUNC_SHARE = "share";
 	public static final String FUNC_UPLOAD = "upload";
 	public static final String FUNC_DOWNLOAD = "download";

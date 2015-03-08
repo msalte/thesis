@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
 import no.uis.msalte.thesis.web_service.routes.DownloadPostRoute;
 import no.uis.msalte.thesis.web_service.routes.NewPublicKeyPostRoute;
+import no.uis.msalte.thesis.web_service.routes.NewReEncryptionKeyPostRoute;
 import no.uis.msalte.thesis.web_service.routes.NewSecretKeyGetRoute;
 import no.uis.msalte.thesis.web_service.routes.NewTorrentPostRoute;
 import no.uis.msalte.thesis.web_service.routes.SharePostRoute;
@@ -38,6 +39,9 @@ public class Server {
 
 		Spark.post(NewPublicKeyPostRoute.PATH, ACCEPT_TYPE,
 				new NewPublicKeyPostRoute(), JSON_TRANSFORMER);
+
+		Spark.post(NewReEncryptionKeyPostRoute.PATH, ACCEPT_TYPE,
+				new NewReEncryptionKeyPostRoute(), JSON_TRANSFORMER);
 
 		Spark.post(SharePostRoute.PATH, ACCEPT_TYPE, new SharePostRoute(),
 				JSON_TRANSFORMER);
