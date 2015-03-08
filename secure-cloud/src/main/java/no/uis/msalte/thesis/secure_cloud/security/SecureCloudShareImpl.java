@@ -78,7 +78,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		if (hasAccess) {
 			String file = Persist.getInstance().readTorrent(fileName);
 
-			// TODO re-encrypt
+//			file = scheme.reEncrypt(file, reEncryptionKey);
 
 			return file;
 		}
