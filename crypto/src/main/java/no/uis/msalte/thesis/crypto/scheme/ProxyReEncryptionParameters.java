@@ -14,7 +14,8 @@ public class ProxyReEncryptionParameters {
 	private PowableElement g, z;
 
 	public ProxyReEncryptionParameters initialize() {
-		e = PairingFactory.getPairing("C:\\source\\jpbc-params\\curves\\a.properties");
+		e = PairingFactory
+				.getPairing("C:\\source\\jpbc-params\\curves\\a.properties");
 
 		group1 = e.getG1();
 		group2 = e.getGT();
@@ -50,5 +51,4 @@ public class ProxyReEncryptionParameters {
 	public PowableElement getZ() {
 		return z;
 	}
-
 }

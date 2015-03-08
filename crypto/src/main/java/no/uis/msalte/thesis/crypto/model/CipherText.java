@@ -56,7 +56,7 @@ public class CipherText {
 
 		return lefts.length - 1;
 	}
-	
+
 	public Element[] getLefts() {
 		return lefts;
 	}

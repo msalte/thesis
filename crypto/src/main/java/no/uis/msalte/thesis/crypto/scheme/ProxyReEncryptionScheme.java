@@ -41,8 +41,8 @@ public interface ProxyReEncryptionScheme {
 	public String encrypt(String message, String destPublicKey);
 
 	/**
-	 * Decrypts a message encrypted in a LVL 1 fashion, in accordance to the
-	 * AFGH scheme
+	 * Decrypts a message encrypted/re-encrypted in a LVL 1 fashion, 
+	 * in accordance to the AFGH scheme
 	 * 
 	 * @param cipher
 	 *            The cipher text to decrypt
@@ -54,13 +54,13 @@ public interface ProxyReEncryptionScheme {
 
 	/**
 	 * Re-encrypts a message that is encrypted in a LVL 2 fashion, in accordance
-	 * to the AFGH scheme
+	 * to the AFGH scheme. Note that the resulting cipher will become a LVL 1 cipher
 	 * 
 	 * @param cipher
 	 *            The cipher text to re-encrypt
 	 * @param reEncryptionKey
 	 *            The re-encryption key
-	 * @return The re-encrypted message
+	 * @return The re-encrypted message, now a LVL 1 cipher
 	 */
 	public String reEncrypt(String cipher, String reEncryptionKey);
 
