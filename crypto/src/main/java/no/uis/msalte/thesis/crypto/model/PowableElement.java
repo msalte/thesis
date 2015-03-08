@@ -12,11 +12,11 @@ public class PowableElement {
 		this.powPreProcessing = element.getElementPowPreProcessing();
 	}
 
-	public Element getElement() {
+	public Element element() {
 		return element.getImmutable();
 	}
 
-	public ElementPowPreProcessing getPowPreProcessing() {
+	public ElementPowPreProcessing powable() {
 		return powPreProcessing;
 	}
 

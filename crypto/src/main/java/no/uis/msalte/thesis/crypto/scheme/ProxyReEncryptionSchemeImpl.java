@@ -31,7 +31,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	public String newPublicKey(String secretKey) {
 		Element sk = base64StringToElement(secretKey, parameters.getGroupZq());
 
-		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing g = parameters.getG().powable();
 
 		// PK = g^a, where a = secret key
 		Element pk = g.powZn(sk).getImmutable();
@@ -43,7 +43,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		Element sk = base64StringToElement(srcSecretKey,
 				parameters.getGroupZq());
 		Element pk = base64StringToCurveElement(destPublicKey, parameters
-				.getG().getElement().getField());
+				.getG().element().getField());
 
 		// RK = (g^b)^1/a
 		// a = source secret key
@@ -61,14 +61,14 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String decrypt(String cipher, String destSecretKey) {
-		CipherText cipherText = cipherStringToCipherText(cipher,
+		CipherText cipherText = parseCipherStringAsCipherText(cipher,
 				parameters.getGroup2());
 
 		return decryptCipherTextToPlainText(cipherText, destSecretKey);
 	}
 
 	public String reEncrypt(String cipher, String reEncryptionKey) {
-		CipherText cipherText = cipherStringToCipherText(cipher,
+		CipherText cipherText = parseCipherStringAsCipherText(cipher,
 				parameters.getGroup1());
 
 		CipherText reEncryptedCipherText = reEncryptToCipherText(cipherText,
@@ -86,7 +86,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String decryptReEncryptable(String cipher, String destSecretKey) {
-		CipherText cipherText = cipherStringToCipherText(cipher,
+		CipherText cipherText = parseCipherStringAsCipherText(cipher,
 				parameters.getGroup1());
 
 		return decryptReEncryptableCipherTextToPlainText(cipherText,
@@ -94,7 +94,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	private CipherText encryptToCipherText(String message, String destPublicKey) {
-		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing g = parameters.getG().powable();
 
 		Element pk = base64StringToCurveElement(destPublicKey, g.getField());
 
@@ -114,14 +114,14 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private String decryptCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
-		Element dsk = base64StringToElement(destSecretKey,
+		Element sk = base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
 		String plaintext = "";
 
-		// M = c1/c2^(1/a), where a = destSecretKey
+		// M = sum(lefts[i]/right^(1/a)), where a = destSecretKey
 		for (Element leftN : cipher.getLefts()) {
-			Element m = leftN.div(cipher.getRight().powZn(dsk.invert()));
+			Element m = leftN.div(cipher.getRight().powZn(sk.invert()));
 
 			plaintext += new String(m.toBytes());
 		}
@@ -131,8 +131,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText reEncryptToCipherText(CipherText cipher,
 			String reEncryptionKey) {
-		Element rek = base64StringToCurveElement(reEncryptionKey, parameters
-				.getG().getElement().getField());
+		Element rk = base64StringToCurveElement(reEncryptionKey, parameters
+				.getG().element().getField());
 
 		// right = Z^(bk)
 		// lefts = m[i]Z^k = lefts
@@ -143,7 +143,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		// m[i]Z^k = lefts[i]
 
-		Element newRight = parameters.getE().pairing(rek, cipher.getRight());
+		Element newRight = parameters.getE().pairing(rk, cipher.getRight());
 
 		cipher.setRight(newRight);
 
@@ -152,10 +152,10 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText encryptReEncryptableToCipherText(String message,
 			String destPublicKey) {
-		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing g = parameters.getG().powable();
 		Element pk = base64StringToCurveElement(destPublicKey, g.getField());
 
-		// get a random integer k from group Zq
+		// get a random k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
 		// C = (lefts[], right)
@@ -172,21 +172,19 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private String decryptReEncryptableCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
 
-		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
+		ElementPowPreProcessing g = parameters.getG().powable();
 		Pairing e = parameters.getE();
 
-		Element dsk = base64StringToElement(destSecretKey,
+		Element sk = base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
-		// M = leftN/e(right, g)^(1/a), where a = destSecretKey
-
-		Element denominator = e.pairing(cipher.getRight(),
-				g.powZn(dsk.invert()));
+		// M = sum(lefts[i]/e(right, g)^(1/a)), where a = destSecretKey
+		Element divisor = e.pairing(cipher.getRight(), g.powZn(sk.invert()));
 
 		String plaintext = "";
 
 		for (Element leftN : cipher.getLefts()) {
-			Element m = leftN.div(denominator);
+			Element m = leftN.div(divisor);
 
 			plaintext += new String(m.toBytes());
 		}
@@ -196,7 +194,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText buildCipherTextFromMessage(Element[] m, Element right,
 			Element k) {
-		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
+		ElementPowPreProcessing z = parameters.getZ().powable();
 
 		CipherText cipherText = null;
 		Element leftN = null;
@@ -257,7 +255,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return elements.toArray(new Element[elements.size()]);
 	}
 
-	private CipherText cipherStringToCipherText(String cipher,
+	private CipherText parseCipherStringAsCipherText(String cipher,
 			Field<?> rightSourceField) {
 		byte[] source = Base64.getDecoder().decode(cipher);
 
@@ -271,11 +269,15 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		int offset = 0;
 
+		// Read the first N*elementLengthInBytes bytes
+		// into the cipher text's lefts[] element array
 		while (messageLengthInBytes - offset != elementLengthInBytes) {
 			offset += leftN.setFromBytes(source, offset);
 			cipherText.appendLeft(leftN);
 		}
 
+		// The final elementLengthInBytes bytes
+		// should be set to the cipher text's right element
 		right.setFromBytes(source, offset);
 
 		cipherText.setRight(right);

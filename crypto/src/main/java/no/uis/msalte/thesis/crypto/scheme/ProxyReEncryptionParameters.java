@@ -22,7 +22,7 @@ public class ProxyReEncryptionParameters {
 		groupZq = e.getZr();
 
 		g = new PowableElement(((CurveField<?>) group1).getGen().getImmutable());
-		z = new PowableElement(e.pairing(g.getElement(), g.getElement())
+		z = new PowableElement(e.pairing(g.element(), g.element())
 				.getImmutable());
 
 		return this;
