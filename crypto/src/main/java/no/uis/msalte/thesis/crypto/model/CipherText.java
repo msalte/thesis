@@ -8,14 +8,14 @@ public class CipherText {
 	private Element[] lefts;
 	private Element right;
 
+	public CipherText() {
+
+	}
+
 	public CipherText(Element left, Element right) {
 		appendLeft(left);
 
 		this.right = right.getImmutable();
-	}
-
-	public CipherText() {
-
 	}
 
 	public CipherText appendLeft(Element element) {
@@ -26,6 +26,23 @@ public class CipherText {
 		}
 
 		return this;
+	}
+
+	public byte[][] toByteArrays() {
+		int n = getLefts().length;
+
+		// Create a set of byte arrays representing the entire cipher text
+		// - the first N arrays represents the message's N left parts
+		// - the last array represents the message's single right part
+		byte[][] bytes = new byte[n + 1][1];
+
+		for (int i = 0; i < n; i++) {
+			bytes[i] = getLefts()[i].toBytes();
+		}
+
+		bytes[n] = getRight().toBytes();
+
+		return bytes;
 	}
 
 	private int ensureLeftsLength() {
@@ -39,13 +56,9 @@ public class CipherText {
 
 		return lefts.length - 1;
 	}
-
+	
 	public Element[] getLefts() {
 		return lefts;
-	}
-
-	public Element getLeft() {
-		return lefts[0];
 	}
 
 	public Element getRight() {

@@ -11,7 +11,8 @@ import org.junit.Test;
 
 public class ProxyReEncryptionSchemeTest {
 	private static ProxyReEncryptionScheme scheme;
-
+	private static final String MESSAGE = "This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message This message is repeated many times to make a long message".trim();
+	
 	@BeforeClass
 	public static void createSchemeInstance() {
 		scheme = new ProxyReEncryptionSchemeImpl(
@@ -27,28 +28,24 @@ public class ProxyReEncryptionSchemeTest {
 	public void testGivenEncryptedMessageDecryptionShouldRecoverMessage() {
 		String sk = scheme.newSecretKey();
 		String pk = scheme.newPublicKey(sk);
-
-		String message = "This is a secret";
-
-		String cipher = scheme.encrypt(message, pk);
+		
+		String cipher = scheme.encrypt(MESSAGE, pk);
 
 		String decrypted = scheme.decrypt(cipher, sk);
 
-		assertEquals(message, decrypted);
+		assertEquals(MESSAGE, decrypted);
 	}
 
 	@Test
 	public void testGivenEncryptedReEncryptableMessageDecryptionShouldRecoverMessage() {
 		String sk = scheme.newSecretKey();
 		String pk = scheme.newPublicKey(sk);
-
-		String message = "This is a secret message";
 		
-		String cipher = scheme.encryptReEncryptable(message, pk);
+		String cipher = scheme.encryptReEncryptable(MESSAGE, pk);
 		
 		String decrypted = scheme.decryptReEncryptable(cipher, sk);
 		
-		assertEquals(message, decrypted);
+		assertEquals(MESSAGE, decrypted);
 	}
 	
 	@Test
@@ -59,10 +56,8 @@ public class ProxyReEncryptionSchemeTest {
 		String bobSecretKey = scheme.newSecretKey();
 		String bobPublicKey = scheme.newPublicKey(bobSecretKey);
 
-		String messageForAlice = "Hello Alice!";
-
 		String cipherForAlice = scheme.encryptReEncryptable(
-				messageForAlice, alicePublicKey);
+				MESSAGE, alicePublicKey);
 
 		String reEncryptionKeyFromAliceToBob = scheme.newReEncryptionKey(
 				aliceSecretKey, bobPublicKey);
@@ -72,7 +67,7 @@ public class ProxyReEncryptionSchemeTest {
 
 		String bobDecryptedMessage = scheme.decrypt(cipherForBob, bobSecretKey);
 
-		assertEquals(messageForAlice, bobDecryptedMessage);
+		assertEquals(MESSAGE, bobDecryptedMessage);
 	}
 
 }

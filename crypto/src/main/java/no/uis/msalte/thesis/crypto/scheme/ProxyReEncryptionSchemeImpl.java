@@ -56,82 +56,63 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	public String encrypt(String message, String destPublicKey) {
 		CipherText c = encryptToCipherText(message, destPublicKey);
-		
-		int n = c.getLefts().length;
 
-		// Create a byte array representing the entire cipher text
-		// - the first N elements represents the message's N left parts
-		// - the last element represents the message's single right part
-		byte[][] bytes = new byte[n + 1][1];
-
-		for (int i = 0; i < n; i++) {
-			bytes[i] = c.getLefts()[i].toBytes();
-		}
-
-		bytes[n] = c.getRight().toBytes();
-
-		return mergeByteArraysToBase64String(bytes);
+		return mergeByteArraysToBase64String(c.toByteArrays());
 	}
 
 	public String decrypt(String cipher, String destSecretKey) {
-		byte[] bytes = Base64.getDecoder().decode(cipher);
+		CipherText cipherText = cipherStringToCipherText(cipher,
+				parameters.getGroup2());
+
+		return decryptCipherText(cipherText, destSecretKey);
+	}
+
+	private CipherText cipherStringToCipherText(String cipher,
+			Field<?> rightSourceField) {
+		byte[] source = Base64.getDecoder().decode(cipher);
 
 		Element leftN = parameters.getGroup2().newElement();
-		Element right = parameters.getGroup2().newElement();
+		Element right = rightSourceField.newElement();
 
-		int elementByteLength = leftN.getLengthInBytes();
-		int messageByteLength = bytes.length;
+		int elementLengthInBytes = leftN.getLengthInBytes();
+		int messageLengthInBytes = source.length;
 
 		CipherText cipherText = new CipherText();
 
 		int offset = 0;
 
-		while (messageByteLength - offset != elementByteLength) {
-			offset += leftN.setFromBytes(bytes, offset);
+		while (messageLengthInBytes - offset != elementLengthInBytes) {
+			offset += leftN.setFromBytes(source, offset);
 			cipherText.appendLeft(leftN);
 		}
 
-		right.setFromBytes(bytes, offset);
+		right.setFromBytes(source, offset);
 
 		cipherText.setRight(right);
 
-		return decryptCipherText(cipherText, destSecretKey);
+		return cipherText;
 	}
 
 	public String reEncrypt(String cipher, String reEncryptionKey) {
-		byte[] bytes = Base64.getDecoder().decode(cipher);
+		CipherText cipherText = cipherStringToCipherText(cipher,
+				parameters.getGroup1());
 
-		Element c1 = parameters.getGroup1().newElement();
-		Element c2 = parameters.getGroup2().newElement();
+		CipherText reEncrypted = reEncryptToCipherText(cipherText, reEncryptionKey);
 
-		int offset = c1.setFromBytes(bytes, 0);
-		c2.setFromBytes(bytes, offset);
-
-		CipherText c = reEncryptToCipherText(new CipherText(c1, c2),
-				reEncryptionKey);
-
-		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c
-				.getRight().toBytes());
+		return mergeByteArraysToBase64String(reEncrypted.toByteArrays());
 	}
 
 	public String encryptReEncryptable(String message, String destPublicKey) {
 		CipherText c = encryptReEncryptableToCipherText(message, destPublicKey);
 
-		return mergeByteArraysToBase64String(c.getLeft().toBytes(), c
-				.getRight().toBytes());
+		return mergeByteArraysToBase64String(c.toByteArrays());
 	}
 
 	public String decryptReEncryptable(String cipher, String destSecretKey) {
-		byte[] bytes = Base64.getDecoder().decode(cipher);
+		CipherText cipherText = cipherStringToCipherText(cipher,
+				parameters.getGroup1());
 
-		Element c1 = parameters.getGroup1().newElement();
-		Element c2 = parameters.getGroup2().newElement();
-
-		int offset = c1.setFromBytes(bytes, 0);
-		c2.setFromBytes(bytes, offset);
-
-		return decryptReEncryptableCipherText(new CipherText(c1, c2),
-				destSecretKey);
+		return decryptReEncryptableCipherText(cipherText, destSecretKey);
 	}
 
 	private CipherText encryptToCipherText(String message, String destPublicKey) {
@@ -149,19 +130,21 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		// It is provable that Z^(ak) = e(a, g^k)
 		Element right = parameters.getE().pairing(dpk, g.powZn(k));
 
-		// left = m[i]*Z^k
+		// leftN = m[i]*Z^k
 		Element[] m = messageToMultipleElementsInGroup2(message);
 
-		Element left = null;
+		Element leftN = null;
 		CipherText cipherText = null;
 
 		for (int i = 0; i < m.length; i++) {
-			left = m[i].mul(z.powZn(k));
+			leftN = m[i].mul(z.powZn(k));
 
-			if (i == 0) {
-				cipherText = new CipherText(left, right);
+			boolean firstIteration = i == 0 && cipherText == null;
+
+			if (firstIteration) {
+				cipherText = new CipherText(leftN, right);
 			} else {
-				cipherText.appendLeft(left);
+				cipherText.appendLeft(leftN);
 			}
 		}
 
@@ -175,8 +158,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		String plaintext = "";
 
 		// M = c1/c2^(1/a), where a = destSecretKey
-		for (Element left : cipher.getLefts()) {
-			Element m = left.div(cipher.getRight().powZn(dsk.invert()));
+		for (Element leftN : cipher.getLefts()) {
+			Element m = leftN.div(cipher.getRight().powZn(dsk.invert()));
 
 			plaintext += new String(m.toBytes());
 		}
@@ -189,19 +172,20 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		Element rek = base64StringToCurveElement(reEncryptionKey, parameters
 				.getG().getElement().getField());
 
-		// c1' = Z^(bk)
-		// c2' = mZ^k = c2
+		// right = Z^(bk)
+		// lefts = m[i]Z^k = lefts
 
 		// Z^(bk) = e(g^(ak), g^(b/a))
-		// g^(ak) = c1
+		// g^(ak) = right
 		// g^(b/a) = reEncryptionKey
 
-		// mZ^k = c2
+		// m[i]Z^k = lefts[i]
 
-		Element c1 = parameters.getE().pairing(rek, cipher.getLeft());
-		Element c2 = cipher.getRight(); // unmodified
+		Element newRight = parameters.getE().pairing(rek, cipher.getRight());
 
-		return new CipherText(c1, c2);
+		cipher.setRight(newRight);
+		
+		return cipher;
 	}
 
 	private CipherText encryptReEncryptableToCipherText(String message,
@@ -209,57 +193,65 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		ElementPowPreProcessing z = parameters.getZ().getPowPreProcessing();
 
-		Element m = messageToElementInGroup2(message);
 		Element dpk = base64StringToCurveElement(destPublicKey, g.getField());
 
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
 
-		// c1 = g^(ak)
+		// C = (left[], right)
+
+		// leftN = m[i]*Z^k
+		// right = g^(ak)
 		// It can be proven that g^(ak) = a^k, where a = destPublicKey
-		// c2 = m*Z^k
 
-		Element c1 = dpk.powZn(k);
-		Element c2 = m.mul(z.powZn(k));
+		Element[] m = messageToMultipleElementsInGroup2(message);
 
-		return new CipherText(c1, c2);
+		Element leftN = null;
+		Element right = dpk.powZn(k);
+
+		CipherText cipherText = null;
+
+		for (int i = 0; i < m.length; i++) {
+			leftN = m[i].mul(z.powZn(k));
+
+			boolean firstIteration = i == 0 && cipherText == null;
+
+			if (firstIteration) {
+				cipherText = new CipherText(leftN, right);
+			} else {
+				cipherText.appendLeft(leftN);
+			}
+		}
+
+		return cipherText;
 	}
 
 	private String decryptReEncryptableCipherText(CipherText cipher,
 			String destSecretKey) {
+
 		ElementPowPreProcessing g = parameters.getG().getPowPreProcessing();
 		Pairing e = parameters.getE();
 
 		Element dsk = base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
-		// M = c2/e(c1, g)^(1/a), where a = destSecretKey
+		// M = leftN/e(right, g)^(1/a), where a = destSecretKey
 
-		Element denominator = e
-				.pairing(cipher.getLeft(), g.powZn(dsk.invert()));
+		Element denominator = e.pairing(cipher.getRight(),
+				g.powZn(dsk.invert()));
 
-		Element m = cipher.getRight().div(denominator);
+		String plaintext = "";
 
-		return new String(m.toBytes()).trim();
-	}
+		for (Element leftN : cipher.getLefts()) {
+			Element m = leftN.div(denominator);
 
-	private Element messageToElementInGroup2(String message) {
-		byte[] bytes = message.getBytes();
-
-		Field<?> group2 = parameters.getGroup2();
-
-		if (bytes.length > group2.getLengthInBytes()) {
-			throw new IllegalArgumentException("Message is too long");
+			plaintext += new String(m.toBytes());
 		}
 
-		final Element result = group2.newElement();
-
-		result.setFromBytes(bytes);
-
-		return result.getImmutable();
+		return plaintext.trim();
 	}
 
-	public Element[] messageToMultipleElementsInGroup2(String message) {
+	private Element[] messageToMultipleElementsInGroup2(String message) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		Field<?> group2 = parameters.getGroup2();
 
