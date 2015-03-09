@@ -38,8 +38,8 @@ public class ServerTest {
 	public void testGivenNewTorrentSuccessThenReturnedContentShouldBeValidTorrent()
 			throws Exception {
 
-		final File file = getFileResource("test.txt");
-		final String extension = "txt";
+		final File file = getFileResource("document.pdf");
+		final String extension = "pdf";
 
 		// new torrent web service call
 		final String result = Client.post(WebServiceRoute.FUNC_NEW_TORRENT,

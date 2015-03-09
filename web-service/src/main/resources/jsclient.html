@@ -69,9 +69,9 @@
 			<form>
 				<div class="form-group"
 					ng-repeat="p in selectedFunction.params track by $index">
-					<label for="paramInput">{{p}}</label> <input type="text"
-						class="form-control" id="{{p}}" name="paramInput"
-						ng-model="form[p]"
+					<label for="paramInput">{{p}}</label> <input
+						type="{{p == 'file' ? 'file' : 'text'}}" class="form-control"
+						id="{{p}}" name="paramInput" ng-model="form[p]"
 						placeholder="Enter argument for parameter {{p}}"
 						ng-required="true">
 				</div>

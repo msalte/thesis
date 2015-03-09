@@ -13,7 +13,7 @@ var mainController = function($scope, $http) {
 										// initially, i.e. empty
 	
 	$scope.form = {};					// The contents of the current form
-	$scope.response = {};				// The contents of the current response
+	$scope.response = {};				// The contents of the current response	
 	
 	// This function will run on page load and the entire
 	// web page is rendered from its result
@@ -37,11 +37,15 @@ var mainController = function($scope, $http) {
 				var param = $scope.selectedFunction.params[i];
 				var arg = $scope.form[param];
 
+				 if(param === 'file') {
+					 arg = document.getElementById('file').files[0];
+				 }
+				
 				// return if required argument is empty
 				if(typeof arg === 'undefined') {
 					return;
 				}
-
+				
 				formData.append(param, arg);
 			}
 		}
@@ -53,7 +57,8 @@ var mainController = function($scope, $http) {
 		    url: url,
 		    data: formData,
 		    headers: { 'Content-Type': undefined },
-		    transformRequest: angular.identity // enables $http to choose the correct content-type
+		    transformRequest: angular.identity // enables $http to choose the
+												// correct content-type
 		}).success(function(data) {
 		    $scope.response = data;
 		});
@@ -79,14 +84,14 @@ var mainController = function($scope, $http) {
 		$scope.resetForm();
 		$scope.resetResponse();
 		
-		for(var i = 0;i < $scope.data.length;i++) {
+		for(var i = 0;i < $scope.data.length;i++) {			
 			var obj = $scope.data[i];
 			
 			var ok = obj.function == func;
 			
 			if(ok) {
 				$scope.selectedFunction.function = obj.function;
-				$scope.selectedFunction.params = obj.params;
+				$scope.selectedFunction.params = obj.params;				
 				$scope.selectedFunction.args = obj.args;
 				$scope.selectedFunction.details = obj.details;
 				$scope.selectedFunction.method = obj.method;
