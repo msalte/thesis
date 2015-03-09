@@ -13,7 +13,9 @@ var mainController = function($scope, $http) {
 										// initially, i.e. empty
 	
 	$scope.form = {};					// The contents of the current form
-	$scope.response = {};				// The contents of the current response	
+	$scope.response = {};				// The contents of the current response
+	
+	$scope.base64EncodedString = '';
 	
 	// This function will run on page load and the entire
 	// web page is rendered from its result
@@ -25,6 +27,15 @@ var mainController = function($scope, $http) {
 			$scope.functionNames.push(data.content[i].function);					
 		}
 	});
+	
+	$scope.convert = function() {
+		var converted = window.atob($scope.base64EncodedString);
+		
+		var blob = new Blob([converted], {type : 'application/x-bittorrent'});
+		var objectUrl = URL.createObjectURL(blob);
+
+		window.location = objectUrl;
+	}
 	
 	// This function will submit the current form and send
 	// a HTTP request (GET/POST) to the selected web service function
@@ -58,7 +69,7 @@ var mainController = function($scope, $http) {
 		    data: formData,
 		    headers: { 'Content-Type': undefined },
 		    transformRequest: angular.identity // enables $http to choose the
-												// correct content-type
+											   // correct content-type
 		}).success(function(data) {
 		    $scope.response = data;
 		});

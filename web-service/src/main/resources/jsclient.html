@@ -13,27 +13,42 @@
 <script src="script.js"></script>
 </head>
 <body ng-controller="mainController"
-	style="margin-top: 50px; margin-bottom: 50px"">
-	<div class="jumbotron">
-		<div class="container">
-			<h2>
-				<a href="" onclick="reloadPage()">{{title}}</a>
-			</h2>
-			<div class="dropdown">
-				<button class="btn btn-default dropdown-toggle" type="button"
-					id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-					Select Function <span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu" role="menu"
-					aria-labelledby="dropdownMenu1">
-					<li role="presentation" ng-repeat="f in functionNames"><a
-						role="menuitem" tabindex="-1" href="#"
-						ng-click="setSelectedFunction(f)">{{f}}</a></li>
-				</ul>
+	style="margin-bottom: 50px; margin-top: 50px">
+	<nav class="navbar navbar-default navbar-fixed-top">
+
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#" onclick="reloadPage()">API</a>
 			</div>
+
+			<ul class="nav navbar-nav">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown" role="button" aria-expanded="false">
+						Select Function <span class="caret"></span>
+				</a>
+					<ul class="dropdown-menu" role="menu">
+						<li role="presentation" ng-repeat="f in functionNames"><a
+							role="menuitem" tabindex="-1" href="#"
+							ng-click="setSelectedFunction(f)">{{f}}</a></li>
+					</ul></li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown" role="button" aria-expanded="false">
+						Convert <span class="caret"></span>
+				</a>
+
+					<ul class="dropdown-menu" role="menu">
+						<li data-toggle="modal" data-target="#convertModal"><a
+							href="#">To .torrent</a></li>
+					</ul></li>
+			</ul>
 		</div>
-	</div>
-	<div class="container" ng-show="selectedFunction.function">
+
+	</nav>
+
+	<div class="container" ng-show="selectedFunction.function" id="content">
 		<h3>
 			Selected function <span class="label label-info">{{selectedFunction.function}}</span>
 		</h3>
@@ -84,6 +99,33 @@
 			rows="10">{{response | json}}</textarea>
 
 	</div>
+
+	<!-- Convertion modal overlay -->
+	<div class="modal fade" id="convertModal" tabindex="-1" role="dialog"
+		aria-labelledby="convertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myconvertModal">Convert Base64
+						encoded string to .torrent file</h4>
+				</div>
+				<div class="modal-body" id="convertBody">
+					<input class="form-control" type="text" name="convertInput"
+						ng-model="base64EncodedString"
+						placeholder="Enter Base64 encoded string"></input>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" ng-click="convert()">Convert</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>
 <script>
 	function reloadPage() {
