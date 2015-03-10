@@ -6,14 +6,16 @@ public class ApiItem {
 	private String details;
 	private String[] params;
 	private String[] args;
+	private String returns;
 
 	public ApiItem(String method, String function, String[] params,
-			String[] args, String message) {
+			String[] args, String message, String returns) {
 		this.method = method;
 		this.function = function;
 		this.params = params;
 		this.args = args;
 		this.details = message;
+		this.returns = returns;
 	}
 
 	public String getFunction() {
@@ -54,6 +56,14 @@ public class ApiItem {
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	public String getReturns() {
+		return returns;
+	}
+
+	public void setReturns(String returns) {
+		this.returns = returns;
 	}
 
 }

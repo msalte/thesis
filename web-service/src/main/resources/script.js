@@ -15,7 +15,8 @@ var mainController = function($scope, $http) {
 	$scope.form = {};					// The contents of the current form
 	$scope.response = {};				// The contents of the current response
 	
-	$scope.base64EncodedString = '';
+	$scope.base64EncodedString = '';	// The user inputed Base64 string
+										// (conversion)
 	
 	// This function will run on page load and the entire
 	// web page is rendered from its result
@@ -28,13 +29,23 @@ var mainController = function($scope, $http) {
 		}
 	});
 	
-	$scope.convert = function() {
-		var converted = window.atob($scope.base64EncodedString);
+	// This function will parse a Base64 encoded string
+	// and attempt to tell the browser to download the file
+	// as a .torrent file
+	$scope.convert = function() {		
+		var decoded = window.atob($scope.base64EncodedString);
+		var array = new Uint8Array(decoded.length);
 		
-		var blob = new Blob([converted], {type : 'application/x-bittorrent'});
+		for( var i = 0; i < decoded.length; i++ ) { 
+			array[i] = decoded.charCodeAt(i); 
+		}
+		
+		var blob = new Blob([array], {type : 'application/x-bittorrent'});
 		var objectUrl = URL.createObjectURL(blob);
 
 		window.location = objectUrl;
+		
+		$scope.base64EncodedString = '';
 	}
 	
 	// This function will submit the current form and send
@@ -81,6 +92,7 @@ var mainController = function($scope, $http) {
 	// form back to its initial state, i.e. empty
 	$scope.resetForm = function() {
 		$scope.form = angular.copy($scope.initialForm);
+		$scope.testForm.$setPristine();
 	};
 	
 	// This function will reset the current
@@ -105,6 +117,7 @@ var mainController = function($scope, $http) {
 				$scope.selectedFunction.params = obj.params;				
 				$scope.selectedFunction.args = obj.args;
 				$scope.selectedFunction.details = obj.details;
+				$scope.selectedFunction.returns = obj.returns;
 				$scope.selectedFunction.method = obj.method;
 			}
 		}

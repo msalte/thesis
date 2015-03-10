@@ -75,18 +75,22 @@
 						style="margin-right: 5px"
 						ng-repeat="a in selectedFunction.args track by $index">{{a}}</span></td>
 				</tr>
+				<tr>
+					<td class="col-md-2">Returns</td>
+					<td class="col-md-10">{{selectedFunction.returns}}</td>
+				</tr>
 			</tbody>
 		</table>
 
 		<hr>
 		<h3>Test function</h3>
 		<div class="well">
-			<form>
+			<form name="testForm">
 				<div class="form-group"
 					ng-repeat="p in selectedFunction.params track by $index">
 					<label for="paramInput">{{p}}</label> <input
 						type="{{p == 'file' ? 'file' : 'text'}}" class="form-control"
-						id="{{p}}" name="paramInput" ng-model="form[p]"
+						id="{{p}}" name="{{p}}" ng-model="form[p]"
 						placeholder="Enter argument for parameter {{p}}"
 						ng-required="true">
 				</div>
@@ -100,7 +104,7 @@
 
 	</div>
 
-	<!-- Convertion modal overlay -->
+	<!-- Conversion modal overlay -->
 	<div class="modal fade" id="convertModal" tabindex="-1" role="dialog"
 		aria-labelledby="convertModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -120,7 +124,8 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" ng-click="convert()">Convert</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal"
+						ng-click="convert()">Convert</button>
 				</div>
 			</div>
 		</div>
