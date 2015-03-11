@@ -7,9 +7,12 @@
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 <script
+	src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+<script
 	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
 <script src="script.js"></script>
 </head>
 <body ng-controller="mainController"
@@ -99,8 +102,7 @@
 		</div>
 		<hr ng-show="response.message">
 		<h3 ng-show="response.message">Response</h3>
-		<textarea ng-show="response.message" class="form-control col-xs-12"
-			rows="10">{{response | json}}</textarea>
+		<pre ng-show="response.message" class="prettyprint lang-js">{{response | json}}</pre>
 
 	</div>
 
