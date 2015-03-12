@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Base64;
 
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
@@ -15,7 +14,6 @@ import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,11 +62,14 @@ public class ServerTest {
 	public void testGivenUploadFileSuccessThenShouldReturnNewFileName()
 			throws Exception {
 
+		final String publicKey = Base64.getEncoder().encodeToString(
+				"public_key".getBytes());
 		final File file = getFileResource("file.torrent");
 
 		// upload file
 		final String result = Client.post(WebServiceRoute.FUNC_UPLOAD,
-				new String[] {}, new String[] {}, file);
+				new String[] { WebServiceRoute.PARAM_PUBLIC_KEY },
+				new String[] { publicKey }, file);
 
 		final String fileName = JsonTransformer.GSON
 				.fromJson(result, WebServiceResponse.class).getContent()
@@ -85,16 +86,20 @@ public class ServerTest {
 	public void testGivenShareFileSuccessThenRecipientShouldBeGrantedDownload()
 			throws Exception {
 
-		final String publicKey = Base64.getEncoder().encodeToString(
-				"public_key".getBytes());
-		final String reEncryptionKey = Base64.getEncoder().encodeToString(
-				"re_encryption_key".getBytes());
+		final String sourcePublicKey = Base64.getEncoder().encodeToString(
+				"source_public_key".getBytes());
+		final String targetPublicKey = Base64.getEncoder().encodeToString(
+				"target_public_key".getBytes());
+		final String sourceToTargetReEncryptionKey = Base64
+				.getEncoder()
+				.encodeToString("source_to_target_re_encryption_key".getBytes());
 
 		final File file = getFileResource("file.torrent");
 
 		// upload file
 		final String uploadResult = Client.post(WebServiceRoute.FUNC_UPLOAD,
-				new String[] {}, new String[] {}, file);
+				new String[] { WebServiceRoute.PARAM_PUBLIC_KEY },
+				new String[] { sourcePublicKey }, file);
 
 		// retrieve file name
 		final String fileName = JsonTransformer.GSON
@@ -106,23 +111,21 @@ public class ServerTest {
 				WebServiceRoute.PARAM_FILE_NAME,
 				WebServiceRoute.PARAM_PUBLIC_KEY,
 				WebServiceRoute.PARAM_RE_ENCRYPTION_KEY }, new String[] {
-				fileName, publicKey, reEncryptionKey }, null);
+				fileName, targetPublicKey, sourceToTargetReEncryptionKey },
+				null);
 
 		// download
 		final String downloadResult = Client.post(
 				WebServiceRoute.FUNC_DOWNLOAD, new String[] {
 						WebServiceRoute.PARAM_FILE_NAME,
 						WebServiceRoute.PARAM_PUBLIC_KEY }, new String[] {
-						fileName, publicKey }, null);
+						fileName, targetPublicKey }, null);
 
 		final WebServiceResponse downloaded = JsonTransformer.GSON.fromJson(
 				downloadResult, WebServiceResponse.class);
 
 		if (downloaded.getContent() != null) {
-			assertTrue(Arrays.equals(
-					FileUtils.readFileToByteArray(file),
-					Base64.getDecoder().decode(
-							downloaded.getContent().toString())));
+			assertTrue(downloaded.getMessage().equals("Download granted"));
 		} else {
 			assertTrue(false);
 		}
