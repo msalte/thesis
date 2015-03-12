@@ -64,7 +64,7 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				"True if share is successful, false otherwise"));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_UPLOAD,
-				new String[] { PARAM_FILE }, new String[] { "binary" },
+				new String[] { PARAM_FILE, PARAM_PUBLIC_KEY }, new String[] { "binary", "string" },
 				"Call this function to upload a torrent",
 				"The uploaded torrent's new unique file name"));
 

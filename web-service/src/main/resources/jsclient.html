@@ -55,7 +55,7 @@
 		<h3>
 			Selected function <span class="label label-info">{{selectedFunction.function}}</span>
 		</h3>
-		<hr>
+		<hr size="0">
 		<table class="table table-striped">
 			<tbody>
 				<tr>
@@ -66,26 +66,25 @@
 					<td class="col-md-2">Method</td>
 					<td class="col-md-10"><span class="label label-success">{{selectedFunction.method}}</span></td>
 				</tr>
-				<tr>
+				<tr ng-show="selectedFunction.params">
 					<td class="col-md-2">Parameters</td>
 					<td class="col-md-10"><span class="label label-primary"
 						style="margin-right: 5px"
 						ng-repeat="p in selectedFunction.params track by $index">{{p}}</span></td>
 				</tr>
-				<tr>
+				<tr ng-show="selectedFunction.args">
 					<td class="col-md-2">Arguments</td>
 					<td class="col-md-10"><span class="label label-warning"
 						style="margin-right: 5px"
 						ng-repeat="a in selectedFunction.args track by $index">{{a}}</span></td>
 				</tr>
-				<tr>
+				<tr ng-show="selectedFunction.returns">
 					<td class="col-md-2">Returns</td>
 					<td class="col-md-10">{{selectedFunction.returns}}</td>
 				</tr>
 			</tbody>
 		</table>
 
-		<hr>
 		<h3>Test function</h3>
 		<div class="well">
 			<form name="testForm">

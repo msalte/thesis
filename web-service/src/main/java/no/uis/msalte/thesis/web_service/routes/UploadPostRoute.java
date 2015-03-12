@@ -34,45 +34,54 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 		request.raw().setAttribute("org.eclipse.multipartConfig",
 				WebServiceUtil.MULTIPART_CONFIG);
 
+		Part filePart = null;
+		String publicKey = "";
+
 		for (Part part : request.raw().getParts()) {
 			if (part.getName().equals(PARAM_FILE)) {
-				// This is the file
+				filePart = part;
+			} else if (part.getName().equals(PARAM_PUBLIC_KEY)) {
+				publicKey = WebServiceUtil.parseInputStream(part
+						.getInputStream());
+			}
+		}
 
-				File tempFile = null;
-				String extension = ".torrent";
+		final boolean isParamsValid = filePart != null && !publicKey.isEmpty();
 
-				try {
-					final String tempFileName = String.format("Temp%d.%s",
-							System.currentTimeMillis(), extension);
+		if (isParamsValid) {
+			File tempFile = null;
+			String extension = ".torrent";
 
-					part.write(tempFileName);
+			try {
+				// TODO remove System.currentTimeMillis() in name?
+				final String tempFileName = String.format("Temp%d.%s",
+						System.currentTimeMillis(), extension);
 
-					tempFile = Paths.get(
-							String.format("%s//%s",
-									WebServiceUtil.MULTIPART_CONFIG
-											.getLocation(), tempFileName))
-							.toFile();
+				filePart.write(tempFileName);
 
-					final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
-							.upload(tempFile);
+				tempFile = Paths.get(
+						String.format("%s//%s",
+								WebServiceUtil.MULTIPART_CONFIG.getLocation(),
+								tempFileName)).toFile();
 
-					if (torrent != null) {
-						// everything fine, treat as HTTP_OK
-						final String message = "Torrent uploaded successfuly";
-						final String content = torrent;
+				final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
+						.upload(tempFile, publicKey);
 
-						r.setStatus(HttpURLConnection.HTTP_OK);
-						r.setMessage(message);
-						r.setContent(content);
-					}
-				} catch (Exception e) {
-					// ignore
-				} finally {
-					if (tempFile != null) {
-						tempFile.delete();
-					}
+				if (torrent != null) {
+					// everything fine, treat as HTTP_OK
+					final String message = "Torrent uploaded successfuly";
+					final String content = torrent;
+
+					r.setStatus(HttpURLConnection.HTTP_OK);
+					r.setMessage(message);
+					r.setContent(content);
 				}
-
+			} catch (Exception e) {
+				// ignore
+			} finally {
+				if (tempFile != null) {
+					tempFile.delete();
+				}
 			}
 		}
 
