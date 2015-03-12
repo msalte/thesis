@@ -22,7 +22,9 @@ public class Persist {
 	private static final Type GSON_TYPE = new TypeToken<ArrayList<KeyTuple>>() {
 	}.getType();
 
-	private static final Logger L = Logger.getLogger(Persist.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Persist.class
+			.getName());
+	private static final boolean IS_LOG_ENABLED = true;
 	private static final String DB_FILE = "C:\\Users\\Morten\\Desktop\\db\\test";
 
 	private static Persist instance;
@@ -52,15 +54,19 @@ public class Persist {
 		if (!torrentExists) {
 			getMap(Maps.TORRENTS.name()).put(fileName, fileBytes);
 
-			L.log(Level.INFO,
-					String.format("Stored new torrent file [%s]", fileName));
+			if (IS_LOG_ENABLED) {
+				LOGGER.log(Level.INFO,
+						String.format("Stored new torrent file [%s]", fileName));
+			}
 
 			db.commit();
 			return;
 		}
 
-		L.log(Level.INFO, String.format(
-				"The torrent file [%s] is already stored", fileName));
+		if (IS_LOG_ENABLED) {
+			LOGGER.log(Level.INFO, String.format(
+					"The torrent file [%s] is already stored", fileName));
+		}
 	}
 
 	public boolean storeKeysTuple(String fileName, KeyTuple keysTuple) {
@@ -78,17 +84,22 @@ public class Persist {
 
 			getMap(Maps.KEY_TUPLES.name()).put(fileName, GSON.toJson(tuples));
 
-			L.log(Level.INFO,
-					String.format("Stored [%s] for file [%s]",
-							GSON.toJson(keysTuple), fileName));
+			if (IS_LOG_ENABLED) {
+				LOGGER.log(
+						Level.INFO,
+						String.format("Stored [%s] for file [%s]",
+								GSON.toJson(keysTuple), fileName));
+			}
 
 			db.commit();
 			return true;
 		}
 
-		L.log(Level.WARNING, String.format(
-				"The file [%s] does not exist in map [%s]", fileName,
-				Maps.TORRENTS.name()));
+		if (IS_LOG_ENABLED) {
+			LOGGER.log(Level.WARNING, String.format(
+					"The file [%s] does not exist in map [%s]", fileName,
+					Maps.TORRENTS.name()));
+		}
 
 		return false;
 	}
@@ -112,9 +123,10 @@ public class Persist {
 			for (String key : getMap(m.name()).keySet()) {
 				getMap(m.name()).remove(key);
 
-				L.log(Level.INFO,
-						String.format("Deleted key [%s] from map [%s]", key,
-								m.name()));
+				if (IS_LOG_ENABLED) {
+					LOGGER.log(Level.INFO, String.format(
+							"Deleted key [%s] from map [%s]", key, m.name()));
+				}
 			}
 		}
 

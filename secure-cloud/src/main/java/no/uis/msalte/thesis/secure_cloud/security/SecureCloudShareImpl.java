@@ -7,8 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
@@ -18,7 +19,11 @@ import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 
 public class SecureCloudShareImpl implements SecureCloudShare {
-	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
+	private static final Logger LOGGER = Logger
+			.getLogger(SecureCloudShareImpl.class.getName());
+	private static final boolean IS_LOG_ENABLED = true;
+
+	// private BitTorrentTracker tracker = new BitTorrentTracker(6969);
 	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(
 			new ProxyReEncryptionParameters().initialize());
 
@@ -34,7 +39,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return scheme.newReEncryptionKey(srcSecretKey, destPublicKey);
 	}
 
-	public String upload(File file) {
+	public String upload(File file, String publicKey) {
 		if (TorrentUtil.isValidTorrent(file)) {
 			final String fileName = String.format("%s.torrent", UUID
 					.randomUUID().toString());
@@ -46,13 +51,22 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 				final String encodedFile = Base64.getEncoder().encodeToString(
 						bytes);
 
-				Persist.getInstance().storeTorrent(fileName, encodedFile);
+				final String encryptedFile = scheme.encryptReEncryptable(
+						encodedFile, publicKey);
 
-				if (!tracker.isStarted()) {
-					tracker.start();
+				if (IS_LOG_ENABLED) {
+					LOGGER.log(Level.INFO, String.format(
+							"Encrypted torrent %s with public key %s",
+							fileName, publicKey));
 				}
 
-				tracker.announce(file);
+				Persist.getInstance().storeTorrent(fileName, encryptedFile);
+
+				// if (!tracker.isStarted()) {
+				// tracker.start();
+				// }
+				//
+				// tracker.announce(file);
 
 				return fileName;
 			} catch (IOException e) {
@@ -65,8 +79,18 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 	public boolean share(String fileName, String publicKey,
 			String reEncryptionKey) {
-		return Persist.getInstance().storeKeysTuple(fileName,
+
+		boolean isShareSuccess = Persist.getInstance().storeKeysTuple(fileName,
 				new KeyTuple(publicKey, reEncryptionKey));
+
+		if (IS_LOG_ENABLED) {
+			LOGGER.log(Level.INFO, String.format(
+					"%s file %s with public key %s",
+					isShareSuccess ? "Successfully shared" : "Failed to share",
+					fileName, publicKey));
+		}
+
+		return isShareSuccess;
 	}
 
 	public String download(String fileName, String publicKey) {
@@ -78,9 +102,21 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		if (hasAccess) {
 			String file = Persist.getInstance().readTorrent(fileName);
 
-//			file = scheme.reEncrypt(file, reEncryptionKey);
+			file = scheme.reEncrypt(file, reEncryptionKey);
+
+			if (IS_LOG_ENABLED) {
+				LOGGER.log(Level.INFO, String.format(
+						"Re-encrypted file %s for download by public key %s",
+						fileName, publicKey));
+			}
 
 			return file;
+		} else if (IS_LOG_ENABLED) {
+			LOGGER.log(
+					Level.INFO,
+					String.format(
+							"Someone tried to download file %s with public key %s, but no access was granted",
+							fileName, publicKey));
 		}
 
 		return null;
@@ -96,12 +132,19 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 			final String encodedFile = Base64.getEncoder()
 					.encodeToString(bytes);
 
-			return TorrentUtil.create(fileName, extension, encodedFile);
+			final String torrent = TorrentUtil.create(fileName, extension,
+					encodedFile);
+
+			if (torrent != null && IS_LOG_ENABLED) {
+				LOGGER.log(Level.INFO, String.format(
+						"Created new torrent file %s.torrent", fileName));
+			}
+
+			return torrent;
 		} catch (IOException e) {
 			// ignore
 		}
 
 		return null;
 	}
-
 }
