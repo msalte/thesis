@@ -1,5 +1,10 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
+/**
+ * An implementation of the AFGH proxy re-encryption scheme
+ * @author Morten
+ *
+ */
 public interface ProxyReEncryptionScheme {
 	/**
 	 * Generates a new secret key

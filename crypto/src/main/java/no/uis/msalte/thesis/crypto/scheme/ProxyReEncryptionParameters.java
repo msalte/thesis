@@ -51,4 +51,23 @@ public class ProxyReEncryptionParameters {
 	public PowableElement getZ() {
 		return z;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(String.format("Parameter e: %s", getE()));
+		sb.append("\n");
+		sb.append(String.format("Parameter g: %s", getG().element()));
+		sb.append("\n");
+		sb.append(String.format("Parameter Z: %s", getZ().element()));
+		sb.append("\n");
+		sb.append(String.format("Group 1: %s", getGroup1()));
+		sb.append("\n");
+		sb.append(String.format("Group 2: %s", getGroup2()));
+		sb.append("\n");
+		sb.append(String.format("Group Zq: %s", getGroupZq()));
+
+		return sb.toString();
+	}
 }

@@ -135,7 +135,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 				.getG().element().getField());
 
 		// right = Z^(bk)
-		// lefts = m[i]Z^k = lefts
+		// lefts = m[i]Z^k = unmodified
 
 		// Z^(bk) = e(g^(ak), g^(b/a))
 		// g^(ak) = right
