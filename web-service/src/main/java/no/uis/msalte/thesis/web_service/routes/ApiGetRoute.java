@@ -26,57 +26,66 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 
 		response.status(status);
 
-		final WebServiceResponse wsr = new WebServiceResponse();
+		final WebServiceResponse r = new WebServiceResponse();
 
 		final String message = "The API - All valid function calls return a JSON object";
 		final ArrayList<ApiItem> content = new ArrayList<ApiItem>();
 
 		content.add(new ApiItem(METHOD_GET, FUNC_API, null, null,
-				"Calling this function gives an overview of the API", null));
+				"Calling this function gives an overview of the API.", null));
 
 		content.add(new ApiItem(
 				METHOD_POST,
 				FUNC_NEW_TORRENT,
 				new String[] { PARAM_FILE, PARAM_FILE_EXTENSION },
 				new String[] { "binary", "string" },
-				"Call this function to generate a new torrent for the given file (Note: nothing is stored on the server)",
-				"A new torrent file encoded as a Base64 string"));
+				"Call this function to generate a new torrent for the given file. (Note: nothing is stored on the server)",
+				"A new torrent file encoded as a Base64 string."));
 
 		content.add(new ApiItem(METHOD_GET, FUNC_NEW_SECRET_KEY, null, null,
-				"Calling this function generates a new secret key",
-				"The new secret key"));
+				"Calling this function generates a new secret key.",
+				"The new secret key."));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_NEW_PUBLIC_KEY,
 				new String[] { PARAM_SECRET_KEY }, new String[] { "string" },
-				"Calling this function generates a new public key",
-				"The new public key"));
+				"Calling this function generates a new public key.",
+				"The new public key."));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_NEW_RE_ENCRYPTION_KEY,
 				new String[] { PARAM_SECRET_KEY, PARAM_PUBLIC_KEY },
 				new String[] { "string", "string" },
-				"Calling this function generates a new re-encryption key",
-				"The new re-encryption key"));
+				"Calling this function generates a new re-encryption key.",
+				"The new re-encryption key."));
 
-		content.add(new ApiItem(METHOD_POST, FUNC_SHARE, new String[] {
-				PARAM_FILE_NAME, PARAM_PUBLIC_KEY, PARAM_RE_ENCRYPTION_KEY },
+		content.add(new ApiItem(
+				METHOD_POST,
+				FUNC_SHARE,
+				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY,
+						PARAM_RE_ENCRYPTION_KEY },
 				new String[] { "string", "string", "string" },
-				"Call this function to share a torrent with someone else",
-				"True if share is successful, false otherwise"));
+				"Call this function to share a torrent with the given public key holder. The corresponding re-encryption key should derive from the owner's secret key and the target's public key.",
+				"True if share was successful, false otherwise."));
 
-		content.add(new ApiItem(METHOD_POST, FUNC_UPLOAD,
-				new String[] { PARAM_FILE, PARAM_PUBLIC_KEY }, new String[] { "binary", "string" },
-				"Call this function to upload a torrent",
-				"The uploaded torrent's new unique file name"));
+		content.add(new ApiItem(
+				METHOD_POST,
+				FUNC_UPLOAD,
+				new String[] { PARAM_FILE, PARAM_PUBLIC_KEY },
+				new String[] { "binary", "string" },
+				"Call this function to upload a torrent file. The torrent will be encrypted with the given public key.",
+				"The uploaded torrent's new unique file name."));
 
-		content.add(new ApiItem(METHOD_POST, FUNC_DOWNLOAD, new String[] {
-				PARAM_FILE_NAME, PARAM_PUBLIC_KEY }, new String[] { "string",
-				"string" }, "Call this function to download a torrent",
-				"The downloaded torrent file encoded as a Base64 string"));
+		content.add(new ApiItem(
+				METHOD_POST,
+				FUNC_DOWNLOAD,
+				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY },
+				new String[] { "string", "string" },
+				"Call this function to download a torrent. The public key must reflect a corresponding call to the share function.",
+				"The downloaded torrent file encoded as a Base64 string."));
 
-		wsr.setStatus(status);
-		wsr.setMessage(message);
-		wsr.setContent(content);
+		r.setStatus(status);
+		r.setMessage(message);
+		r.setContent(content);
 
-		return wsr;
+		return r;
 	}
 }
