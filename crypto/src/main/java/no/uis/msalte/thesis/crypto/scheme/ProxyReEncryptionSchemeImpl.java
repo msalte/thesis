@@ -4,7 +4,6 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
-import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +28,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String newPublicKey(String secretKey) {
-		Element sk = base64StringToElement(secretKey, parameters.getGroupZq());
+		Element sk = parameters.base64StringToElement(secretKey,
+				parameters.getGroupZq());
 
 		ElementPowPreProcessing g = parameters.getG().powable();
 
@@ -40,10 +40,10 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
-		Element sk = base64StringToElement(srcSecretKey,
+		Element sk = parameters.base64StringToElement(srcSecretKey,
 				parameters.getGroupZq());
-		Element pk = base64StringToCurveElement(destPublicKey, parameters
-				.getG().element().getField());
+		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+				parameters.getG().element().getField());
 
 		// RK = (g^b)^1/a
 		// a = source secret key
@@ -96,7 +96,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private CipherText encryptToCipherText(String message, String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().powable();
 
-		Element pk = base64StringToCurveElement(destPublicKey, g.getField());
+		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+				g.getField());
 
 		// get a random integer k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
@@ -114,7 +115,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private String decryptCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
-		Element sk = base64StringToElement(destSecretKey,
+		Element sk = parameters.base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
 		String plaintext = "";
@@ -131,8 +132,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText reEncryptToCipherText(CipherText cipher,
 			String reEncryptionKey) {
-		Element rk = base64StringToCurveElement(reEncryptionKey, parameters
-				.getG().element().getField());
+		Element rk = parameters.base64StringToCurveElement(reEncryptionKey,
+				parameters.getG().element().getField());
 
 		// right = Z^(bk)
 		// lefts = m[i]Z^k = unmodified
@@ -153,7 +154,8 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private CipherText encryptReEncryptableToCipherText(String message,
 			String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().powable();
-		Element pk = base64StringToCurveElement(destPublicKey, g.getField());
+		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+				g.getField());
 
 		// get a random k from group Zq
 		Element k = parameters.getGroupZq().newRandomElement().getImmutable();
@@ -175,7 +177,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		ElementPowPreProcessing g = parameters.getG().powable();
 		Pairing e = parameters.getE();
 
-		Element sk = base64StringToElement(destSecretKey,
+		Element sk = parameters.base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
 		// M = sum(lefts[i]/e(right, g)^(1/a)), where a = destSecretKey
@@ -299,24 +301,4 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return Base64.getEncoder().encodeToString(merged);
 	}
 
-	private Element base64StringToElement(String s, Field<?> field) {
-		byte[] bytes = Base64.getDecoder().decode(s);
-
-		Element element = field.newZeroElement();
-
-		element.setFromBytes(bytes);
-
-		return element.getImmutable();
-	}
-
-	private Element base64StringToCurveElement(String s, Field<?> field) {
-		byte[] bytes = Base64.getDecoder().decode(s);
-
-		CurveElement<?, ?> curveElement = (CurveElement<?, ?>) field
-				.newZeroElement();
-
-		curveElement.setFromBytes(bytes);
-
-		return curveElement.getImmutable();
-	}
 }
