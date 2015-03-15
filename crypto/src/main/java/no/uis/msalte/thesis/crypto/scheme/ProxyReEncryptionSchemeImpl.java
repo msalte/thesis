@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import no.uis.msalte.thesis.crypto.model.CipherText;
+import no.uis.msalte.thesis.crypto.util.ElementUtils;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -28,7 +29,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String newPublicKey(String secretKey) {
-		Element sk = parameters.base64StringToElement(secretKey,
+		Element sk = ElementUtils.base64StringToElement(secretKey,
 				parameters.getGroupZq());
 
 		ElementPowPreProcessing g = parameters.getG().powable();
@@ -40,9 +41,9 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	}
 
 	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
-		Element sk = parameters.base64StringToElement(srcSecretKey,
+		Element sk = ElementUtils.base64StringToElement(srcSecretKey,
 				parameters.getGroupZq());
-		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+		Element pk = ElementUtils.base64StringToElement(destPublicKey,
 				parameters.getG().element().getField());
 
 		// RK = (g^b)^1/a
@@ -96,7 +97,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private CipherText encryptToCipherText(String message, String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().powable();
 
-		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+		Element pk = ElementUtils.base64StringToElement(destPublicKey,
 				g.getField());
 
 		// get a random integer k from group Zq
@@ -115,7 +116,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private String decryptCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
-		Element sk = parameters.base64StringToElement(destSecretKey,
+		Element sk = ElementUtils.base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
 		String plaintext = "";
@@ -132,7 +133,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText reEncryptToCipherText(CipherText cipher,
 			String reEncryptionKey) {
-		Element rk = parameters.base64StringToCurveElement(reEncryptionKey,
+		Element rk = ElementUtils.base64StringToElement(reEncryptionKey,
 				parameters.getG().element().getField());
 
 		// right = Z^(bk)
@@ -154,7 +155,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private CipherText encryptReEncryptableToCipherText(String message,
 			String destPublicKey) {
 		ElementPowPreProcessing g = parameters.getG().powable();
-		Element pk = parameters.base64StringToCurveElement(destPublicKey,
+		Element pk = ElementUtils.base64StringToElement(destPublicKey,
 				g.getField());
 
 		// get a random k from group Zq
@@ -177,7 +178,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		ElementPowPreProcessing g = parameters.getG().powable();
 		Pairing e = parameters.getE();
 
-		Element sk = parameters.base64StringToElement(destSecretKey,
+		Element sk = ElementUtils.base64StringToElement(destSecretKey,
 				parameters.getGroupZq());
 
 		// M = sum(lefts[i]/e(right, g)^(1/a)), where a = destSecretKey

@@ -14,8 +14,8 @@ public class App {
 		ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(
 				parameters);
 
-		String aliceSecretKey = "F1k7LYIJbBZA5QYbA0Kh43yZW8M=";
-		String alicePublicKey = "LRosMdblCrGlWYbtd8nORQekWfFBTsbNtCTqrO2uHzvkqaZhH57qqDgD+UNhTNAsbyY5g+ts9mk1r8g2P9fv8Z89McAaXQ346rs100db8lvv4VC1zGYj9nkEJHPIsW7yjLxOTPspAgGWI8nrkl9fXLNm+hD7YWdYSLj9mFvOhEY=";
+		String aliceSecretKey = scheme.newSecretKey();
+		String alicePublicKey = scheme.newPublicKey(aliceSecretKey);
 
 		String bobSecretKey = "HWYCQM0L37yvAuOJCdNHsPIqeQw=";
 		String bobPublicKey = "BIwaJpLGdcdqAYfU6/OMGnDth8vFZQInbqRDYRiSvn4ACsma11QQfYAXSI3XNUQKtYvZL27dXyda/cKuYyDoWRPzamUorTM2fMBWW5KbBZZ6H0H3W8K9s9YItSPeSMaNDHkDvNec0sAQkETPs2PLXuX9GUW0lTFWM4mMWGSczSQ=";
