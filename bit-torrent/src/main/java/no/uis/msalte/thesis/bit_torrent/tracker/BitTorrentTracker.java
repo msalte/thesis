@@ -27,6 +27,8 @@ public class BitTorrentTracker {
 						return name.endsWith(".torrent");
 					}
 				};
+
+				tracker.start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -40,6 +42,8 @@ public class BitTorrentTracker {
 	public void stop() {
 		if (isStarted) {
 			tracker.stop();
+
+			isStarted = false;
 		}
 	}
 

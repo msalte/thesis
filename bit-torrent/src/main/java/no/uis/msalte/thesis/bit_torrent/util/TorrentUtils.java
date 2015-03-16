@@ -6,23 +6,48 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 
 import com.turn.ttorrent.common.Torrent;
 
-public class TorrentUtil {
+public class TorrentUtils {
 	private static final int PIECE_LENGTH = 256 * 1000;
-	private static final String ANNOUNCE_URI = "http://localhost:6969/announce";
+	private static final String ANNOUNCE_URI = "http://10.0.5.84:6969/announce";
 
-	public static String create(String fileName, String fileExt, String file) {
-		return create(fileName, fileExt, file, false, null);
-	}
+	public static String create(String name, String token, File file) {
+		File torrent = null;
+		FileOutputStream fos = null;
 
-	public static void create(String fileName, String fileExt, String file,
-			String outputDirectory) {
-		create(fileName, fileExt, file, true, outputDirectory);
+		try {
+			// Create a temporary file in the file system to
+			// represent the new torrent
+			torrent = File
+					.createTempFile(name, String.format(".%s", "torrent"));
+
+			// Write the torrent contents into the temporary file
+			fos = new FileOutputStream(torrent);
+			writeBencodedContents(file, token, fos);
+
+			fos.flush();
+			fos.close();
+
+			// Return an encoded version of the created torrent file
+			byte[] bytes = Files.readAllBytes(Paths.get(torrent
+					.getAbsolutePath()));
+
+			return Base64.getEncoder().encodeToString(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			// Delete the torrent from the file system
+			if (torrent != null) {
+				torrent.delete();
+			}
+		}
+
+		return null;
 	}
 
 	public static boolean isValidTorrent(File torrent) {
@@ -59,80 +84,16 @@ public class TorrentUtil {
 		}
 	}
 
-	private static String create(String fileName, String fileExt, String file,
-			boolean saveToDisk, String outputDirectory) {
-
-		File localFile = null;
-		File localTorrent = null;
-
-		FileOutputStream fos = null;
-		try {
-			// Create a local temporary file in the file system for
-			// the encoded file supplied as parameter
-			byte[] fileBytes = Base64.getDecoder().decode(file);
-
-			localFile = File.createTempFile(fileName,
-					String.format(".%s", fileExt));
-
-			fos = new FileOutputStream(localFile);
-			fos.write(fileBytes);
-
-			fos.flush();
-			fos.close();
-
-			// Determine whether to write the torrent to disk or to create a
-			// temporary file
-			if (saveToDisk) {
-				localTorrent = new File(String.format("%s//%s.%s.%s",
-						outputDirectory, fileName, fileExt, "torrent"));
-			} else {
-				localTorrent = File.createTempFile(fileName,
-						String.format(".%s", "torrent"));
-			}
-
-			// Write the torrent contents into the permanent/temporary file
-			fos = new FileOutputStream(localTorrent);
-			writeBencodedContents(localFile, fos);
-
-			fos.flush();
-			fos.close();
-
-			// Return an encoded version of the torrent file
-			return Base64.getEncoder()
-					.encodeToString(
-							Files.readAllBytes(Paths.get(localTorrent
-									.getAbsolutePath())));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			if (localFile != null) {
-				localFile.delete();
-			}
-
-			if (localTorrent != null && !saveToDisk) {
-				localTorrent.delete();
-			}
-		}
-
-		return null;
-	}
-
-	private static Torrent writeBencodedContents(File file, FileOutputStream fos)
-			throws InterruptedException, IOException {
+	private static Torrent writeBencodedContents(File file, String token,
+			FileOutputStream fos) throws InterruptedException, IOException {
 
 		final URI announce = URI.create(ANNOUNCE_URI);
 
-		final List<List<URI>> announceTiers = new ArrayList<List<URI>>();
-		final List<URI> announceTier1 = new ArrayList<URI>();
+		final Torrent torrent = Torrent.create(file, PIECE_LENGTH, announce,
+				TorrentUtils.class.getPackage().getName(), token);
 
-		announceTier1.add(announce);
-		announceTiers.add(announceTier1);
-
-		final Torrent torrent = Torrent.create(file, PIECE_LENGTH,
-				announceTiers, TorrentUtil.class.getPackage().getName());
-
+		// TODO look into the ability to avoid saving to disk at all and just
+		// return the bytes
 		torrent.save(fos);
 
 		return torrent;
