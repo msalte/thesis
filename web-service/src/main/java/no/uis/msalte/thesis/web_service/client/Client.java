@@ -18,7 +18,7 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 public class Client {
 
-	private static final String URL_TEMPLATE = "http://localhost:%d/%s";
+	private static final String URL_TEMPLATE = "https://localhost:%d/%s";
 
 	public static String get(String function) {
 		final String url = String.format(URL_TEMPLATE, Server.HTTP_PORT,

@@ -19,12 +19,16 @@ public class Server {
 
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
+	
+	private static final String KEY_STORE_FILE = "C:\\Users\\Morten\\Desktop\\keystore\\web_service.jks";
+	private static final String KEY_STORE_PW = "esp8bing";
 
 	public static final int HTTP_PORT = 9090;
 
 	public void start() {
 		// ---- SETUP ---- //
 		Spark.port(HTTP_PORT);
+		Spark.secure(KEY_STORE_FILE, KEY_STORE_PW, null, null);
 		setStaticFileLocation();
 
 		// ---- GET FUNCTIONS ---- //
