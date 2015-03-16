@@ -2,17 +2,13 @@ package no.uis.msalte.thesis.crypto;
 
 import java.io.IOException;
 
-import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
 public class App {
 
 	public static void main(String[] args) throws IOException {
-		ProxyReEncryptionParameters parameters = new ProxyReEncryptionParameters()
-				.initialize();
-		ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(
-				parameters);
+		ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl();
 
 		String aliceSecretKey = scheme.newSecretKey();
 		String alicePublicKey = scheme.newPublicKey(aliceSecretKey);

@@ -1,7 +1,6 @@
 package no.uis.msalte.thesis.crypto.tests;
 
 import static org.junit.Assert.assertEquals;
-import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
@@ -15,8 +14,7 @@ public class ProxyReEncryptionSchemeTest {
 	
 	@BeforeClass
 	public static void createSchemeInstance() {
-		scheme = new ProxyReEncryptionSchemeImpl(
-				new ProxyReEncryptionParameters().initialize());
+		scheme = new ProxyReEncryptionSchemeImpl();
 	}
 
 	@AfterClass
