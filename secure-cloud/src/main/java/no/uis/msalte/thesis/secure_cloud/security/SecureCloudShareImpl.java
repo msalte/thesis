@@ -134,4 +134,8 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 		return torrent;
 	}
+
+	public String decrypt(String ciphertext, String secretKey) {
+		return scheme.decrypt(ciphertext, secretKey);
+	}
 }

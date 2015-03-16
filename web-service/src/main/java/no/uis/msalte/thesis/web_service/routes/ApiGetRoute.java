@@ -59,11 +59,19 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 
 		content.add(new ApiItem(
 				METHOD_POST,
+				FUNC_DECRYPT,
+				new String[] { PARAM_CIPHERTEXT, PARAM_SECRET_KEY },
+				new String[] { "string", "string" },
+				"Calling this function attempts to decrypt the given ciphertext with the given secret key.",
+				"The resulting plaintext."));
+
+		content.add(new ApiItem(
+				METHOD_POST,
 				FUNC_SHARE,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY,
 						PARAM_RE_ENCRYPTION_KEY },
 				new String[] { "string", "string", "string" },
-				"Call this function to share a torrent with the given public key holder. The corresponding re-encryption key should derive from the owner's secret key and the target's public key.",
+				"Call this function to share a torrent with the given public key holder. The corresponding re-encryption key should derive from the source's secret key and the destination's public key.",
 				"True if share was successful, false otherwise."));
 
 		content.add(new ApiItem(
@@ -79,8 +87,8 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				FUNC_DOWNLOAD,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY },
 				new String[] { "string", "string" },
-				"Call this function to download a torrent. The public key must reflect a corresponding call to the share function.",
-				"The downloaded torrent file encoded as a Base64 string."));
+				"Call this function to download an encrypted torrent. The public key refers to the destination's public key and must reflect a corresponding call to the share function.",
+				"The torrent file encrypted under the given public key and encoded as a Base64 string."));
 
 		r.setStatus(status);
 		r.setMessage(message);

@@ -13,6 +13,20 @@ public interface SecureCloudShare {
 	public String newTorrent(File file);
 
 	/**
+	 * <p>
+	 * TODO: Debate whether this function should exist.
+	 * </p>
+	 * Decrypts the ciphertext with the given secret key
+	 * 
+	 * @param ciphertext
+	 *            The ciphertext to decrypt
+	 * @param secretKey
+	 *            The secret key used in the decryption process
+	 * @return The decrypted message
+	 */
+	public String decrypt(String ciphertext, String secretKey);
+
+	/**
 	 * Generates a new secret key
 	 * 
 	 * @return The new secret key, represented by a Base64 encoded string

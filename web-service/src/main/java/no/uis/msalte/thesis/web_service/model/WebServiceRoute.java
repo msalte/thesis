@@ -6,8 +6,10 @@ public interface WebServiceRoute {
 	public static final String PARAM_PUBLIC_KEY = "publicKey";
 	public static final String PARAM_FILE_NAME = "fileName";
 	public static final String PARAM_RE_ENCRYPTION_KEY = "reEncryptionKey";
+	public static final String PARAM_CIPHERTEXT = "ciphertext";
 
 	public static final String FUNC_API = "api";
+	public static final String FUNC_DECRYPT = "decrypt";
 	public static final String FUNC_NEW_TORRENT = "newTorrent";
 	public static final String FUNC_NEW_SECRET_KEY = "newSecretKey";
 	public static final String FUNC_NEW_PUBLIC_KEY = "newPublicKey";

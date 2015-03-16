@@ -3,6 +3,7 @@ package no.uis.msalte.thesis.web_service.server;
 import java.net.URISyntaxException;
 
 import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
+import no.uis.msalte.thesis.web_service.routes.DecryptPostRoute;
 import no.uis.msalte.thesis.web_service.routes.DownloadPostRoute;
 import no.uis.msalte.thesis.web_service.routes.NewPublicKeyPostRoute;
 import no.uis.msalte.thesis.web_service.routes.NewReEncryptionKeyPostRoute;
@@ -43,6 +44,9 @@ public class Server {
 		Spark.post(NewReEncryptionKeyPostRoute.PATH, ACCEPT_TYPE,
 				new NewReEncryptionKeyPostRoute(), JSON_TRANSFORMER);
 
+		Spark.post(DecryptPostRoute.PATH, ACCEPT_TYPE, new DecryptPostRoute(),
+				JSON_TRANSFORMER);
+
 		Spark.post(SharePostRoute.PATH, ACCEPT_TYPE, new SharePostRoute(),
 				JSON_TRANSFORMER);
 
@@ -59,8 +63,8 @@ public class Server {
 
 	private static void setStaticFileLocation() {
 		try {
-			final String location = WebServiceUtils.getFileResource("script.js")
-					.getParent();
+			final String location = WebServiceUtils
+					.getFileResource("script.js").getParent();
 			Spark.externalStaticFileLocation(location);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
