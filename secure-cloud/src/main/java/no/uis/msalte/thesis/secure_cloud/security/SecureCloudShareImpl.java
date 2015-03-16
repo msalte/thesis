@@ -10,8 +10,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
-import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionParameters;
+import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
+import no.uis.msalte.thesis.bit_torrent.util.TorrentUtils;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
@@ -23,9 +23,8 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 			.getLogger(SecureCloudShareImpl.class.getName());
 	private static final boolean IS_LOG_ENABLED = true;
 
-	// private BitTorrentTracker tracker = new BitTorrentTracker(6969);
-	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl(
-			new ProxyReEncryptionParameters().initialize());
+	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
+	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl();
 
 	public String newSecretKey() {
 		return scheme.newSecretKey();
@@ -40,9 +39,8 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public String upload(File file, String publicKey) {
-		if (TorrentUtil.isValidTorrent(file)) {
-			final String fileName = String.format("%s.torrent", UUID
-					.randomUUID().toString());
+		if (TorrentUtils.isValidTorrent(file)) {
+			final String fileName = file.getName();
 
 			try {
 				final Path path = Paths.get(file.getAbsolutePath());
@@ -62,11 +60,8 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 				Persist.getInstance().storeTorrent(fileName, encryptedFile);
 
-				// if (!tracker.isStarted()) {
-				// tracker.start();
-				// }
-				//
-				// tracker.announce(file);
+				tracker.start();
+				tracker.announce(file);
 
 				return fileName;
 			} catch (IOException e) {
@@ -122,29 +117,21 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		return null;
 	}
 
-	public String newTorrent(File file, String extension) {
-		final String fileName = UUID.randomUUID().toString();
+	public String newTorrent(File file) {
+		final String torrentName = UUID.randomUUID().toString();
 
-		try {
-			final Path path = Paths.get(file.getAbsolutePath());
-			final byte[] bytes = Files.readAllBytes(path);
+		// TODO generate token randomly
+		// TODO store hash
+		// TODO compare hash on the tracker to validate clients
+		final String token = "security_token";
+		
+		final String torrent = TorrentUtils.create(torrentName, token, file);
 
-			final String encodedFile = Base64.getEncoder()
-					.encodeToString(bytes);
-
-			final String torrent = TorrentUtil.create(fileName, extension,
-					encodedFile);
-
-			if (torrent != null && IS_LOG_ENABLED) {
-				LOGGER.log(Level.INFO, String.format(
-						"Created new torrent file %s.torrent", fileName));
-			}
-
-			return torrent;
-		} catch (IOException e) {
-			// ignore
+		if (torrent != null && IS_LOG_ENABLED) {
+			LOGGER.log(Level.INFO, String.format(
+					"Created new torrent file %s.torrent", torrentName));
 		}
 
-		return null;
+		return torrent;
 	}
 }

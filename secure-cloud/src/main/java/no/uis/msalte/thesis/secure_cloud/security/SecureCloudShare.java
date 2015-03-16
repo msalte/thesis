@@ -8,11 +8,9 @@ public interface SecureCloudShare {
 	 * 
 	 * @param file
 	 *            The source file
-	 * @param extension
-	 *            The file's extension, i.e. mp3
 	 * @return The generated torrent, represented by a Base64 encoded string
 	 */
-	public String newTorrent(File file, String extension);
+	public String newTorrent(File file);
 
 	/**
 	 * Generates a new secret key
