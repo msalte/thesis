@@ -4,7 +4,7 @@ import java.net.HttpURLConnection;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
@@ -21,7 +21,7 @@ public class NewSecretKeyGetRoute extends RouteImpl implements WebServiceRoute {
 	public Object handle(Request request, Response response) throws Exception {
 		final WebServiceResponse r = new WebServiceResponse();
 
-		final String secretKey = WebServiceUtil.SECURE_CLOUD_SHARE
+		final String secretKey = WebServiceUtils.SECURE_CLOUD_SHARE
 				.newSecretKey();
 
 		if (secretKey != null) {

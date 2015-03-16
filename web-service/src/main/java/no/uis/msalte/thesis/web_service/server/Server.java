@@ -11,7 +11,7 @@ import no.uis.msalte.thesis.web_service.routes.NewTorrentPostRoute;
 import no.uis.msalte.thesis.web_service.routes.SharePostRoute;
 import no.uis.msalte.thesis.web_service.routes.UploadPostRoute;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Spark;
 
 public class Server {
@@ -59,7 +59,7 @@ public class Server {
 
 	private static void setStaticFileLocation() {
 		try {
-			final String location = WebServiceUtil.getFileResource("script.js")
+			final String location = WebServiceUtils.getFileResource("script.js")
 					.getParent();
 			Spark.externalStaticFileLocation(location);
 		} catch (URISyntaxException e) {

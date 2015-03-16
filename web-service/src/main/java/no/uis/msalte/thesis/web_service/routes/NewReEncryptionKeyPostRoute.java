@@ -6,7 +6,7 @@ import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
@@ -31,17 +31,17 @@ public class NewReEncryptionKeyPostRoute extends RouteImpl implements
 
 		// treating all post requests as multipart/form-data
 		request.raw().setAttribute("org.eclipse.multipartConfig",
-				WebServiceUtil.MULTIPART_CONFIG);
+				WebServiceUtils.MULTIPART_CONFIG);
 
 		String secretKey = "";
 		String publicKey = "";
 
 		for (Part part : request.raw().getParts()) {
 			if (part.getName().equals(PARAM_SECRET_KEY)) {
-				secretKey = WebServiceUtil.parseInputStream(part
+				secretKey = WebServiceUtils.parseInputStream(part
 						.getInputStream());
 			} else if (part.getName().equals(PARAM_PUBLIC_KEY)) {
-				publicKey = WebServiceUtil.parseInputStream(part
+				publicKey = WebServiceUtils.parseInputStream(part
 						.getInputStream());
 			}
 		}
@@ -51,7 +51,7 @@ public class NewReEncryptionKeyPostRoute extends RouteImpl implements
 
 		if (isParamValid) {
 			try {
-				final String rk = WebServiceUtil.SECURE_CLOUD_SHARE
+				final String rk = WebServiceUtils.SECURE_CLOUD_SHARE
 						.newReEncryptionKey(secretKey, publicKey);
 
 				if (publicKey != null) {

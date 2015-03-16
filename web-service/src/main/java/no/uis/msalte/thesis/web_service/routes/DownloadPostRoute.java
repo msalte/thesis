@@ -6,7 +6,7 @@ import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
@@ -30,7 +30,7 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 
 		// treating all post requests as multipart/form-data
 		request.raw().setAttribute("org.eclipse.multipartConfig",
-				WebServiceUtil.MULTIPART_CONFIG);
+				WebServiceUtils.MULTIPART_CONFIG);
 
 		String fileName = "";
 		String publicKey = "";
@@ -39,10 +39,10 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 			String name = part.getName();
 
 			if (name.equals(PARAM_FILE_NAME)) {
-				fileName = WebServiceUtil.parseInputStream(part
+				fileName = WebServiceUtils.parseInputStream(part
 						.getInputStream());
 			} else if (name.equals(PARAM_PUBLIC_KEY)) {
-				publicKey = WebServiceUtil.parseInputStream(part
+				publicKey = WebServiceUtils.parseInputStream(part
 						.getInputStream());
 			}
 		}
@@ -52,7 +52,7 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 
 		if (isParamsValid) {
 			try {
-				final String file = WebServiceUtil.SECURE_CLOUD_SHARE.download(
+				final String file = WebServiceUtils.SECURE_CLOUD_SHARE.download(
 						fileName, publicKey);
 
 				final boolean hasAccess = file != null;

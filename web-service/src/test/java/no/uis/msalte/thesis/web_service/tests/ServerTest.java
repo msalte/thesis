@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.Base64;
 
-import no.uis.msalte.thesis.bit_torrent.util.TorrentUtil;
+import no.uis.msalte.thesis.bit_torrent.util.TorrentUtils;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
@@ -37,12 +37,10 @@ public class ServerTest {
 			throws Exception {
 
 		final File file = getFileResource("document.pdf");
-		final String extension = "pdf";
 
 		// new torrent web service call
 		final String result = Client.post(WebServiceRoute.FUNC_NEW_TORRENT,
-				new String[] { WebServiceRoute.PARAM_FILE_EXTENSION },
-				new String[] { extension }, file);
+				new String[] {}, new String[] {}, file);
 
 		// response parse
 		final WebServiceResponse res = JsonTransformer.GSON.fromJson(result,
@@ -52,7 +50,7 @@ public class ServerTest {
 		if (res.getStatus() == HttpURLConnection.HTTP_OK) {
 			String torrentBytes = res.getContent().toString();
 
-			assertTrue(TorrentUtil.isValidTorrent(torrentBytes));
+			assertTrue(TorrentUtils.isValidTorrent(torrentBytes));
 		} else {
 			assertTrue(false);
 		}

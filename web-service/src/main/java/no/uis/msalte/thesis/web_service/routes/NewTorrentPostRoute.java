@@ -8,7 +8,7 @@ import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
@@ -32,39 +32,33 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 
 		// treating all post requests as multipart/form-data
 		request.raw().setAttribute("org.eclipse.multipartConfig",
-				WebServiceUtil.MULTIPART_CONFIG);
+				WebServiceUtils.MULTIPART_CONFIG);
 
 		Part filePart = null;
-		String extension = "";
 
 		for (Part part : request.raw().getParts()) {
 			if (part.getName().equals(PARAM_FILE)) {
 				filePart = part;
-			} else if (part.getName().equals(PARAM_FILE_EXTENSION)) {
-				// Assuming that this part is a string, parsing it immediately
-				// Also removing eventual punctuation as it will be added later
-				extension = WebServiceUtil.parseInputStream(
-						part.getInputStream()).replaceAll("\\.", "");
 			}
 		}
 
-		final boolean isParamsValid = filePart != null && !extension.isEmpty();
+		final boolean isParamsValid = filePart != null;
 
 		if (isParamsValid) {
-			File tempFile = null;
+			File file = null;
 			try {
-				String tempFileName = String.format("Temp%d.%s",
-						System.currentTimeMillis(), extension);
+				String fileName = WebServiceUtils
+						.parseFileNameFromHeader(filePart);
 
-				filePart.write(tempFileName);
+				filePart.write(fileName);
 
-				tempFile = Paths.get(
+				file = Paths.get(
 						String.format("%s//%s",
-								WebServiceUtil.MULTIPART_CONFIG.getLocation(),
-								tempFileName)).toFile();
+								WebServiceUtils.MULTIPART_CONFIG.getLocation(),
+								fileName)).toFile();
 
-				final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
-						.newTorrent(tempFile, extension);
+				final String torrent = WebServiceUtils.SECURE_CLOUD_SHARE
+						.newTorrent(file);
 
 				if (torrent != null) {
 					// everything fine, treat as HTTP_OK
@@ -76,10 +70,13 @@ public class NewTorrentPostRoute extends RouteImpl implements WebServiceRoute {
 					r.setContent(content);
 				}
 			} catch (Exception e) {
-				// ignore
+				// Ignore
 			} finally {
-				if (tempFile != null) {
-					tempFile.delete();
+				if (file != null) {
+					file.delete();
+				}
+				if (filePart != null) {
+					filePart.delete();
 				}
 			}
 		}

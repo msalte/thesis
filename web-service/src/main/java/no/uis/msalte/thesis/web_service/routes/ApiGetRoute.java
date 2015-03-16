@@ -37,8 +37,8 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 		content.add(new ApiItem(
 				METHOD_POST,
 				FUNC_NEW_TORRENT,
-				new String[] { PARAM_FILE, PARAM_FILE_EXTENSION },
-				new String[] { "binary", "string" },
+				new String[] { PARAM_FILE },
+				new String[] { "binary" },
 				"Call this function to generate a new torrent for the given file. (Note: nothing is stored on the server)",
 				"A new torrent file encoded as a Base64 string."));
 

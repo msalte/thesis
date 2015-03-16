@@ -8,7 +8,7 @@ import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.util.WebServiceUtil;
+import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 import spark.Request;
 import spark.Response;
 import spark.RouteImpl;
@@ -32,7 +32,7 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 
 		// treating all post requests as multipart/form-data
 		request.raw().setAttribute("org.eclipse.multipartConfig",
-				WebServiceUtil.MULTIPART_CONFIG);
+				WebServiceUtils.MULTIPART_CONFIG);
 
 		Part filePart = null;
 		String publicKey = "";
@@ -41,7 +41,7 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 			if (part.getName().equals(PARAM_FILE)) {
 				filePart = part;
 			} else if (part.getName().equals(PARAM_PUBLIC_KEY)) {
-				publicKey = WebServiceUtil.parseInputStream(part
+				publicKey = WebServiceUtils.parseInputStream(part
 						.getInputStream());
 			}
 		}
@@ -49,23 +49,21 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 		final boolean isParamsValid = filePart != null && !publicKey.isEmpty();
 
 		if (isParamsValid) {
-			File tempFile = null;
-			String extension = ".torrent";
+			File file = null;
 
 			try {
-				// TODO remove System.currentTimeMillis() in name?
-				final String tempFileName = String.format("Temp%d.%s",
-						System.currentTimeMillis(), extension);
+				final String fileName = WebServiceUtils
+						.parseFileNameFromHeader(filePart);
 
-				filePart.write(tempFileName);
+				filePart.write(fileName);
 
-				tempFile = Paths.get(
+				file = Paths.get(
 						String.format("%s//%s",
-								WebServiceUtil.MULTIPART_CONFIG.getLocation(),
-								tempFileName)).toFile();
+								WebServiceUtils.MULTIPART_CONFIG.getLocation(),
+								fileName)).toFile();
 
-				final String torrent = WebServiceUtil.SECURE_CLOUD_SHARE
-						.upload(tempFile, publicKey);
+				final String torrent = WebServiceUtils.SECURE_CLOUD_SHARE
+						.upload(file, publicKey);
 
 				if (torrent != null) {
 					// everything fine, treat as HTTP_OK
@@ -79,8 +77,11 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 			} catch (Exception e) {
 				// ignore
 			} finally {
-				if (tempFile != null) {
-					tempFile.delete();
+				if (file != null) {
+					file.delete();
+				}
+				if (filePart != null) {
+					filePart.delete();
 				}
 			}
 		}
