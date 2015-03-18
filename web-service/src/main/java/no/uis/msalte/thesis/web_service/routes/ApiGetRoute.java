@@ -47,13 +47,13 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				"The new secret key."));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_NEW_PUBLIC_KEY,
-				new String[] { PARAM_SECRET_KEY }, new String[] { "string" },
+				new String[] { PARAM_SECRET_KEY }, new String[] { "base64" },
 				"Calling this function generates a new public key.",
 				"The new public key."));
 
 		content.add(new ApiItem(METHOD_POST, FUNC_NEW_RE_ENCRYPTION_KEY,
 				new String[] { PARAM_SECRET_KEY, PARAM_PUBLIC_KEY },
-				new String[] { "string", "string" },
+				new String[] { "base64", "base64" },
 				"Calling this function generates a new re-encryption key.",
 				"The new re-encryption key."));
 
@@ -61,7 +61,7 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				METHOD_POST,
 				FUNC_DECRYPT,
 				new String[] { PARAM_CIPHERTEXT, PARAM_SECRET_KEY },
-				new String[] { "string", "string" },
+				new String[] { "base64", "base64" },
 				"Calling this function attempts to decrypt the given ciphertext with the given secret key.",
 				"The resulting plaintext."));
 
@@ -70,7 +70,7 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				FUNC_SHARE,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY,
 						PARAM_RE_ENCRYPTION_KEY },
-				new String[] { "string", "string", "string" },
+				new String[] { "string", "base64", "base64" },
 				"Call this function to share a torrent with the given public key holder. The corresponding re-encryption key should derive from the source's secret key and the destination's public key.",
 				"True if share was successful, false otherwise."));
 
@@ -78,7 +78,7 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				METHOD_POST,
 				FUNC_UPLOAD,
 				new String[] { PARAM_FILE, PARAM_PUBLIC_KEY },
-				new String[] { "binary", "string" },
+				new String[] { "binary", "base64" },
 				"Call this function to upload a torrent file. The torrent will be encrypted with the given public key.",
 				"The uploaded torrent's new unique file name."));
 
@@ -86,7 +86,7 @@ public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
 				METHOD_POST,
 				FUNC_DOWNLOAD,
 				new String[] { PARAM_FILE_NAME, PARAM_PUBLIC_KEY },
-				new String[] { "string", "string" },
+				new String[] { "string", "base64" },
 				"Call this function to download an encrypted torrent. The public key refers to the destination's public key and must reflect a corresponding call to the share function.",
 				"The torrent file encrypted under the given public key and encoded as a Base64 string."));
 
