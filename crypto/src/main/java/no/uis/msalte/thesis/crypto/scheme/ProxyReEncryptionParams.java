@@ -9,6 +9,7 @@ import no.uis.msalte.thesis.crypto.util.ElementUtils;
 
 public class ProxyReEncryptionParams {
 	private static final String GENERATOR_BASE_64 = "P6PrrTuwA/qnfovO5Zf12Iolj8z4OxLe5IZkX1y0p3lTuPzMK04NJcNqmft35nYp7EK4m6CwaWFC6RWfkNf3fZg2rdbZEnYwhdNEnoSxLvfkkydF1lcSk5mce0WNlGqY43nFgPO6crpsg/BJZdxTC+Ju/QWp0jZAzbQbyvg8d/Y=";
+	private static final String CURVE_PATH = "C:\\source\\jpbc-params\\curves\\a.properties";
 
 	private Pairing e;
 	private Field<?> group1;
@@ -17,8 +18,7 @@ public class ProxyReEncryptionParams {
 	private PowableElement g, z;
 
 	public ProxyReEncryptionParams initialize() {
-		e = PairingFactory
-				.getPairing("C:\\source\\jpbc-params\\curves\\a.properties");
+		e = PairingFactory.getPairing(CURVE_PATH);
 
 		group1 = e.getG1();
 		group2 = e.getGT();
@@ -26,8 +26,7 @@ public class ProxyReEncryptionParams {
 
 		g = new PowableElement(ElementUtils.base64StringToElement(
 				GENERATOR_BASE_64, (CurveField<?>) group1));
-		z = new PowableElement(e.pairing(g.element(), g.element())
-				.getImmutable());
+		z = new PowableElement(e.pairing(g.element(), g.element()));
 
 		return this;
 	}

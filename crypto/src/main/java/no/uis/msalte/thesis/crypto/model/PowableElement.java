@@ -8,12 +8,12 @@ public class PowableElement {
 	private ElementPowPreProcessing powPreProcessing;
 
 	public PowableElement(Element element) {
-		this.element = element;
-		this.powPreProcessing = element.getElementPowPreProcessing();
+		this.element = element.getImmutable();
+		this.powPreProcessing = this.element.getElementPowPreProcessing();
 	}
 
 	public Element element() {
-		return element.getImmutable();
+		return element;
 	}
 
 	public ElementPowPreProcessing powable() {
