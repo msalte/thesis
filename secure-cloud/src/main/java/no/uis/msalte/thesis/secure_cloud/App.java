@@ -7,6 +7,6 @@ public class App {
 		Persist p = Persist.getInstance();
 
 		System.out.println(p.formatMap(Persist.Maps.TORRENTS));
-		System.out.println(p.formatMap(Persist.Maps.KEY_TUPLES));
+		System.out.println(p.formatMap(Persist.Maps.SHARES));
 	}
 }

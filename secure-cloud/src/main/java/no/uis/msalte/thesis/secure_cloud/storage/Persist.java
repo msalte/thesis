@@ -74,7 +74,7 @@ public class Persist {
 
 		if (torrentExists) {
 			ArrayList<KeyTuple> tuples = GSON.fromJson(
-					getMap(Maps.KEY_TUPLES.name()).get(fileName), GSON_TYPE);
+					getMap(Maps.SHARES.name()).get(fileName), GSON_TYPE);
 
 			if (tuples == null) {
 				tuples = new ArrayList<KeyTuple>();
@@ -82,7 +82,7 @@ public class Persist {
 
 			tuples.add(keysTuple);
 
-			getMap(Maps.KEY_TUPLES.name()).put(fileName, GSON.toJson(tuples));
+			getMap(Maps.SHARES.name()).put(fileName, GSON.toJson(tuples));
 
 			if (IS_LOG_ENABLED) {
 				LOGGER.log(
@@ -109,7 +109,7 @@ public class Persist {
 	}
 
 	public ArrayList<KeyTuple> readKeyTuples(String fileName) {
-		final String json = getMap(Maps.KEY_TUPLES.name()).get(fileName);
+		final String json = getMap(Maps.SHARES.name()).get(fileName);
 
 		if (json != null) {
 			return GSON.fromJson(json, GSON_TYPE);
@@ -169,6 +169,6 @@ public class Persist {
 	}
 
 	public enum Maps {
-		TORRENTS, KEY_TUPLES
+		TORRENTS, SHARES
 	}
 }
