@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import no.uis.msalte.thesis.secure_cloud.App;
 import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 
 import org.mapdb.DB;
@@ -17,6 +18,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class Persist {
+	private static final String DB_DIR = "db";
+	private static final String DB_FILE = "secure_cloud";
+	
 	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping()
 			.create();
 	private static final Type GSON_TYPE = new TypeToken<ArrayList<KeyTuple>>() {
@@ -25,7 +29,6 @@ public class Persist {
 	private static final Logger LOGGER = Logger.getLogger(Persist.class
 			.getName());
 	private static final boolean IS_LOG_ENABLED = true;
-	private static final String DB_FILE = "C:\\Users\\Morten\\Desktop\\db\\test";
 
 	private static Persist instance;
 
@@ -44,7 +47,9 @@ public class Persist {
 	}
 
 	private void init() {
-		db = DBMaker.newFileDB(new File(DB_FILE)).closeOnJvmShutdown().make();
+		String path = String.format("%s\\%s\\%s", App.DIR, DB_DIR, DB_FILE);
+		
+		db = DBMaker.newFileDB(new File(path)).closeOnJvmShutdown().make();
 	}
 
 	public void storeTorrent(String fileName, String fileBytes) {

@@ -6,6 +6,7 @@ import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 
 public class App {
+	public static final String DIR = "C:\\Users\\Morten\\Desktop\\app_dir";
 
 	public static void main(String[] args) throws IOException {
 		ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl();
