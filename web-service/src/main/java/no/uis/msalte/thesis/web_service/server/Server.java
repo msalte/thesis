@@ -1,5 +1,13 @@
 package no.uis.msalte.thesis.web_service.server;
 
+import static spark.Spark.get;
+import static spark.Spark.post;
+import static spark.SparkBase.externalStaticFileLocation;
+import static spark.SparkBase.port;
+import static spark.SparkBase.secure;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
@@ -14,22 +22,20 @@ import no.uis.msalte.thesis.web_service.routes.UploadPostRoute;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 
-import static spark.Spark.*;
-
 public class Server {
 
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
 
-	private static final String KEY_STORE_FILE = "C:\\Users\\Morten\\Desktop\\keystore\\web_service.jks";
-	private static final String KEY_STORE_PW = "esp8bing";
+	private static final String TLS_KEY_STORE_FILE = "C:\\Users\\Morten\\Desktop\\keystore\\web_service.jks";
+	private static final String TLS_KEY_STORE_PASSWORD_FILE = "C:\\Users\\Morten\\Desktop\\keystore\\keystore.pw";
 
 	public static final int HTTP_PORT = 9090;
 
 	public void start() {
 		// ---- SETUP ---- //
 		port(HTTP_PORT);
-		secure(KEY_STORE_FILE, KEY_STORE_PW, null, null);
+		secure(TLS_KEY_STORE_FILE, parseKeyStorePassword(), null, null);
 		setStaticFileLocation();
 
 		// ---- GET FUNCTIONS ---- //
@@ -63,6 +69,17 @@ public class Server {
 
 	public void stop() {
 		stop();
+	}
+
+	private static String parseKeyStorePassword() {
+		try {
+			return WebServiceUtils.parseInputStream(new FileInputStream(
+					TLS_KEY_STORE_PASSWORD_FILE));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	private static void setStaticFileLocation() {
