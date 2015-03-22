@@ -18,8 +18,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class Persist {
-	private static final String DB_DIR = "db";
-	private static final String DB_FILE = "secure_cloud";
+	private static final String DIR_DB = "db";
+	private static final String FILE_DB = "secure_cloud";
 	
 	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping()
 			.create();
@@ -47,7 +47,7 @@ public class Persist {
 	}
 
 	private void init() {
-		String path = String.format("%s\\%s\\%s", App.DIR, DB_DIR, DB_FILE);
+		String path = String.format("%s\\%s\\%s", App.DIR, DIR_DB, FILE_DB);
 		
 		db = DBMaker.newFileDB(new File(path)).closeOnJvmShutdown().make();
 	}

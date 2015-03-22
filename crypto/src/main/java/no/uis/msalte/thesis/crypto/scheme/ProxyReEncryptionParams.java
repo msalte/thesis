@@ -11,8 +11,8 @@ import no.uis.msalte.thesis.crypto.util.ElementUtils;
 public class ProxyReEncryptionParams {
 	private static final String GENERATOR_BASE_64 = "P6PrrTuwA/qnfovO5Zf12Iolj8z4OxLe5IZkX1y0p3lTuPzMK04NJcNqmft35nYp7EK4m6CwaWFC6RWfkNf3fZg2rdbZEnYwhdNEnoSxLvfkkydF1lcSk5mce0WNlGqY43nFgPO6crpsg/BJZdxTC+Ju/QWp0jZAzbQbyvg8d/Y=";
 
-	private static final String CURVE_DIR = "jpbc-curves";
-	private static final String CURVE = "a.properties";
+	private static final String DIR_CURVES = "jpbc-curves";
+	private static final String FILE_CURVE = "a.properties";
 
 	private Pairing e;
 	private Field<?> group1;
@@ -22,7 +22,7 @@ public class ProxyReEncryptionParams {
 
 	public ProxyReEncryptionParams initialize() {
 		e = PairingFactory.getPairing(String.format("%s\\%s\\%s", App.DIR,
-				CURVE_DIR, CURVE));
+				DIR_CURVES, FILE_CURVE));
 
 		group1 = e.getG1();
 		group2 = e.getGT();

@@ -25,9 +25,9 @@ import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
 
 public class Server {
-	private static final String TLS_KEY_STORE_DIR = "keystore";
-	private static final String TLS_KEY_STORE_FILE = "web_service.jks";
-	private static final String TLS_KEY_STORE_PW_FILE = "keystore.pw";
+	private static final String DIR_TLS_KEY_STORE = "keystore";
+	private static final String FILE_TLS_KEY_STORE = "web_service.jks";
+	private static final String FILE_TLS_KEY_STORE_PW = "keystore.pw";
 
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
@@ -37,8 +37,8 @@ public class Server {
 	public void start() {
 		// ---- SETUP ---- //
 		port(HTTP_PORT);
-		secure(String.format("%s\\%s\\%s", App.DIR, TLS_KEY_STORE_DIR,
-				TLS_KEY_STORE_FILE), parseKeyStorePassword(), null, null);
+		secure(String.format("%s\\%s\\%s", App.DIR, DIR_TLS_KEY_STORE,
+				FILE_TLS_KEY_STORE), parseKeyStorePassword(), null, null);
 		setStaticFileLocation();
 
 		// ---- GET FUNCTIONS ---- //
@@ -75,8 +75,8 @@ public class Server {
 	}
 
 	private static String parseKeyStorePassword() {
-		String path = String.format("%s\\%s\\%s", App.DIR, TLS_KEY_STORE_DIR,
-				TLS_KEY_STORE_PW_FILE);
+		String path = String.format("%s\\%s\\%s", App.DIR, DIR_TLS_KEY_STORE,
+				FILE_TLS_KEY_STORE_PW);
 
 		try {
 			return WebServiceUtils.parseInputStream(new FileInputStream(path));
