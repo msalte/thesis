@@ -10,36 +10,38 @@ import java.net.URISyntaxException;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
+import no.uis.msalte.thesis.bit_torrent.App;
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
 
 public class WebServiceUtils {
+	private static final String DIR_TEMP = "temp";
 
 	public static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	public static final MultipartConfigElement MULTIPART_CONFIG = new MultipartConfigElement(
-			"C:\\Users\\Morten\\Desktop\\tempdir");
+			String.format("%s\\%s", App.DIR, DIR_TEMP));
 
-	public static File getFileResource(String filename)
+	public static File getFileResource(String fileName)
 			throws URISyntaxException {
 		return new File(WebServiceUtils.class.getClassLoader()
-				.getResource(filename).toURI());
+				.getResource(fileName).toURI());
 	}
 
 	public static String parseFileNameFromHeader(Part filePart) {
-		final String header = filePart.getHeader("content-disposition");
+		final String cd = filePart.getHeader("content-disposition");
 
-		if (header == null) {
+		if (cd == null) {
 			return null;
 		}
 
 		String fileName = "";
 
-		for (String s : header.split(";")) {
-			String item = s.trim();
+		for (String h : cd.split(";")) {
+			String header = h.trim();
 
-			if (item.startsWith("filename")) {
-				item = item.replaceAll("\"", ""); // remove quotes
+			if (header.startsWith("filename")) {
+				header = header.replaceAll("\"", ""); // remove quotes
 
-				fileName = item.substring(item.indexOf("=") + 1);
+				fileName = header.substring(header.indexOf("=") + 1);
 			}
 		}
 
