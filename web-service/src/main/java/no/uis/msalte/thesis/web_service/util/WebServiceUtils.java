@@ -11,12 +11,13 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import no.uis.msalte.thesis.bit_torrent.App;
+import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShare;
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
 
 public class WebServiceUtils {
 	private static final String DIR_TEMP = "temp";
 
-	public static final SecureCloudShareImpl SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
+	public static final SecureCloudShare SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	public static final MultipartConfigElement MULTIPART_CONFIG = new MultipartConfigElement(
 			String.format("%s\\%s", App.DIR, DIR_TEMP));
 
