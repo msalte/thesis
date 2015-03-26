@@ -5,8 +5,6 @@ import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 
 import no.uis.msalte.thesis.crypto.model.CipherText;
@@ -15,36 +13,36 @@ import no.uis.msalte.thesis.crypto.util.ElementUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
-	private ProxyReEncryptionParams prep;
+	private ProxyReEncryptionParams params;
 
 	public ProxyReEncryptionSchemeImpl() {
-		prep = new ProxyReEncryptionParams();
-		prep.initialize();
+		params = new ProxyReEncryptionParams();
+		params.initialize();
 	}
 
 	public String newSecretKey() {
 		// SK = random element a in Zq
-		Element sk = prep.getGroupZq().newRandomElement().getImmutable();
+		Element sk = params.getGroupZq().newRandomElement().getImmutable();
 
-		return elementToBase64String(sk);
+		return ElementUtils.elementToBase64String(sk);
 	}
 
 	public String newPublicKey(String secretKey) {
 		Element sk = ElementUtils.base64StringToElement(secretKey,
-				prep.getGroupZq());
+				params.getGroupZq());
 
-		ElementPowPreProcessing g = prep.getG().powable();
+		ElementPowPreProcessing g = params.getG().powable();
 
 		// PK = g^a, where a = secret key
 		Element pk = g.powZn(sk).getImmutable();
 
-		return elementToBase64String(pk);
+		return ElementUtils.elementToBase64String(pk);
 	}
 
 	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
 		Element sk = ElementUtils.base64StringToElement(srcSecretKey,
-				prep.getGroupZq());
-		Element pk = ElementUtils.base64StringToElement(destPublicKey, prep
+				params.getGroupZq());
+		Element pk = ElementUtils.base64StringToElement(destPublicKey, params
 				.getG().element().getField());
 
 		// RK = (g^b)^1/a
@@ -53,7 +51,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		Element rk = pk.powZn(sk.invert()).getImmutable();
 
-		return elementToBase64String(rk);
+		return ElementUtils.elementToBase64String(rk);
 	}
 
 	public String encrypt(String message, String destPublicKey) {
@@ -64,14 +62,14 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	public String decrypt(String cipher, String destSecretKey) {
 		CipherText cipherText = parseCipherStringAsCipherText(cipher,
-				prep.getGroup2());
+				params.getGroup2());
 
 		return decryptCipherTextToPlainText(cipherText, destSecretKey);
 	}
 
 	public String reEncrypt(String cipher, String reEncryptionKey) {
 		CipherText cipherText = parseCipherStringAsCipherText(cipher,
-				prep.getGroup1());
+				params.getGroup1());
 
 		CipherText reEncryptedCipherText = reEncryptToCipherText(cipherText,
 				reEncryptionKey);
@@ -89,28 +87,29 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	public String decryptReEncryptable(String cipher, String destSecretKey) {
 		CipherText cipherText = parseCipherStringAsCipherText(cipher,
-				prep.getGroup1());
+				params.getGroup1());
 
 		return decryptReEncryptableCipherTextToPlainText(cipherText,
 				destSecretKey);
 	}
 
 	private CipherText encryptToCipherText(String message, String destPublicKey) {
-		ElementPowPreProcessing g = prep.getG().powable();
+		ElementPowPreProcessing g = params.getG().powable();
 
 		Element pk = ElementUtils.base64StringToElement(destPublicKey,
 				g.getField());
 
 		// get a random integer k from group Zq
-		Element k = prep.getGroupZq().newRandomElement().getImmutable();
+		Element k = params.getGroupZq().newRandomElement().getImmutable();
 
 		// C = (lefts[], right)
 		// leftN = m[i]*Z^k
 		// right = Z^(ak), where a = destPublicKey
 		// It is provable that Z^(ak) = e(a, g^k)
 
-		Element right = prep.getE().pairing(pk, g.powZn(k));
-		Element[] m = messageToElementsInGroup2(message);
+		Element right = params.getE().pairing(pk, g.powZn(k));
+		Element[] m = ElementUtils.messageToElementsInGroup(message,
+				params.getGroup2());
 
 		return buildCipherTextFromMessage(m, right, k);
 	}
@@ -118,7 +117,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private String decryptCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
 		Element sk = ElementUtils.base64StringToElement(destSecretKey,
-				prep.getGroupZq());
+				params.getGroupZq());
 
 		String plaintext = "";
 
@@ -134,7 +133,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText reEncryptToCipherText(CipherText cipher,
 			String reEncryptionKey) {
-		Element rk = ElementUtils.base64StringToElement(reEncryptionKey, prep
+		Element rk = ElementUtils.base64StringToElement(reEncryptionKey, params
 				.getG().element().getField());
 
 		// right = Z^(bk)
@@ -146,7 +145,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		// m[i]Z^k = lefts[i]
 
-		Element newRight = prep.getE().pairing(rk, cipher.getRight());
+		Element newRight = params.getE().pairing(rk, cipher.getRight());
 
 		cipher.setRight(newRight);
 
@@ -155,19 +154,20 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText encryptReEncryptableToCipherText(String message,
 			String destPublicKey) {
-		ElementPowPreProcessing g = prep.getG().powable();
+		ElementPowPreProcessing g = params.getG().powable();
 		Element pk = ElementUtils.base64StringToElement(destPublicKey,
 				g.getField());
 
 		// get a random k from group Zq
-		Element k = prep.getGroupZq().newRandomElement().getImmutable();
+		Element k = params.getGroupZq().newRandomElement().getImmutable();
 
 		// C = (lefts[], right)
 		// leftN = m[i]*Z^k
 		// right = g^(ak)
 		// It can be proven that g^(ak) = a^k, where a = destPublicKey
 
-		Element[] m = messageToElementsInGroup2(message);
+		Element[] m = ElementUtils.messageToElementsInGroup(message,
+				params.getGroup2());
 		Element right = pk.powZn(k);
 
 		return buildCipherTextFromMessage(m, right, k);
@@ -176,11 +176,11 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 	private String decryptReEncryptableCipherTextToPlainText(CipherText cipher,
 			String destSecretKey) {
 
-		ElementPowPreProcessing g = prep.getG().powable();
-		Pairing e = prep.getE();
+		ElementPowPreProcessing g = params.getG().powable();
+		Pairing e = params.getE();
 
 		Element sk = ElementUtils.base64StringToElement(destSecretKey,
-				prep.getGroupZq());
+				params.getGroupZq());
 
 		// M = sum(lefts[i]/e(right, g)^(1/a)), where a = destSecretKey
 		Element divisor = e.pairing(cipher.getRight(), g.powZn(sk.invert()));
@@ -198,7 +198,7 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 	private CipherText buildCipherTextFromMessage(Element[] m, Element right,
 			Element k) {
-		ElementPowPreProcessing z = prep.getZ().powable();
+		ElementPowPreProcessing z = params.getZ().powable();
 
 		CipherText cipherText = null;
 		Element leftN = null;
@@ -219,51 +219,11 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return cipherText;
 	}
 
-	private Element[] messageToElementsInGroup2(String message) {
-		ArrayList<Element> elements = new ArrayList<Element>();
-		Field<?> group2 = prep.getGroup2();
-
-		byte[] source = message.trim().getBytes();
-
-		int messageLengthInBytes = source.length;
-		int elementLengthInBytes = group2.getLengthInBytes();
-
-		// Need to make sure that the message length is divisible
-		// by the element length.
-		if (messageLengthInBytes < elementLengthInBytes) {
-			// If lesser, set message length equal to element length
-			source = Arrays.copyOf(source, elementLengthInBytes);
-		} else if (messageLengthInBytes > elementLengthInBytes) {
-			// If greater, set message length to a multiple of element length
-			int factor = messageLengthInBytes / elementLengthInBytes + 1;
-
-			source = Arrays.copyOf(source, factor * elementLengthInBytes);
-		}
-
-		messageLengthInBytes = source.length;
-
-		// Begin finding the elements in group 2
-		// representing the message
-		int offset = 0;
-		while (true) {
-			Element e = group2.newElement();
-			offset += e.setFromBytes(source, offset);
-			elements.add(e.getImmutable());
-
-			if (offset >= messageLengthInBytes) {
-				// Finished
-				break;
-			}
-		}
-
-		return elements.toArray(new Element[elements.size()]);
-	}
-
 	private CipherText parseCipherStringAsCipherText(String cipher,
 			Field<?> rightSourceField) {
 		byte[] source = Base64.getDecoder().decode(cipher);
 
-		Element leftN = prep.getGroup2().newElement();
+		Element leftN = params.getGroup2().newElement();
 		Element right = rightSourceField.newElement();
 
 		int elementLengthInBytes = leftN.getLengthInBytes();
@@ -289,10 +249,6 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 		return cipherText;
 	}
 
-	private String elementToBase64String(Element element) {
-		return Base64.getEncoder().encodeToString(element.toBytes());
-	}
-
 	private String mergeByteArraysToBase64String(byte[]... arrays) {
 		byte[] merged = arrays[0];
 
@@ -302,5 +258,4 @@ public class ProxyReEncryptionSchemeImpl implements ProxyReEncryptionScheme {
 
 		return Base64.getEncoder().encodeToString(merged);
 	}
-
 }
