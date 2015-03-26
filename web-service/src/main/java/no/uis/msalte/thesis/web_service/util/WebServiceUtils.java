@@ -1,16 +1,13 @@
 package no.uis.msalte.thesis.web_service.util;
 
-import java.io.BufferedReader;
+import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
-import no.uis.msalte.thesis.bit_torrent.App;
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShare;
 import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
 
@@ -19,7 +16,7 @@ public class WebServiceUtils {
 
 	public static final SecureCloudShare SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
 	public static final MultipartConfigElement MULTIPART_CONFIG = new MultipartConfigElement(
-			String.format("%s\\%s", App.DIR, DIR_TEMP));
+			String.format("%s\\%s", DIR_APP, DIR_TEMP));
 
 	public static File getFileResource(String fileName)
 			throws URISyntaxException {
@@ -47,21 +44,5 @@ public class WebServiceUtils {
 		}
 
 		return fileName;
-	}
-
-	public static String parseInputStream(InputStream is) throws IOException {
-		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		final StringBuilder response = new StringBuilder();
-
-		String line;
-
-		while ((line = br.readLine()) != null) {
-			response.append(line);
-		}
-
-		br.close();
-		is.close();
-
-		return response.toString();
 	}
 }

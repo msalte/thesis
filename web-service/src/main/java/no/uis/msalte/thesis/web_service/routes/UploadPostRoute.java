@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import javax.servlet.http.Part;
 
+import no.uis.msalte.thesis.common.util.InputStreamUtils;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
@@ -41,8 +42,7 @@ public class UploadPostRoute extends RouteImpl implements WebServiceRoute {
 			if (part.getName().equals(PARAM_FILE)) {
 				filePart = part;
 			} else if (part.getName().equals(PARAM_PUBLIC_KEY)) {
-				publicKey = WebServiceUtils.parseInputStream(part
-						.getInputStream());
+				publicKey = InputStreamUtils.parse(part.getInputStream());
 			}
 		}
 

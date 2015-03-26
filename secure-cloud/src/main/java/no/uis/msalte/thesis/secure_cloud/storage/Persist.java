@@ -1,5 +1,10 @@
 package no.uis.msalte.thesis.secure_cloud.storage;
 
+import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
+import static no.uis.msalte.thesis.common.AppConstants.DIR_DB;
+import static no.uis.msalte.thesis.common.AppConstants.FILE_DB;
+import static no.uis.msalte.thesis.common.AppConstants.IS_LOG_ENABLED;
+
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -7,7 +12,6 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import no.uis.msalte.thesis.secure_cloud.App;
 import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
 
 import org.mapdb.DB;
@@ -18,8 +22,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class Persist {
-	private static final String DIR_DB = "db";
-	private static final String FILE_DB = "secure_cloud";
 	
 	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping()
 			.create();
@@ -28,7 +30,6 @@ public class Persist {
 
 	private static final Logger LOGGER = Logger.getLogger(Persist.class
 			.getName());
-	private static final boolean IS_LOG_ENABLED = true;
 
 	private static Persist instance;
 
@@ -47,7 +48,7 @@ public class Persist {
 	}
 
 	private void init() {
-		String path = String.format("%s\\%s\\%s", App.DIR, DIR_DB, FILE_DB);
+		String path = String.format("%s\\%s\\%s", DIR_APP, DIR_DB, FILE_DB);
 		
 		db = DBMaker.newFileDB(new File(path)).closeOnJvmShutdown().make();
 	}

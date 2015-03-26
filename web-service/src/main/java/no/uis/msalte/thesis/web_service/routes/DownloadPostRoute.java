@@ -4,6 +4,7 @@ import java.net.HttpURLConnection;
 
 import javax.servlet.http.Part;
 
+import no.uis.msalte.thesis.common.util.InputStreamUtils;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
@@ -39,11 +40,9 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 			String name = part.getName();
 
 			if (name.equals(PARAM_FILE_NAME)) {
-				fileName = WebServiceUtils.parseInputStream(part
-						.getInputStream());
+				fileName = InputStreamUtils.parse(part.getInputStream());
 			} else if (name.equals(PARAM_PUBLIC_KEY)) {
-				publicKey = WebServiceUtils.parseInputStream(part
-						.getInputStream());
+				publicKey = InputStreamUtils.parse(part.getInputStream());
 			}
 		}
 
@@ -52,8 +51,8 @@ public class DownloadPostRoute extends RouteImpl implements WebServiceRoute {
 
 		if (isParamsValid) {
 			try {
-				final String file = WebServiceUtils.SECURE_CLOUD_SHARE.download(
-						fileName, publicKey);
+				final String file = WebServiceUtils.SECURE_CLOUD_SHARE
+						.download(fileName, publicKey);
 
 				final boolean hasAccess = file != null;
 

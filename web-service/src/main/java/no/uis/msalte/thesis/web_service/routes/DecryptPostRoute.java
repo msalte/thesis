@@ -4,6 +4,7 @@ import java.net.HttpURLConnection;
 
 import javax.servlet.http.Part;
 
+import no.uis.msalte.thesis.common.util.InputStreamUtils;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
 import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
@@ -39,11 +40,9 @@ public class DecryptPostRoute extends RouteImpl implements WebServiceRoute {
 			String name = part.getName();
 
 			if (name.equals(PARAM_CIPHERTEXT)) {
-				ciphertext = WebServiceUtils.parseInputStream(part
-						.getInputStream());
+				ciphertext = InputStreamUtils.parse(part.getInputStream());
 			} else if (name.equals(PARAM_SECRET_KEY)) {
-				secretKey = WebServiceUtils.parseInputStream(part
-						.getInputStream());
+				secretKey = InputStreamUtils.parse(part.getInputStream());
 			}
 		}
 

@@ -12,7 +12,7 @@ import com.turn.ttorrent.common.Torrent;
 
 public class TorrentUtils {
 	private static final int PIECE_LENGTH = 256 * 1000;
-	private static final String ANNOUNCE_URI = "http://10.0.5.84:6969/announce";
+	private static final String ANNOUNCE_URI = "http://10.0.5.90:6969/announce";
 
 	public static String create(String name, String token, File file) {
 		File torrent = null;

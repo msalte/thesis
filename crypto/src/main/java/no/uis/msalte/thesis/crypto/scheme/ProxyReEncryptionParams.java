@@ -1,18 +1,17 @@
 package no.uis.msalte.thesis.crypto.scheme;
 
+import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
+import static no.uis.msalte.thesis.common.AppConstants.DIR_CURVES;
+import static no.uis.msalte.thesis.common.AppConstants.FILE_CURVE;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
-import no.uis.msalte.thesis.crypto.App;
 import no.uis.msalte.thesis.crypto.model.PowableElement;
 import no.uis.msalte.thesis.crypto.util.ElementUtils;
 
 public class ProxyReEncryptionParams {
 	private static final String GENERATOR_BASE_64 = "P6PrrTuwA/qnfovO5Zf12Iolj8z4OxLe5IZkX1y0p3lTuPzMK04NJcNqmft35nYp7EK4m6CwaWFC6RWfkNf3fZg2rdbZEnYwhdNEnoSxLvfkkydF1lcSk5mce0WNlGqY43nFgPO6crpsg/BJZdxTC+Ju/QWp0jZAzbQbyvg8d/Y=";
-
-	private static final String DIR_CURVES = "jpbc-curves";
-	private static final String FILE_CURVE = "a.properties";
 
 	private Pairing e;
 	private Field<?> group1;
@@ -21,7 +20,7 @@ public class ProxyReEncryptionParams {
 	private PowableElement g, z;
 
 	public ProxyReEncryptionParams initialize() {
-		e = PairingFactory.getPairing(String.format("%s\\%s\\%s", App.DIR,
+		e = PairingFactory.getPairing(String.format("%s\\%s\\%s", DIR_APP,
 				DIR_CURVES, FILE_CURVE));
 
 		group1 = e.getG1();

@@ -1,5 +1,9 @@
 package no.uis.msalte.thesis.web_service.server;
 
+import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
+import static no.uis.msalte.thesis.common.AppConstants.DIR_TLS;
+import static no.uis.msalte.thesis.common.AppConstants.FILE_TLS_KEY_STORE;
+import static no.uis.msalte.thesis.common.AppConstants.FILE_TLS_KEY_STORE_PW;
 import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.SparkBase.externalStaticFileLocation;
@@ -10,8 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import spark.Spark;
-import no.uis.msalte.thesis.web_service.App;
+import no.uis.msalte.thesis.common.util.InputStreamUtils;
 import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
 import no.uis.msalte.thesis.web_service.routes.DecryptPostRoute;
 import no.uis.msalte.thesis.web_service.routes.DownloadPostRoute;
@@ -23,11 +26,9 @@ import no.uis.msalte.thesis.web_service.routes.SharePostRoute;
 import no.uis.msalte.thesis.web_service.routes.UploadPostRoute;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 import no.uis.msalte.thesis.web_service.util.WebServiceUtils;
+import spark.Spark;
 
 public class Server {
-	private static final String DIR_TLS = "tls";
-	private static final String FILE_TLS_KEY_STORE = "web_service.jks";
-	private static final String FILE_TLS_KEY_STORE_PW = "keystore.pw";
 
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
@@ -38,7 +39,7 @@ public class Server {
 		// ---- SETUP ---- //
 		port(HTTP_PORT);
 		secure(String
-				.format("%s\\%s\\%s", App.DIR, DIR_TLS, FILE_TLS_KEY_STORE),
+				.format("%s\\%s\\%s", DIR_APP, DIR_TLS, FILE_TLS_KEY_STORE),
 				parseKeyStorePassword(), null, null);
 		setStaticFileLocation();
 
@@ -76,11 +77,11 @@ public class Server {
 	}
 
 	private static String parseKeyStorePassword() {
-		String path = String.format("%s\\%s\\%s", App.DIR, DIR_TLS,
+		String path = String.format("%s\\%s\\%s", DIR_APP, DIR_TLS,
 				FILE_TLS_KEY_STORE_PW);
 
 		try {
-			return WebServiceUtils.parseInputStream(new FileInputStream(path));
+			return InputStreamUtils.parse(new FileInputStream(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
