@@ -28,7 +28,18 @@ public class ElementUtils {
 		return element.getImmutable();
 	}
 
-	public static Element[] messageToElementsInGroup(String message, Field<?> group) {
+	/**
+	 * Converts a plain text message into multiple Element objects
+	 * 
+	 * @param message
+	 *            The message to convert
+	 * @param group
+	 *            The group in which to find Element objects
+	 * @return An array of Element objects. Note that short messages will only
+	 *         require one Element.
+	 */
+	public static Element[] messageToElementsInGroup(String message,
+			Field<?> group) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 
 		byte[] source = message.trim().getBytes();
@@ -66,7 +77,14 @@ public class ElementUtils {
 
 		return elements.toArray(new Element[elements.size()]);
 	}
-	
+
+	/**
+	 * Converts an Element object into a Base64 encoded string
+	 * 
+	 * @param element
+	 *            The element to convert
+	 * @return The Base64 encoded string
+	 */
 	public static String elementToBase64String(Element element) {
 		return Base64.getEncoder().encodeToString(element.toBytes());
 	}
