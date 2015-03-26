@@ -17,4 +17,8 @@ public class AppConstants {
 	// Cryptography
 	public static final String DIR_CURVES = "jpbc-curves";
 	public static final String FILE_CURVE = "a.properties";
+	
+	// BitTorrent
+	public static final String ANNOUNCE_URI = "https://10.0.5.90:6969/announce";
+	public static final int PIECE_LENGTH = 256 * 1000;
 }

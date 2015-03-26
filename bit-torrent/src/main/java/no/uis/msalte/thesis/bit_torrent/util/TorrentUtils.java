@@ -1,5 +1,8 @@
 package no.uis.msalte.thesis.bit_torrent.util;
 
+import static no.uis.msalte.thesis.common.AppConstants.ANNOUNCE_URI;
+import static no.uis.msalte.thesis.common.AppConstants.PIECE_LENGTH;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,8 +14,6 @@ import java.util.Base64;
 import com.turn.ttorrent.common.Torrent;
 
 public class TorrentUtils {
-	private static final int PIECE_LENGTH = 256 * 1000;
-	private static final String ANNOUNCE_URI = "http://10.0.5.90:6969/announce";
 
 	public static String create(String name, String token, File file) {
 		File torrent = null;
