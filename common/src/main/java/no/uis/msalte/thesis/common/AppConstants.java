@@ -1,24 +1,59 @@
 package no.uis.msalte.thesis.common;
 
 public class AppConstants {
-	// Main
+	// ---- MAIN CONSTANTS ---- //
+	/**
+	 * The application's main directory, all other directories are
+	 * sub-directories of this.
+	 */
 	public static final String DIR_APP = "C:\\Users\\Morten\\Desktop\\app_dir";
+	/**
+	 * True if logging is enabled, false otherwise.
+	 */
 	public static final boolean IS_LOG_ENABLED = true;
-	
-	// Transport Layer Security (TLS)
+
+	// ---- TRANSPORT LAYER SECURITY (TLS) ---- //
+	/**
+	 * The directory containing all TLS related files.
+	 */
 	public static final String DIR_TLS = "tls";
+	/**
+	 * The Java KeyStore file.
+	 */
 	public static final String FILE_TLS_KEY_STORE = "web_service.jks";
+	/**
+	 * The file containing the Java KeyStore password.
+	 */
 	public static final String FILE_TLS_KEY_STORE_PW = "keystore.pw";
-	
-	// Database
+
+	// ---- DATABASE/PERSISTANCE LAYER ---- //
+	/**
+	 * The directory containing all database files.
+	 */
 	public static final String DIR_DB = "db";
+	/**
+	 * The database file.
+	 */
 	public static final String FILE_DB = "secure_cloud";
-	
-	// Cryptography
+
+	// ---- CRYPTOGRAPHY ---- //
+	/**
+	 * The directory containing the curve files for the Java Pairing-Based
+	 * Cryptography library.
+	 */
 	public static final String DIR_CURVES = "jpbc-curves";
+	/**
+	 * The curve in use by the AFGH implementation.
+	 */
 	public static final String FILE_CURVE = "a.properties";
-	
-	// BitTorrent
+
+	// ---- BITTORRENT ---- //
+	/**
+	 * The announce URI.
+	 */
 	public static final String ANNOUNCE_URI = "https://10.0.5.90:6969/announce";
+	/**
+	 * The piece length.
+	 */
 	public static final int PIECE_LENGTH = 256 * 1000;
 }
