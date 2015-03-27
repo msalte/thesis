@@ -1,7 +1,7 @@
 package no.uis.msalte.thesis.common;
 
 public class AppConstants {
-	// ---- MAIN CONSTANTS ---- //
+	// ---- GENERAL ---- //
 	/**
 	 * The application's main directory, all other directories are
 	 * sub-directories of this.
