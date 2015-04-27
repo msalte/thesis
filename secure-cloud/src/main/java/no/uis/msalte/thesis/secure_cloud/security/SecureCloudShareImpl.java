@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtils;
+import no.uis.msalte.thesis.common.AppConstants;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
 import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
@@ -21,7 +22,6 @@ import no.uis.msalte.thesis.secure_cloud.storage.Persist;
 public class SecureCloudShareImpl implements SecureCloudShare {
 	private static final Logger LOGGER = Logger
 			.getLogger(SecureCloudShareImpl.class.getName());
-	private static final boolean IS_LOG_ENABLED = true;
 
 	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
 	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl();
@@ -52,7 +52,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 				final String encryptedFile = scheme.encryptReEncryptable(
 						encodedFile, publicKey);
 
-				if (IS_LOG_ENABLED) {
+				if (AppConstants.IS_LOG_ENABLED) {
 					LOGGER.log(Level.INFO, String.format(
 							"Encrypted torrent %s with public key %s",
 							fileName, publicKey));
@@ -60,8 +60,10 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 				Persist.getInstance().storeTorrent(fileName, encryptedFile);
 
-				tracker.start();
-				tracker.announce(file);
+				if(AppConstants.IS_TRACKER_EMBEDDED) {
+					tracker.start();
+					tracker.announce(file);	
+				}
 
 				return fileName;
 			} catch (IOException e) {
@@ -78,7 +80,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		boolean isShareSuccess = Persist.getInstance().storeKeysTuple(fileName,
 				new KeyTuple(publicKey, reEncryptionKey));
 
-		if (IS_LOG_ENABLED) {
+		if (AppConstants.IS_LOG_ENABLED) {
 			LOGGER.log(Level.INFO, String.format(
 					"%s file %s with public key %s",
 					isShareSuccess ? "Successfully shared" : "Failed to share",
@@ -99,14 +101,14 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 			file = scheme.reEncrypt(file, reEncryptionKey);
 
-			if (IS_LOG_ENABLED) {
+			if (AppConstants.IS_LOG_ENABLED) {
 				LOGGER.log(Level.INFO, String.format(
 						"Re-encrypted file %s for download by public key %s",
 						fileName, publicKey));
 			}
 
 			return file;
-		} else if (IS_LOG_ENABLED) {
+		} else if (AppConstants.IS_LOG_ENABLED) {
 			LOGGER.log(
 					Level.INFO,
 					String.format(
@@ -127,7 +129,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		
 		final String torrent = TorrentUtils.create(torrentName, token, file);
 
-		if (torrent != null && IS_LOG_ENABLED) {
+		if (torrent != null && AppConstants.IS_LOG_ENABLED) {
 			LOGGER.log(Level.INFO, String.format(
 					"Created new torrent file %s.torrent", torrentName));
 		}
