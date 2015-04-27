@@ -56,4 +56,9 @@ public class AppConstants {
 	 * The piece length.
 	 */
 	public static final int PIECE_LENGTH = 256 * 1000;
+
+	/**
+	 * True if tracker is embedded, false otherwise
+	 */
+	public static final boolean IS_TRACKER_EMBEDDED = true;
 }
