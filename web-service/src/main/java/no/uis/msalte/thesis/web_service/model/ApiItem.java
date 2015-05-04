@@ -1,6 +1,6 @@
 package no.uis.msalte.thesis.web_service.model;
 
-public class ApiItem {
+public class ApiItem implements Comparable<ApiItem> {
 	private String function;
 	private String method;
 	private String details;
@@ -64,6 +64,11 @@ public class ApiItem {
 
 	public void setReturns(String returns) {
 		this.returns = returns;
+	}
+
+	@Override
+	public int compareTo(ApiItem other) {
+		return this.getFunction().compareTo(other.getFunction());
 	}
 
 }

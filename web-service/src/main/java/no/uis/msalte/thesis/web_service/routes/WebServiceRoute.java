@@ -42,7 +42,7 @@ public abstract class WebServiceRoute extends RouteImpl {
 		
 		// by default, treat as BAD_REQUEST
 		r.setStatus(HttpURLConnection.HTTP_BAD_REQUEST);
-		r.setMessage("Invalid parameters");
+		r.setMessage("Invalid parameter(s)");
 		r.setContent(null);
 		
 		if(isPostRoute) {

@@ -2,6 +2,7 @@ package no.uis.msalte.thesis.web_service.routes;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import no.uis.msalte.thesis.web_service.model.ApiItem;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
@@ -87,6 +88,16 @@ public class ApiGetRoute extends WebServiceRoute {
 				new String[] { "string", "base64" },
 				"Call this function to download an encrypted torrent. The public key refers to the destination's public key and must reflect a corresponding call to the share function.",
 				"The torrent file encrypted under the given public key and encoded as a Base64 string."));
+
+		content.add(new ApiItem(
+				METHOD_POST,
+				FUNC_ANNOUNCE,
+				new String[] { PARAM_FILE },
+				new String[] { "binary" },
+				"Call this function to manually announce a torrent on the system's tracker.",
+				"The torrent's new unique file name."));
+
+		Collections.sort(content);
 
 		r.setStatus(status);
 		r.setMessage(message);

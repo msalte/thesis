@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import no.uis.msalte.thesis.common.util.InputStreamUtils;
+import no.uis.msalte.thesis.web_service.routes.AnnouncePostRoute;
 import no.uis.msalte.thesis.web_service.routes.ApiGetRoute;
 import no.uis.msalte.thesis.web_service.routes.DecryptPostRoute;
 import no.uis.msalte.thesis.web_service.routes.DownloadPostRoute;
@@ -69,6 +70,9 @@ public class Server {
 				JSON_TRANSFORMER);
 
 		post(NewTorrentPostRoute.PATH, ACCEPT_TYPE, new NewTorrentPostRoute(),
+				JSON_TRANSFORMER);
+
+		post(AnnouncePostRoute.PATH, ACCEPT_TYPE, new AnnouncePostRoute(),
 				JSON_TRANSFORMER);
 	}
 
