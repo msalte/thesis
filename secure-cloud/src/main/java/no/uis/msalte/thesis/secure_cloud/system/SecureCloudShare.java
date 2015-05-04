@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.security;
+package no.uis.msalte.thesis.secure_cloud.system;
 
 import java.io.File;
 

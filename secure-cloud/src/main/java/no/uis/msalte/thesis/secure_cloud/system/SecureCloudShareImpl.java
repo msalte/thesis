@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.security;
+package no.uis.msalte.thesis.secure_cloud.system;
 
 import static no.uis.msalte.thesis.common.AppConstants.IS_LOG_ENABLED;
 import static no.uis.msalte.thesis.common.AppConstants.IS_TRACKER_EMBEDDED;
