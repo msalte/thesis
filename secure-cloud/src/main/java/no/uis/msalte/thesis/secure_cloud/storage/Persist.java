@@ -35,7 +35,7 @@ public class Persist {
 
 	private DB db;
 
-	protected Persist() {
+	private Persist() {
 		init();
 	}
 

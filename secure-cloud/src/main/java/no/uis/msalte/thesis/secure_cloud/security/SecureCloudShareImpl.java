@@ -25,19 +25,20 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	private static final Logger LOGGER = Logger
 			.getLogger(SecureCloudShareImpl.class.getName());
 
-	private BitTorrentTracker tracker = new BitTorrentTracker(6969);
-	private ProxyReEncryptionScheme scheme = new ProxyReEncryptionSchemeImpl();
+	private BitTorrentTracker bitTorrentTracker = new BitTorrentTracker(6969);
+	private ProxyReEncryptionScheme proxyReEncryptionScheme = new ProxyReEncryptionSchemeImpl();
 
 	public String newSecretKey() {
-		return scheme.newSecretKey();
+		return proxyReEncryptionScheme.newSecretKey();
 	}
 
 	public String newPublicKey(String secretKey) {
-		return scheme.newPublicKey(secretKey);
+		return proxyReEncryptionScheme.newPublicKey(secretKey);
 	}
 
 	public String newReEncryptionKey(String srcSecretKey, String destPublicKey) {
-		return scheme.newReEncryptionKey(srcSecretKey, destPublicKey);
+		return proxyReEncryptionScheme.newReEncryptionKey(srcSecretKey,
+				destPublicKey);
 	}
 
 	public String upload(File file, String publicKey) {
@@ -51,8 +52,8 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 				final String encodedFile = Base64.getEncoder().encodeToString(
 						bytes);
 
-				final String encryptedFile = scheme.encryptReEncryptable(
-						encodedFile, publicKey);
+				final String encryptedFile = proxyReEncryptionScheme
+						.encryptReEncryptable(encodedFile, publicKey);
 
 				if (IS_LOG_ENABLED) {
 					LOGGER.log(Level.INFO, String.format(
@@ -62,9 +63,9 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 
 				Persist.getInstance().storeTorrent(fileName, encryptedFile);
 
-				if(IS_TRACKER_EMBEDDED) {
-					tracker.start();
-					tracker.announce(file);	
+				if (IS_TRACKER_EMBEDDED) {
+					bitTorrentTracker.start();
+					bitTorrentTracker.announce(file);
 				}
 
 				return fileName;
@@ -101,7 +102,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		if (hasAccess) {
 			String file = Persist.getInstance().readTorrent(fileName);
 
-			file = scheme.reEncrypt(file, reEncryptionKey);
+			file = proxyReEncryptionScheme.reEncrypt(file, reEncryptionKey);
 
 			if (IS_LOG_ENABLED) {
 				LOGGER.log(Level.INFO, String.format(
@@ -128,7 +129,7 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 		// TODO store hash
 		// TODO compare hash on the tracker to validate clients
 		final String token = "security_token";
-		
+
 		final String torrent = TorrentUtils.create(torrentName, token, file);
 
 		if (torrent != null && IS_LOG_ENABLED) {
@@ -140,6 +141,17 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public String decrypt(String ciphertext, String secretKey) {
-		return scheme.decrypt(ciphertext, secretKey);
+		return proxyReEncryptionScheme.decrypt(ciphertext, secretKey);
+	}
+
+	public String announce(File file) {
+		if (TorrentUtils.isValidTorrent(file)) {
+			bitTorrentTracker.start();
+			bitTorrentTracker.announce(file);
+
+			return file.getName();
+		}
+
+		return null;
 	}
 }

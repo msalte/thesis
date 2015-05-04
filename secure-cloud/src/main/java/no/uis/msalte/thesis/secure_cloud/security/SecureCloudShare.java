@@ -88,4 +88,11 @@ public interface SecureCloudShare {
 	 * @return The torrent file, represented by a Base64 encoded string
 	 */
 	public String download(String fileName, String publicKey);
+	
+	/**
+	 * Announce a torrent on the system's BitTorrent tracker
+	 * @param file The torrent file
+	 * @return The torrent's file name
+	 */
+	public String announce(File file);
 }
