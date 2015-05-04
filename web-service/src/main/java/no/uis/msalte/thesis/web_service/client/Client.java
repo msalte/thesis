@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
+import no.uis.msalte.thesis.web_service.routes.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
 
 import org.apache.commons.httpclient.HttpClient;

@@ -5,19 +5,17 @@ import java.util.ArrayList;
 
 import no.uis.msalte.thesis.web_service.model.ApiItem;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
-import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
 import spark.Request;
 import spark.Response;
-import spark.RouteImpl;
 
-public class ApiGetRoute extends RouteImpl implements WebServiceRoute {
+public class ApiGetRoute extends WebServiceRoute {
 	public static final String PATH = String.format("/%s", FUNC_API);
 
 	private static final String METHOD_GET = "GET";
 	private static final String METHOD_POST = "POST";
 
 	public ApiGetRoute() {
-		super(PATH);
+		super(PATH, false);
 	}
 
 	@Override

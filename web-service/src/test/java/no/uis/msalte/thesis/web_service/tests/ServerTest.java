@@ -10,7 +10,7 @@ import java.util.Base64;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtils;
 import no.uis.msalte.thesis.web_service.client.Client;
 import no.uis.msalte.thesis.web_service.model.WebServiceResponse;
-import no.uis.msalte.thesis.web_service.model.WebServiceRoute;
+import no.uis.msalte.thesis.web_service.routes.WebServiceRoute;
 import no.uis.msalte.thesis.web_service.server.Server;
 import no.uis.msalte.thesis.web_service.util.JsonTransformer;
 
