@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.system;
+package no.uis.msalte.thesis.secure_share.system;
 
 import static no.uis.msalte.thesis.common.AppConstants.IS_LOG_ENABLED;
 import static no.uis.msalte.thesis.common.AppConstants.IS_TRACKER_EMBEDDED;
@@ -17,13 +17,13 @@ import no.uis.msalte.thesis.bit_torrent.tracker.BitTorrentTracker;
 import no.uis.msalte.thesis.bit_torrent.util.TorrentUtils;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionScheme;
 import no.uis.msalte.thesis.crypto.scheme.ProxyReEncryptionSchemeImpl;
-import no.uis.msalte.thesis.secure_cloud.access.AccessControl;
-import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
-import no.uis.msalte.thesis.secure_cloud.storage.Persist;
+import no.uis.msalte.thesis.secure_share.access.AccessControl;
+import no.uis.msalte.thesis.secure_share.model.KeyTuple;
+import no.uis.msalte.thesis.secure_share.storage.Persist;
 
-public class SecureCloudShareImpl implements SecureCloudShare {
+public class SecureShareImpl implements SecureShare {
 	private static final Logger LOGGER = Logger
-			.getLogger(SecureCloudShareImpl.class.getName());
+			.getLogger(SecureShareImpl.class.getName());
 
 	private BitTorrentTracker bitTorrentTracker = new BitTorrentTracker(6969);
 	private ProxyReEncryptionScheme proxyReEncryptionScheme = new ProxyReEncryptionSchemeImpl();

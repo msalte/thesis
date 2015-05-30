@@ -17,7 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>no.uis.msalte.thesis</groupId>
-			<artifactId>secure-cloud</artifactId>
+			<artifactId>secure-share</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>

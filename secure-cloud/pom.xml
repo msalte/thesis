@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>no.uis.msalte.thesis</groupId>
-	<artifactId>secure-cloud</artifactId>
+	<artifactId>secure-share</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>secure-cloud</name>
+	<name>secure-share</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>

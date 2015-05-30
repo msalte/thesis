@@ -8,13 +8,13 @@ import java.net.URISyntaxException;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
-import no.uis.msalte.thesis.secure_cloud.system.SecureCloudShare;
-import no.uis.msalte.thesis.secure_cloud.system.SecureCloudShareImpl;
+import no.uis.msalte.thesis.secure_share.system.SecureShare;
+import no.uis.msalte.thesis.secure_share.system.SecureShareImpl;
 
 public class WebServiceUtils {
 	private static final String DIR_TEMP = "temp";
 
-	public static final SecureCloudShare SECURE_CLOUD_SHARE = new SecureCloudShareImpl();
+	public static final SecureShare SECURE_CLOUD_SHARE = new SecureShareImpl();
 	public static final MultipartConfigElement MULTIPART_CONFIG = new MultipartConfigElement(
 			String.format("%s\\%s", DIR_APP, DIR_TEMP));
 

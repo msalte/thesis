@@ -1,7 +1,7 @@
-package no.uis.msalte.thesis.secure_cloud.access;
+package no.uis.msalte.thesis.secure_share.access;
 
-import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
-import no.uis.msalte.thesis.secure_cloud.storage.Persist;
+import no.uis.msalte.thesis.secure_share.model.KeyTuple;
+import no.uis.msalte.thesis.secure_share.storage.Persist;
 
 public class AccessControl {
 	

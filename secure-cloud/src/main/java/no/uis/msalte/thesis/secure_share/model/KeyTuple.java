@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.model;
+package no.uis.msalte.thesis.secure_share.model;
 
 public class KeyTuple {
 	private String publicKey;

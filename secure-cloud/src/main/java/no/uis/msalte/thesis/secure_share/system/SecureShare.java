@@ -1,8 +1,8 @@
-package no.uis.msalte.thesis.secure_cloud.system;
+package no.uis.msalte.thesis.secure_share.system;
 
 import java.io.File;
 
-public interface SecureCloudShare {
+public interface SecureShare {
 	/**
 	 * Generates a new torrent for the given file
 	 * 

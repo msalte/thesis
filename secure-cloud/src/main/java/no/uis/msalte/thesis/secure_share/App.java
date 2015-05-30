@@ -1,6 +1,6 @@
-package no.uis.msalte.thesis.secure_cloud;
+package no.uis.msalte.thesis.secure_share;
 
-import no.uis.msalte.thesis.secure_cloud.storage.Persist;
+import no.uis.msalte.thesis.secure_share.storage.Persist;
 
 public class App {
 	

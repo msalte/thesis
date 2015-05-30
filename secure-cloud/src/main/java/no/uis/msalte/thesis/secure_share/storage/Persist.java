@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud.storage;
+package no.uis.msalte.thesis.secure_share.storage;
 
 import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
 import static no.uis.msalte.thesis.common.AppConstants.DIR_DB;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import no.uis.msalte.thesis.secure_cloud.model.KeyTuple;
+import no.uis.msalte.thesis.secure_share.model.KeyTuple;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;

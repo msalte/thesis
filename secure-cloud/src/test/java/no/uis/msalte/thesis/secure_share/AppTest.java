@@ -1,4 +1,4 @@
-package no.uis.msalte.thesis.secure_cloud;
+package no.uis.msalte.thesis.secure_share;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
