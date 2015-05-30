@@ -50,7 +50,7 @@ public class ServerTest {
 		if (res.getStatus() == HttpURLConnection.HTTP_OK) {
 			String torrentBytes = res.getContent().toString();
 
-			assertTrue(TorrentUtils.isValidTorrent(torrentBytes));
+			assertTrue(TorrentUtils.isBase64ValidTorrent(torrentBytes));
 		} else {
 			assertTrue(false);
 		}

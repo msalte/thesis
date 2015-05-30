@@ -53,5 +53,4 @@ public class NewPublicKeyPostRoute extends WebServiceRoute {
 
 		return r;
 	}
-
 }

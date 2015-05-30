@@ -53,5 +53,4 @@ public abstract class WebServiceRoute extends RouteImpl {
 		
 		return r;
 	}
-
 }

@@ -123,14 +123,14 @@ public class SecureCloudShareImpl implements SecureCloudShare {
 	}
 
 	public String newTorrent(File file) {
-		final String torrentName = UUID.randomUUID().toString();
-
 		// TODO generate token randomly
 		// TODO store hash
 		// TODO compare hash on the tracker to validate clients
-		final String token = "security_token";
-
-		final String torrent = TorrentUtils.create(torrentName, token, file);
+		
+		final String torrentName = UUID.randomUUID().toString();
+		final String token = UUID.randomUUID().toString();
+		
+		final String torrent = TorrentUtils.createBase64(torrentName, token, file);
 
 		if (torrent != null && IS_LOG_ENABLED) {
 			LOGGER.log(Level.INFO, String.format(

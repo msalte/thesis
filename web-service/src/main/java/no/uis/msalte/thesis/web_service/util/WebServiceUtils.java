@@ -8,8 +8,8 @@ import java.net.URISyntaxException;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
-import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShare;
-import no.uis.msalte.thesis.secure_cloud.security.SecureCloudShareImpl;
+import no.uis.msalte.thesis.secure_cloud.system.SecureCloudShare;
+import no.uis.msalte.thesis.secure_cloud.system.SecureCloudShareImpl;
 
 public class WebServiceUtils {
 	private static final String DIR_TEMP = "temp";

@@ -15,7 +15,7 @@ import com.turn.ttorrent.common.Torrent;
 
 public class TorrentUtils {
 
-	public static String create(String name, String token, File file) {
+	public static String createBase64(String name, String token, File file) {
 		File torrent = null;
 		FileOutputStream fos = null;
 
@@ -60,7 +60,7 @@ public class TorrentUtils {
 		}
 	}
 
-	public static boolean isValidTorrent(String torrent) {
+	public static boolean isBase64ValidTorrent(String torrent) {
 		FileOutputStream fos = null;
 		File tmp = null;
 
@@ -92,9 +92,7 @@ public class TorrentUtils {
 
 		final Torrent torrent = Torrent.create(file, PIECE_LENGTH, announce,
 				TorrentUtils.class.getPackage().getName(), token);
-
-		// TODO look into the ability to avoid saving to disk at all and just
-		// return the bytes
+		
 		torrent.save(fos);
 
 		return torrent;
