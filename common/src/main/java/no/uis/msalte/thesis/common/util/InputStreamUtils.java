@@ -7,6 +7,14 @@ import java.io.InputStreamReader;
 
 public class InputStreamUtils {
 
+	/**
+	 * Parses an InputStream object to a String object
+	 * 
+	 * @param is
+	 *            The InputStream object to parse
+	 * @return The String object representing the InputStream's content
+	 * @throws IOException
+	 */
 	public static String parse(InputStream is) throws IOException {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		final StringBuilder sb = new StringBuilder();

@@ -1,11 +1,12 @@
 package no.uis.msalte.thesis.web_service.client;
 
+import static no.uis.msalte.thesis.common.AppConstants.WEB_SERVICE_PORT;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import no.uis.msalte.thesis.web_service.routes.WebServiceRoute;
-import no.uis.msalte.thesis.web_service.server.Server;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -21,7 +22,7 @@ public class Client {
 	private static final String URL_TEMPLATE = "https://localhost:%d/%s";
 
 	public static String get(String function) {
-		final String url = String.format(URL_TEMPLATE, Server.HTTP_PORT,
+		final String url = String.format(URL_TEMPLATE, WEB_SERVICE_PORT,
 				function);
 
 		try {
@@ -43,7 +44,7 @@ public class Client {
 
 	public static String post(String function, String[] params, String[] args,
 			File file) {
-		final String url = String.format(URL_TEMPLATE, Server.HTTP_PORT,
+		final String url = String.format(URL_TEMPLATE, WEB_SERVICE_PORT,
 				function);
 
 		int numParts = 0;

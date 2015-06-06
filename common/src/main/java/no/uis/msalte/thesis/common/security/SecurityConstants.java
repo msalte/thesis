@@ -22,11 +22,11 @@ public class SecurityConstants {
 	}
 
 	private static SSLContext buildSSLContext() {
-		String keystoreLocation = String.format("%s\\%s\\%s", DIR_APP, DIR_TLS,
-				FILE_TLS_KEY_STORE);
+		final String keystoreLocation = String.format("%s\\%s\\%s", DIR_APP,
+				DIR_TLS, FILE_TLS_KEY_STORE);
 
-		String passwordLocation = String.format("%s\\%s\\%s", DIR_APP, DIR_TLS,
-				FILE_TLS_KEY_STORE_PW);
+		final String passwordLocation = String.format("%s\\%s\\%s", DIR_APP,
+				DIR_TLS, FILE_TLS_KEY_STORE_PW);
 
 		FileInputStream fis = null;
 		SSLContext context = null;

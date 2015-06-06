@@ -2,6 +2,7 @@ package no.uis.msalte.thesis.web_service.server;
 
 import static no.uis.msalte.thesis.common.AppConstants.DIR_APP;
 import static no.uis.msalte.thesis.common.AppConstants.DIR_TLS;
+import static no.uis.msalte.thesis.common.AppConstants.WEB_SERVICE_PORT;
 import static no.uis.msalte.thesis.common.AppConstants.FILE_TLS_KEY_STORE;
 import static no.uis.msalte.thesis.common.AppConstants.FILE_TLS_KEY_STORE_PW;
 import static spark.Spark.get;
@@ -34,11 +35,9 @@ public class Server {
 	private static final String ACCEPT_TYPE = "application/json";
 	private static final JsonTransformer JSON_TRANSFORMER = new JsonTransformer();
 
-	public static final int HTTP_PORT = 9090;
-
 	public void start() {
 		// ---- SETUP ---- //
-		port(HTTP_PORT);
+		port(WEB_SERVICE_PORT);
 		secure(String
 				.format("%s\\%s\\%s", DIR_APP, DIR_TLS, FILE_TLS_KEY_STORE),
 				parseKeyStorePassword(), null, null);

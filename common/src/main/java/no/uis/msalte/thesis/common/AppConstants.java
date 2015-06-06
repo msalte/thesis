@@ -10,7 +10,7 @@ public class AppConstants {
 	/**
 	 * True if logging is enabled, false otherwise.
 	 */
-	public static final boolean IS_LOG_ENABLED = true;
+	public static final boolean IS_LOG_ENABLED = false;
 
 	// ---- TRANSPORT LAYER SECURITY (TLS) ---- //
 	/**
@@ -26,6 +26,12 @@ public class AppConstants {
 	 */
 	public static final String FILE_TLS_KEY_STORE_PW = "keystore.pw";
 
+	// ---- WEB SERVICE ---- //
+	/**
+	 * The port on which the web service's web server will listen
+	 */
+	public static final int WEB_SERVICE_PORT = 9090;
+	
 	// ---- DATABASE/PERSISTANCE LAYER ---- //
 	/**
 	 * The directory containing all database files.
@@ -34,7 +40,7 @@ public class AppConstants {
 	/**
 	 * The database file.
 	 */
-	public static final String FILE_DB = "secure_cloud";
+	public static final String FILE_DB = "secure_share";
 
 	// ---- CRYPTOGRAPHY ---- //
 	/**
@@ -49,11 +55,11 @@ public class AppConstants {
 
 	// ---- BITTORRENT ---- //
 	/**
-	 * The announce URI.
+	 * The BitTorrent tracker's announce URI.
 	 */
 	public static final String ANNOUNCE_URI = "https://10.0.5.90:6969/announce";
 	/**
-	 * The piece length.
+	 * The BitTorrent piece length.
 	 */
 	public static final int PIECE_LENGTH = 256 * 1000;
 
