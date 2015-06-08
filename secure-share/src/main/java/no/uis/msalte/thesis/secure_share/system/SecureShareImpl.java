@@ -122,7 +122,6 @@ public class SecureShareImpl implements SecureShare {
 		return null;
 	}
 
-	@SuppressWarnings("unused")
 	public String newTorrent(File file) {
 		final String torrentName = UUID.randomUUID().toString();
 		final String token = UUID.randomUUID().toString();

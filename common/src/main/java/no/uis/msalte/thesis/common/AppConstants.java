@@ -10,7 +10,7 @@ public class AppConstants {
 	/**
 	 * True if logging is enabled, false otherwise.
 	 */
-	public static final boolean IS_LOG_ENABLED = false;
+	public static final boolean IS_LOG_ENABLED = true;
 
 	// ---- TRANSPORT LAYER SECURITY (TLS) ---- //
 	/**
@@ -28,7 +28,7 @@ public class AppConstants {
 
 	// ---- WEB SERVICE ---- //
 	/**
-	 * The port on which the web service's web server will listen
+	 * The port on which the web service's web server will listen.
 	 */
 	public static final int WEB_SERVICE_PORT = 9090;
 	
@@ -55,7 +55,8 @@ public class AppConstants {
 
 	// ---- BITTORRENT ---- //
 	/**
-	 * The BitTorrent tracker's announce URI.
+	 * The BitTorrent tracker's announce URI. This is used in the
+	 * generation of torrent files. 
 	 */
 	public static final String ANNOUNCE_URI = "https://10.0.5.90:6969/announce";
 	/**
