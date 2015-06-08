@@ -122,11 +122,8 @@ public class SecureShareImpl implements SecureShare {
 		return null;
 	}
 
+	@SuppressWarnings("unused")
 	public String newTorrent(File file) {
-		// TODO generate token randomly
-		// TODO store hash
-		// TODO compare hash on the tracker to validate clients
-		
 		final String torrentName = UUID.randomUUID().toString();
 		final String token = UUID.randomUUID().toString();
 		

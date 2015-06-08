@@ -13,9 +13,6 @@ public interface SecureShare {
 	public String newTorrent(File file);
 
 	/**
-	 * <p>
-	 * TODO: Debate whether this function should exist.
-	 * </p>
 	 * Decrypts the ciphertext with the given secret key
 	 * 
 	 * @param ciphertext
