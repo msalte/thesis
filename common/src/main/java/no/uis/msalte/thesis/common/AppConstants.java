@@ -20,7 +20,7 @@ public class AppConstants {
 	/**
 	 * The Java KeyStore file.
 	 */
-	public static final String FILE_TLS_KEY_STORE = "web_service.jks";
+	public static final String FILE_TLS_KEY_STORE = "secure-share.jks";
 	/**
 	 * The file containing the Java KeyStore password.
 	 */
@@ -31,7 +31,7 @@ public class AppConstants {
 	 * The port on which the web service's web server will listen.
 	 */
 	public static final int WEB_SERVICE_PORT = 9090;
-	
+
 	// ---- DATABASE/PERSISTANCE LAYER ---- //
 	/**
 	 * The directory containing all database files.
@@ -40,7 +40,7 @@ public class AppConstants {
 	/**
 	 * The database file.
 	 */
-	public static final String FILE_DB = "secure_share";
+	public static final String FILE_DB = "secure-share";
 
 	// ---- CRYPTOGRAPHY ---- //
 	/**
@@ -55,10 +55,15 @@ public class AppConstants {
 
 	// ---- BITTORRENT ---- //
 	/**
-	 * The BitTorrent tracker's announce URI. This is used in the
-	 * generation of torrent files. 
+	 * The port on which the BitTorrent tracker will listen.
 	 */
-	public static final String ANNOUNCE_URI = "https://10.0.5.90:6969/announce";
+	public static final int TRACKER_PORT = 6969;
+
+	/**
+	 * The host name of the BitTorrent tracker.
+	 */
+	public static final String TRACKER_HOSTNAME = "10.0.5.90";
+
 	/**
 	 * The BitTorrent piece length.
 	 */

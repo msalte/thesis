@@ -1,6 +1,7 @@
 package no.uis.msalte.thesis.bit_torrent.util;
 
-import static no.uis.msalte.thesis.common.AppConstants.ANNOUNCE_URI;
+import static no.uis.msalte.thesis.common.AppConstants.TRACKER_HOSTNAME;
+import static no.uis.msalte.thesis.common.AppConstants.TRACKER_PORT;
 import static no.uis.msalte.thesis.common.AppConstants.PIECE_LENGTH;
 
 import java.io.File;
@@ -88,11 +89,12 @@ public class TorrentUtils {
 	private static Torrent writeBencodedContents(File file, String token,
 			FileOutputStream fos) throws InterruptedException, IOException {
 
-		final URI announce = URI.create(ANNOUNCE_URI);
-
+		final URI announce = URI.create(String.format("https://%s:%d/announce",
+				TRACKER_HOSTNAME, TRACKER_PORT));
+		
 		final Torrent torrent = Torrent.create(file, PIECE_LENGTH, announce,
 				TorrentUtils.class.getPackage().getName(), token);
-		
+
 		torrent.save(fos);
 
 		return torrent;
